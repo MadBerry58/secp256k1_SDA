@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/build",
+  "command": "/usr/bin/g++    -g   -std=gnu++14 -o CMakeFiles/secp256k1_SDA.dir/main.cpp.o -c /mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/main.cpp",
+  "file": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/main.cpp"
+},
+{
+  "directory": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/build",
+  "command": "/usr/bin/g++    -g   -std=gnu++14 -o CMakeFiles/secp256k1_SDA.dir/src/Point.cpp.o -c /mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/src/Point.cpp",
+  "file": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/src/Point.cpp"
+},
+{
+  "directory": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/build",
+  "command": "/usr/bin/g++    -g   -std=gnu++14 -o CMakeFiles/secp256k1_SDA.dir/src/Mod.cpp.o -c /mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/src/Mod.cpp",
+  "file": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/src/Mod.cpp"
+},
+{
+  "directory": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/build",
+  "command": "/usr/bin/g++    -g   -std=gnu++14 -o CMakeFiles/secp256k1_SDA.dir/src/Operators.cpp.o -c /mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/src/Operators.cpp",
+  "file": "/mnt/c/Users/muram/OneDrive/Desktop/Facultate/PCD/secp256k1_SDA/src/Operators.cpp"
+}
+]
