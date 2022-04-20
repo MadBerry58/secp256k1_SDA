@@ -3,6 +3,7 @@
 //
 
 #include "../include/Mod.h"
+
 mpz_t moduloHalb;
 mpz_t order;
 mpz_t prime;

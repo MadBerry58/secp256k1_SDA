@@ -24,7 +24,7 @@ Point::Point(const char xString[], const char yString[]) {
     mpz_init_set_d(n, 1);
     mpz_init_set_d(k, 0);
 }
-Point::Point(const char *xString, const char *yString,const char *kString) {
+Point::Point(const char *xString, const char *yString, const char *kString) {
     mpz_init_set_str(this->x, xString, 16);
     mpz_init_set_str(this->y, yString, 16);
     mpz_init_set_d(t1, 0);
@@ -34,6 +34,8 @@ Point::Point(const char *xString, const char *yString,const char *kString) {
     mpz_init_set_str(k, kString, 16);
     keyKnown = true;
 }
+
+
 Point::~Point(){
     mpz_clear(x);
     mpz_clear(y);
