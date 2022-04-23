@@ -47,6 +47,7 @@ int generatePointsFile(std::ofstream cardinalLSB_write, std::set<unsigned long> 
         cardinalLSB_write << A.getLSB() << "\n";
     }
     cardinalLSB_write.close();
+    return 0;
 }
 
 
@@ -108,6 +109,7 @@ int restoreCheckpoint(std::ifstream checkPoint_read, Point T , int* jump, Point 
     checkPoint_read.close();
     std::cout << "Checkpoint Restored\n";
     *pointLoaded = true;
+    return 0;
 }
     
 int resumeCheckpoint(std::ifstream checkPoint_read, Point T, Point runningT,Point runningNT, int* jump, bool* pointLoaded)
@@ -188,6 +190,7 @@ int resumeCheckpoint(std::ifstream checkPoint_read, Point T, Point runningT,Poin
     checkPoint_read.close();
     std::cout << "Checkpoint Restored\n";
     *pointLoaded = true;
+    return 0;
 }
 
 int loadPoints(std::ifstream cardinalLSB_read, bool* listLoaded){
@@ -210,6 +213,7 @@ int loadPoints(std::ifstream cardinalLSB_read, bool* listLoaded){
     std::cout << "Cardinal LSB list loaded\n"
               << "Elements in set: " << LSB_cardinal.size() << "\n";
     *listLoaded = true;
+    return 0;
 }
 
 int createNewTargetFile(Point T, Point runningT, Point runningNT, Point temp, mpz_t &search_space)
@@ -268,4 +272,5 @@ int createNewTargetFile(Point T, Point runningT, Point runningNT, Point temp, mp
     std::cout << "Negative point: \nxNT: " << runningNT.getX() << "\nyNT: " << runningNT.getY();
     *pointLoaded = true;
     jump = 0;
+    return 0;
 }

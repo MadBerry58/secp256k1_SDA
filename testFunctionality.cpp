@@ -1,7 +1,4 @@
-#ifndef OPERATORS
-#define OPERATORS
 #include "include/Operators.h"
-#endif
 
 int verboseTestRoutine(Point runningT, Point runningNT, Point temp, Point G, Point T, Point J, Point sJ, Point J2, mpz_t &container,
                        std::ofstream checkPoint_write, std::ifstream checkPoint_read, std::set<unsigned int> LSBset, mpz_t &counter,

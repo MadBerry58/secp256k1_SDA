@@ -155,6 +155,7 @@ int startIteration(bool &listLoaded, bool &pointLoaded, std::set<unsigned int> L
     {
         std::cout << "Point or Cardinal List not loaded\n";
     }
+    return 0;
 }
 
 int generateExplicitList(Point A, Point G, Point I, Point sI, Point J, Point sJ, int intervals, int subIntervals, std::ofstream cardinalPoints){
@@ -204,4 +205,5 @@ int generateExplicitList(Point A, Point G, Point I, Point sI, Point J, Point sJ,
         std::cout << "Exiting\n";
         
     }
+    return 0;
 }

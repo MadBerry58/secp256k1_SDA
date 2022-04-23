@@ -1,8 +1,8 @@
-#ifndef OPERATORS
-#define OPERATORS
 #include "include/Operators.h"
-#endif
 
+#include "testFunctionality.cpp"
+#include "filemanager.cpp"
+#include "filemanager.cpp"
 #include "threads.h"
 
 
@@ -48,6 +48,7 @@ int main() {
         switch(user_input){
             case 'G':  //////Generate cardinal points
                 //TODO: Generate points function
+                break;
 
             case 'L': /////Load cardinal points
                 //TODO: Load points function
