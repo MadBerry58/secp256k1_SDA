@@ -5,8 +5,9 @@
 #ifndef SECP251K1_SANDBOX_CONSTANTS_H
 #define SECP251K1_SANDBOX_CONSTANTS_H
 
-
 #define PREFFERED_BASE                                  16u
+#define LSB_HASH_SIZE                                   unsigned long
+
 
 /// Point generation errors
 #define GENERATION_E_OK                                 0u
@@ -18,6 +19,10 @@
 #define GENERATION_E_POINT_NUMBER_NOT_MATCHING          6u
 
 
+#define MEMORY_E_OK                                     64u
+#define MEMORY_E_VARIABLES_NOT_INITIALIZED              64u
+
+
 /// File stream errors
 #define FILE_E_OK                                       128u
 #define FILE_E_NOT_OPEN                                 129u
@@ -25,21 +30,27 @@
 
 /// File integrity errors
 #define INTEGRITY_E_OK                                  256u
-#define INTEGRITY_E_UNKNOWN_FILETYPE                    257u
-#define INTEGRITY_E_UNKNOWN_INITIAL_POINT               258u
-#define INTEGRITY_E_INVALID_INITIAL_POINT               259u
-#define INTEGRITY_E_UNKNOWN_SLICE_NUMBER                260u
-#define INTEGRITY_E_INVALID_SLICE_NUMBER                261u
-#define INTEGRITY_E_UNKNOWN_SLICE_SIZE                  262u
-#define INTEGRITY_E_UNKNOWN_POINTS_PER_SLICE            263u
-#define INTEGRITY_E_INVALID_POINTS_PER_SLICE            264u
-#define INTEGRITY_E_UNKNOWN_TOTAL_POINT_NUMBER          265u
-#define INTEGRITY_E_INVALID_TOTAL_POINT_NUMBER          266u
-#define INTEGRITY_E_POINT_NUMBERS_NOT_MATCHING          267u
-#define INTEGRITY_E_UNKNOWN_INCREMENT_SIZE              268u
-#define INTEGRITY_E_SLICE_SIZE_TOO_BIG                  269u
-#define INTEGRITY_E_INCREMENT_SIZE_TOO_BIG              270u
-#define INTEGRITY_E_INVALID_EOF_TOKEN                   271u
+#define INTEGRITY_E_FILETYPE_MISMATCH                   257u
+#define INTEGRITY_E_UNKNOWN_FILETYPE                    258u
+#define INTEGRITY_E_UNKNOWN_INITIAL_POINT               259u
+#define INTEGRITY_E_INVALID_INITIAL_POINT               260u
+#define INTEGRITY_E_UNKNOWN_TARGET_POINT                261u
+#define INTEGRITY_E_INVALID_TARGET_POINT                262u
+#define INTEGRITY_E_UNKNOWN_SLICE_NUMBER                263u
+#define INTEGRITY_E_INVALID_SLICE_NUMBER                264u
+#define INTEGRITY_E_UNKNOWN_SLICE_SIZE                  265u
+#define INTEGRITY_E_UNKNOWN_POINTS_PER_SLICE            266u
+#define INTEGRITY_E_INVALID_POINTS_PER_SLICE            267u
+#define INTEGRITY_E_UNKNOWN_TOTAL_POINT_NUMBER          268u
+#define INTEGRITY_E_INVALID_TOTAL_POINT_NUMBER          269u
+#define INTEGRITY_E_UNKNOWN_ITERATIONs_NUMBER           270u
+#define INTEGRITY_E_POINT_NUMBERS_NOT_MATCHING          271u
+#define INTEGRITY_E_UNKNOWN_INCREMENT_SIZE              272u
+#define INTEGRITY_E_SLICE_SIZE_TOO_BIG                  273u
+#define INTEGRITY_E_INCREMENT_SIZE_TOO_BIG              274u
+#define INTEGRITY_E_UNKNOWN_EOF_TOKEN                   275u
+#define INTEGRITY_E_INVALID_EOF_TOKEN                   275u
+
 
 /// Verbose point generation errors
 #define VERBOSE_GENERATION_E_OK                         "Point generation parameters are valid"
@@ -62,10 +73,12 @@
 #define SLICE_SIZE_TAG "SLICE_SIZE"
 #define POINTS_PER_SLICE_TAG "POINTS_PER_sLICE"
 #define TOTAL_POINT_NUMBER_TAG "TOTAL_POINTS"
+#define ITERATION_NUMBER_TAG "ITERATION_NUMBER"
 #define INCREMENT_SIZE_TAG "INCREMENT_SIZE"
 #define EOF_TAG "EOF"
 #define GENERATED_POINTS_EOF_TAG "GENERATED_POINTS_EOF"
 #define CHECKPOINT_EOF_TAG "CHECKPOINT_EOF"
+
 
 /// Known file types
 #define FILETYPE_UNCOMPRESSED_POINTS                    0u
@@ -75,6 +88,7 @@
 #define FILETYPE_UNKNOWN                                4u
 
 
+///Elliptic Curve Parameters
 #define moduloHalb_String "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE17"
 #define order_String "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"
 #define orderMinusOneDivTwo_String "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0"
@@ -82,13 +96,15 @@
 #define primeMinusOne_String "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2E"
 #define primePlusOneDivFour_String "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
 #define kG_String "1"
+
+
 /// G multiples
 
 /// G * 2^0
 #define xG_String "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
 #define yG_String "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
 
-// TODO: add the multiples of G for efficient multiplication
+/// TODO: add the multiples of G for efficient multiplication
 /// G * 2^1
 /// G * 2^2
 /// G * 2^3

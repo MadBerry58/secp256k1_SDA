@@ -43,8 +43,8 @@ public:
     char*           getX                ();
     char*           getY                ();
     char*           getK                ();
-    unsigned long   getLSB              ();
-    
+    LSB_HASH_SIZE   getLSB              ();
+
     ///Setters
     void            setK                (const char *k, int base, bool known);
     void            setX                (const char *x, int base);
