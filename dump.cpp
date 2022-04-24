@@ -27,3 +27,51 @@ auto subJumps = 18522; // 0x485A
 char ksJ[] = "145B4081CC2E32B538FE828E3D0E59728A42D47EC1F61721CB3";
 char xsJ[] = "3f20f070b21dc3d8502c2bc963d072fe3a4f6499983e281a425043f1188fc443";
 char ysJ[] = "88728e6a46fc44c9a3aaf6f08f7f62626a58ed30de614afb75c903ab15c5a652";
+
+int generatePointsFile_old(std::ofstream cardinalLSB_write, std::set<unsigned long> LSBset, Point G, Point I, Point sI, Point J, Point sJ, Point A, int intervals, int subIntervals)
+{
+    bool *listLoaded;
+    cardinalLSB_write.open("cardinalLSB");
+    LSBset.insert(G.getLSB());
+    cardinalLSB_write << G.getLSB() << "\n";
+    LSBset.insert(I.getLSB());
+    cardinalLSB_write << I.getLSB() << "\n";
+    LSBset.insert(sI.getLSB());
+    cardinalLSB_write << sI.getLSB() << "\n";
+    LSBset.insert(J.getLSB());
+    cardinalLSB_write << J.getLSB() << "\n";
+    LSBset.insert(sJ.getLSB());
+    cardinalLSB_write << sJ.getLSB() << "\n";
+    char user_input = 's';
+    // TODO: create a filename generator to output multiple files.
+
+    std::cout << "The list needs 2.5GB of disk space and will take a good while. Are you sure?(Y/n)\n";
+    std::cin >> user_input;
+    if (user_input == 'Y')
+    {
+        std::cout << "Generating new LSB file\n";
+        /// TODO: Generate cardinal Points function
+        std::cout << "Cardinal point file generated\n";
+        // std::cout << "Elements in set: "<< LSB_cardinal.size() << "\n";
+        *listLoaded = true;
+    }
+    else
+    {
+        std::cout << "Exiting to menu\n";
+    }
+
+    for (int i = 0; i < intervals / 2; ++i)
+    {
+        for (int j = 0; j < subIntervals; ++j)
+        {
+            A.addPoint(A, sI);
+            LSBset.insert(A.getLSB());
+            cardinalLSB_write << A.getLSB() << "\n";
+        }
+        A.addPoint(A, G);
+        LSBset.insert(A.getLSB());
+        cardinalLSB_write << A.getLSB() << "\n";
+    }
+    cardinalLSB_write.close();
+    return 0;
+}

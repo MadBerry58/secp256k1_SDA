@@ -1,117 +1,327 @@
 #include "include/Operators.h"
 
-int generatePointsFile(std::ofstream cardinalLSB_write, std::set<unsigned long> LSBset, Point G, Point I , Point sI, Point J, Point sJ, Point A,  int intervals, int subIntervals){
-    bool* listLoaded;
-    cardinalLSB_write.open("cardinalLSB");
-    LSBset.insert(G.getLSB());
-    cardinalLSB_write << G.getLSB() << "\n";
-    LSBset.insert(I.getLSB());
-    cardinalLSB_write << I.getLSB() << "\n";
-    LSBset.insert(sI.getLSB());
-    cardinalLSB_write << sI.getLSB() << "\n";
-    LSBset.insert(J.getLSB());
-    cardinalLSB_write << J.getLSB() << "\n";
-    LSBset.insert(sJ.getLSB());
-    cardinalLSB_write << sJ.getLSB() << "\n";
-    char user_input = 's';
-    // TODO: create a filename generator to output multiple files.
+#ifndef SECP251K1_SANDBOX_FILEMANAGER_H
+#define SECP251K1_SANDBOX_FILEMANAGER_H
 
-    std::cout << "The list needs 2.5GB of disk space and will take a good while. Are you sure?(Y/n)\n";
-    // TODO: preallocate needed space
-    // TODO: add low entropy bitsets
-    std::cin >> user_input;
-    if (user_input == 'Y')
+extern mpz_t orderHalf;
+mpz_t temp;
+mpz_t incrementSizeContainer;
+mpz_t sliceSizeContainer;
+mpz_t sliceRemainderContainer;
+Point tempPoint;
+Point remainderPoint;
+
+int fileManager_Init()
+{
+    tempPoint.reset();
+    remainderPoint.reset();
+    mpz_init(temp);
+    mpz_init(incrementSizeContainer);
+    mpz_init(sliceSizeContainer);
+    mpz_init(sliceRemainderContainer);
+}
+
+int generationSanityCheck(Point startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &incrementSize)
+{
+    ///TODO: check for negative inputs
+    mpz_set_d(temp, 0);
+    if(startingPoint.getK())
     {
-        std::cout << "Generating new LSB file\n";
-        /// TODO: Generate cardinal Points function
-        std::cout << "Cardinal point file generated\n";
-        // std::cout << "Elements in set: "<< LSB_cardinal.size() << "\n";
-        *listLoaded = true;
+        return GENERATION_E_UNKNOWN_POINT_KEY;
+    }
+    
+    if(numberOfSlices > numberOfPoints)
+    {
+        return GENERATION_E_TOO_MANY_SLICES;
+    }
+    else if (numberOfSlices < 1)
+    {
+        return GENERATION_E_NO_SLICES;
+    }
+
+    if ((numberOfSlices == 1) && (pointsPerSlice != numberOfPoints))
+    {
+        return GENERATION_E_POINT_NUMBER_NOT_MATCHING;
+    }
+    else if(pointsPerSlice * numberOfSlices > numberOfPoints)
+    {
+        return GENERATION_E_TOO_MANY_POINTS_PER_SLICE;
+    }
+
+    mpz_mul_ui(temp, incrementSize, numberOfPoints);
+    if(mpz_cmp(temp, orderHalf))
+    {
+        return GENERATION_E_POINTS_OUTSIDE_RANGE;
+    }
+
+    return GENERATION_E_OK;
+}
+
+int generateHashedPointsFile(std::ofstream outputFile, Point startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
+{
+    ////TODO: preallocate needed space
+    ////TODO: add low entropy bitsets
+
+    if (outputFile.is_open())
+    {
+        outputFile << HASHED_POINTS_FILE_TAG << "\n"
+                   << STARTING_POINT_TAG << "\n"
+                   << startingPoint.getK() << "\n"
+                   << startingPoint.getX() << "\n"
+                   << startingPoint.getY() << "\n"
+                   << SLICE_NUMBER_TAG << "\n"
+                   << numberOfSlices << "\n"
+                   << POINTS_PER_SLICE_TAG << "\n"
+                   << pointsPerSlice << "\n"
+                   << INCREMENT_SIZE_TAG << "\n"
+                   << mpz_get_str(NULL, 16, incrementSize) << "\n"
+                   << TOTAL_POINT_NUMBER_TAG << "\n"
+                   << numberOfPoints << "\n";
+
+        mpz_mod(sliceRemainderContainer, sliceSize, incrementSize);
+        remainderPoint *= sliceRemainderContainer;
+
+        Point incrementPoint;
+        incrementPoint *= incrementSize;
+
+        for (unsigned long i = 0; i < numberOfSlices; ++i)
+        {
+            /// outputFile << SLICE_ << i << "\n";
+            outputFile << startingPoint.getLSB() << "\n";
+            for (unsigned long j = 0; j < pointsPerSlice; ++j)
+            {
+                startingPoint += incrementPoint;
+                outputFile << startingPoint.getLSB() << "\n";
+            }
+            startingPoint += remainderPoint;
+        }
+        outputFile << EOF_TAG << "\n"
+                   << GENERATED_POINTS_EOF_TAG << "\n"
+                   << startingPoint.getLSB() << "\n";
     }
     else
     {
-        std::cout << "Exiting to menu\n";
+        return FILE_E_NOT_OPEN;
     }
-    
-
-    for (int i = 0; i < intervals / 2; ++i)
-    {
-        for (int j = 0; j < subIntervals; ++j)
-        {
-            A.addPoint(A, sI);
-            LSBset.insert(A.getLSB());
-            cardinalLSB_write << A.getLSB() << "\n";
-        }
-        A.addPoint(A, G);
-        LSBset.insert(A.getLSB());
-        cardinalLSB_write << A.getLSB() << "\n";
-    }
-    cardinalLSB_write.close();
-    return 0;
 }
 
-
-int restoreCheckpoint(std::ifstream checkPoint_read, Point T , int* jump, Point runningT, Point runningNT, bool* pointLoaded)
+int generateUncompressedPointsFile(std::ofstream outputFile, Point startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
 {
+    ////TODO: implement validation before calling the function
+    // TODO: preallocate needed space
+    // TODO: add low entropy bitsets
+
+    if (outputFile.is_open())
+    {
+        outputFile << UNCOMPRESSED_POINTS_FILE_TAG << "\n"
+                   << STARTING_POINT_TAG << "\n"
+                   << startingPoint.getK() << "\n"
+                   << startingPoint.getX() << "\n"
+                   << startingPoint.getY() << "\n"
+                   << SLICE_NUMBER_TAG << "\n"
+                   << numberOfSlices << "\n"
+                   << SLICE_SIZE_TAG << "\n"
+                   << mpz_get_str(NULL, 16, incrementSize) << "\n"
+                   << POINTS_PER_SLICE_TAG << "\n"
+                   << pointsPerSlice << "\n"
+                   << TOTAL_POINT_NUMBER_TAG << "\n"
+                   << numberOfPoints << "\n"
+                   << INCREMENT_SIZE_TAG << "\n"
+                   << mpz_get_str(NULL, 16, incrementSize) << "\n";
+
+        Point remainderPoint;
+        mpz_mod(sliceRemainderContainer, sliceSize, incrementSize);
+        remainderPoint *= sliceRemainderContainer;
+
+        Point incrementPoint;
+        incrementPoint *= incrementSize;
+
+        for (unsigned long i = 0; i < numberOfSlices; ++i)
+        {
+            /// outputFile << SLICE_ << i << "\n";
+            outputFile  << startingPoint.getK() << "\n"
+                        << startingPoint.getX() << "\n"
+                        << startingPoint.getY() << "\n";
+            for (unsigned long j = 0; j < pointsPerSlice; ++j)
+            {
+                startingPoint += incrementPoint;
+                outputFile  << startingPoint.getK() << "\n"
+                            << startingPoint.getX() << "\n"
+                            << startingPoint.getY() << "\n";
+            }
+            startingPoint += remainderPoint;
+        }
+        outputFile << EOF_TAG << "\n"
+                   << GENERATED_POINTS_EOF_TAG << "\n"
+                   << startingPoint.getLSB() << "\n";
+    }
+    else
+    {
+        return FILE_E_NOT_OPEN;
+    }
+}
+
+int generateCheckpointFile(std::ofstream outputFile, Point targetPoint, unsigned int iterationNumber, )
+
+int checkFileIntegrity(std::ifstream inputFile)
+{
+    int integrityError = INTEGRITY_E_OK;
     std::string line;
-    mpz_t counter;
-    checkPoint_read.open("checkpoint");
-    if(checkPoint_read.is_open()){
-        getline(checkPoint_read, line);
-        if ("Target" == line){
-            getline(checkPoint_read, line);
-            T.setX(line.c_str(), 16);
-            getline(checkPoint_read, line);
-            T.setY(line.c_str(), 16);
-            std::cout << "Target:\nX: " << T.getX() << "\nY: "<< T.getY() <<"\n";
-            if(!T.checkY()){std::cout << "Target not valid\n";
-            ///TODO: add error handling
+    unsigned int fileType = FILETYPE_UNKNOWN;
+    unsigned long long sliceNumber = 0, pointsPerSlice = 0, totalPoints = 0;
+    if(inputFile.is_open())
+    {
+        getline(inputFile, line);
+        if(line == UNCOMPRESSED_POINTS_FILE_TAG)
+        {
+            fileType = FILETYPE_UNCOMPRESSED_POINTS;
+        }
+        else if(line == COMPRESSED_POINTS_FILE_TAG)
+        {
+            fileType = FILETYPE_COMPRESSED_POINTS;
+        }
+        else if(line == HASHED_POINTS_FILE_TAG)
+        {
+            fileType = FILETYPE_HASHED_POINTS;
+        }
+        else if(line == CHECKPOINT_FILE_TAG)
+        {
+            fileType = FILETYPE_CHECKPOINT;
+        }
+        else
+        {
+            return INTEGRITY_E_UNKNOWN_FILETYPE;
+        }
+
+        getline(inputFile, line);
+        if( (line == STARTING_POINT_TAG) || (line == TARGET_POINT_TAG) )
+        {
+            getline(inputFile, line);
+            tempPoint.setK(line.c_str(), PREFFERED_BASE, (fileType != FILETYPE_CHECKPOINT));
+
+            getline(inputFile, line);
+            tempPoint.setX(line.c_str(), PREFFERED_BASE);
+            
+            getline(inputFile, line);
+            tempPoint.setY(line.c_str(), PREFFERED_BASE);
+            
+            if(tempPoint.checkY() == false)
+            {
+                return INTEGRITY_E_INVALID_INITIAL_POINT;
             }
         }
         else
         {
-            std::cout << "Target not found\n";
+            return INTEGRITY_E_UNKNOWN_INITIAL_POINT;
         }
-        getline(checkPoint_read, line);
-        if ("Iteration" == line) {
-            getline(checkPoint_read, line);
-            mpz_set_str(counter, line.c_str(), 10);
-        } 
-        else 
+
+        getline(inputFile, line);
+        if (line == SLICE_NUMBER_TAG)
         {
-            std::cout << "Iteration count not found\n";
+            getline(inputFile, line);
+            sliceNumber = std::stoll(line, 0, PREFFERED_BASE);
         }
-        getline(checkPoint_read, line);
-        if ("Jump" == line) {
-            getline(checkPoint_read, line);
-            *jump = std::stoi(line);
-            std::cout << "Jump:\n" << jump <<"\n";
-        } else {std::cout << "Jump not found\n";}
-        getline(checkPoint_read, line);
-        if ("Running pTarget" == line) {
-            getline(checkPoint_read, line);
-            runningT.setX(line.c_str(), 16);
-            getline(checkPoint_read, line);
-            runningT.setY(line.c_str(), 16);
-            std::cout << "Running pTarget:\nX: " << runningT.getX() << "\nY: "<< runningT.getY() <<"\n";
-        }else{std::cout << "pTarget not found\n";}
-        getline(checkPoint_read, line);
-        if ("Running nTarget" == line) {
-            getline(checkPoint_read, line);
-            runningNT.setX(line.c_str(), 16);
-            getline(checkPoint_read, line);
-            runningNT.setY(line.c_str(), 16);
-            std::cout << "Running nTarget:\nX: " << runningNT.getX() << "\nY: "<< runningNT.getY() <<"\n";
-        }else{std::cout << "nTarget not found\n";}
-        //TODO: compare  (Target + temp) to pTarget
-        //TODO: compare (-Target + temp) to nTarget
+        else
+        {
+            return INTEGRITY_E_UNKNOWN_SLICE_NUMBER;
+        }
+
+        getline(inputFile, line);
+        if (line == SLICE_SIZE_TAG)
+        {
+            getline(inputFile, line);
+            mpz_set_str(sliceSizeContainer, line.c_str(), PREFFERED_BASE);
+        }
+        else
+        {
+            return INTEGRITY_E_UNKNOWN_SLICE_SIZE;
+        }
+
+        getline(inputFile, line);
+        if (line == POINTS_PER_SLICE_TAG)
+        {
+            getline(inputFile, line);
+            pointsPerSlice = std::stoll(line, 0, PREFFERED_BASE);
+        }
+        else
+        {
+            return INTEGRITY_E_UNKNOWN_POINTS_PER_SLICE;
+        }
+
+        getline(inputFile, line);
+        if (line == TOTAL_POINT_NUMBER_TAG)
+        {
+            getline(inputFile, line);
+            totalPoints = std::stoll(line, 0, PREFFERED_BASE);
+        }
+        else
+        {
+            return INTEGRITY_E_UNKNOWN_TOTAL_POINT_NUMBER;
+        }
+
+        if ( ( (sliceNumber == 1) && (totalPoints != pointsPerSlice) ) || ((sliceNumber >  1) && (totalPoints != (sliceNumber * pointsPerSlice)) ) )
+        {
+            return INTEGRITY_E_POINT_NUMBERS_NOT_MATCHING;
+        }
+
+        getline(inputFile, line);
+        if (line == INCREMENT_SIZE_TAG)
+        {
+            getline(inputFile, line);
+            mpz_set_str(incrementSizeContainer, line.c_str(), PREFFERED_BASE);
+        }
+        else
+        {
+            return INTEGRITY_E_UNKNOWN_INCREMENT_SIZE;
+        }
+
+        if(sliceNumber > 1)
+        {
+            mpz_mul_ui(temp, sliceSizeContainer, sliceNumber);
+            if(mpz_cmp(temp, orderHalf))
+            {
+                return INTEGRITY_E_SLICE_SIZE_TOO_BIG;
+            }
+        }
+
+        mpz_mul_ui(temp, incrementSizeContainer, pointsPerSlice);
+        if(mpz_cmp(temp, sliceSizeContainer)) /// in the case of one slice , the slice size is equal to orderHalf; in the case of multiple slices, total increments inside the slice must be smaller or equal than the slice size
+        {
+            return INTEGRITY_E_INCREMENT_SIZE_TOO_BIG;
+        }
+
+        while(line != EOF_TAG)
+        {
+            getline(inputFile, line);
+        }
+        getline(inputFile, line);
+        if( (line == GENERATED_POINTS_EOF_TAG)
+        {
+            if(sliceNumber > 1)
+            {
+                mpz_mul_ui(temp, sliceSizeContainer, sliceNumber);
+            }
+            else
+            {
+                mpz_mul_ui(temp, incrementSizeContainer, totalPoints);
+            }
+            tempPoint.reset();
+            tempPoint *= temp;
+            getline(inputFile, line);
+            if (std::stol(NULL, line, PREFFERED_BASE) != tempPoint.getLSB())
+            {
+                return INTEGRITY_E_INVALID_EOF_TOKEN;
+            }
+        }
     }
-    checkPoint_read.close();
-    std::cout << "Checkpoint Restored\n";
-    *pointLoaded = true;
-    return 0;
+    else
+    {
+        return FILE_E_NOT_OPEN;
+    }
+    return INTEGRITY_E_OK;
 }
-    
+
+ 
 int resumeCheckpoint(std::ifstream checkPoint_read, Point T, Point runningT,Point runningNT, int* jump, bool* pointLoaded)
 {
     std::string line;
@@ -123,9 +333,9 @@ int resumeCheckpoint(std::ifstream checkPoint_read, Point T, Point runningT,Poin
         if ("Target" == line)
         {
             getline(checkPoint_read, line);
-            T.setX(line.c_str(), 16);
+            T.setX(line.c_str(), PREFFERED_BASE);
             getline(checkPoint_read, line);
-            T.setY(line.c_str(), 16);
+            T.setY(line.c_str(), PREFFERED_BASE);
             std::cout << "Target:\nX: " << T.getX() << "\nY: " << T.getY() << "\n";
             if (!T.checkY())
             {
@@ -162,9 +372,9 @@ int resumeCheckpoint(std::ifstream checkPoint_read, Point T, Point runningT,Poin
         if ("Running pTarget" == line)
         {
             getline(checkPoint_read, line);
-            runningT.setX(line.c_str(), 16);
+            runningT.setX(line.c_str(), PREFFERED_BASE);
             getline(checkPoint_read, line);
-            runningT.setY(line.c_str(), 16);
+            runningT.setY(line.c_str(), PREFFERED_BASE);
             std::cout << "Running pTarget:\nX: " << runningT.getX() << "\nY: " << runningT.getY() << "\n";
         }
         else
@@ -175,9 +385,9 @@ int resumeCheckpoint(std::ifstream checkPoint_read, Point T, Point runningT,Poin
         if ("Running nTarget" == line)
         {
             getline(checkPoint_read, line);
-            runningNT.setX(line.c_str(), 16);
+            runningNT.setX(line.c_str(), PREFFERED_BASE);
             getline(checkPoint_read, line);
-            runningNT.setY(line.c_str(), 16);
+            runningNT.setY(line.c_str(), PREFFERED_BASE);
             std::cout << "Running nTarget:\nX: " << runningNT.getX() << "\nY: " << runningNT.getY() << "\n";
         }
         else
@@ -222,17 +432,17 @@ int createNewTargetFile(Point T, Point runningT, Point runningNT, Point temp, mp
     mpz_t counter;
     std::string userBuffer;
     bool* pointLoaded;
-    std::cout << "Insert target's X coordinate (base 16)\n";
+    std::cout << "Insert target's X coordinate (base PREFFERED_BASE)\n";
     std::cin >> userBuffer;
-    T.setX(userBuffer.c_str(), 16);
-    runningT.setX(userBuffer.c_str(), 16);
-    runningNT.setX(userBuffer.c_str(), 16);
+    T.setX(userBuffer.c_str(), PREFFERED_BASE);
+    runningT.setX(userBuffer.c_str(), PREFFERED_BASE);
+    runningNT.setX(userBuffer.c_str(), PREFFERED_BASE);
 
-    std::cout << "Insert target's Y coordinate (base 16)\n";
+    std::cout << "Insert target's Y coordinate (base PREFFERED_BASE)\n";
     std::cin >> userBuffer;
-    T.setY(userBuffer.c_str(), 16);
-    runningT.setY(userBuffer.c_str(), 16);
-    runningNT.setY(userBuffer.c_str(), 16);
+    T.setY(userBuffer.c_str(), PREFFERED_BASE);
+    runningT.setY(userBuffer.c_str(), PREFFERED_BASE);
+    runningNT.setY(userBuffer.c_str(), PREFFERED_BASE);
     runningNT.negate(); /// prepare point -T
 
     if (T.checkY())
@@ -249,7 +459,7 @@ int createNewTargetFile(Point T, Point runningT, Point runningNT, Point temp, mp
     std::cout << "Insert iteration counter (base 10)\n";
     std::cin >> userBuffer;
     mpz_set_str(counter, userBuffer.c_str(), 10);
-    mpz_init_set_str(search_space, "2044472428167007402249549317371870405449633012157584065567923", 10);
+    mpz_init_set_str(search_space, "2044472428PREFFERED_BASE7007402249549317371870405449633012157584065567923", 10);
 
     if (mpz_cmp(search_space, counter) && (mpz_cmp_ui(counter, 0) > -1))
     {
@@ -274,3 +484,5 @@ int createNewTargetFile(Point T, Point runningT, Point runningNT, Point temp, mp
     jump = 0;
     return 0;
 }
+
+#endif // SECP251K1_SANDBOX_FILEMANAGER_H
