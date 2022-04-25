@@ -2,7 +2,7 @@
 #define SECP251K1_SANDBOX_FILEMANAGER_H
 #include "../../src/headers/Operators.h"
 
-typedef struct targetStringProfile
+struct targetStringProfile
 {
     std::string targetPoint;
     std::string checkOutPoint;
@@ -13,7 +13,7 @@ typedef struct targetStringProfile
     std::string pointsPerSlice;
 };
 
-typedef struct pointsStringProfile
+struct pointsStringProfile
 {
     std::string initialPoint;
     std::string finalPoint;
@@ -25,7 +25,7 @@ typedef struct pointsStringProfile
     std::set<LSB_HASH_SIZE>* knownSet;
 };
 
-int fileManager_Init();
+void fileManager_Init();
 int generationSanityCheck(Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &incrementSize);
 int generateHashedPointsFile(std::ofstream outputFile, Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);
 int generate_file_uncompressedPoints(std::ofstream outputFile, Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);

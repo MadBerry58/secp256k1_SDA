@@ -15,7 +15,7 @@ Point tempPoint;
 Point containerPoint;
 Point remainderPoint;
 
-int fileManager_Init()
+void fileManager_Init()
 {
     tempPoint.reset();
     remainderPoint.reset();
@@ -24,6 +24,7 @@ int fileManager_Init()
     mpz_init(incrementSizeContainer);
     mpz_init(sliceSizeContainer);
     mpz_init(sliceRemainderContainer);
+    gmp_printf("fileManager_Init() works\n");
 }
 
 int generationSanityCheck(Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &incrementSize)
@@ -108,6 +109,7 @@ int generateHashedPointsFile(std::ofstream outputFile, Point &startingPoint, uns
     {
         return FILE_E_NOT_OPEN;
     }
+    return GENERATION_E_OK;
 }
 
 int generate_file_uncompressedPoints(std::ofstream outputFile, Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
@@ -164,6 +166,7 @@ int generate_file_uncompressedPoints(std::ofstream outputFile, Point &startingPo
     {
         return FILE_E_NOT_OPEN;
     }
+    return GENERATION_E_OK;
 }
 
 int generate_file_checkpoint(std::ofstream outputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
@@ -194,10 +197,12 @@ int generate_file_checkpoint(std::ofstream outputFile, Point &targetPoint, Point
     {
         return FILE_E_NOT_OPEN;
     }
+    return CHECKPOINT_E_OK;
 }
 
-int checkIntegrity_file_checkpoint(std::ifstream &inputFile, bool writeToParameters = false, Point &output_targetPoint, Point &output_checkOutPoint, unsigned int output_iterationNumber, 
-                                   unsigned int output_numberOfSlices, unsigned int output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize)
+int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targetPoint, Point &output_checkOutPoint, unsigned int output_iterationNumber,
+                                   unsigned int output_numberOfSlices, unsigned int output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize, 
+                                   bool writeToParameters = false)
 {
     int integrityError = INTEGRITY_E_OK;
     std::string line;

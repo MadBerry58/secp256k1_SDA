@@ -1,6 +1,6 @@
 #include "headers/memoryManager.h"
 
-int pointProfile_Init(targetProfile* profile)
+void pointProfile_Init(targetProfile* profile)
 {
     profile->checkOutPoint.reset();
     profile->targetPoint.reset();
@@ -11,7 +11,7 @@ int pointProfile_Init(targetProfile* profile)
     mpz_init_set_si(profile->sliceSize, 0u);
 }
 
-int targetProfile_Init(pointsProfile* profile)
+void targetProfile_Init(pointsProfile* profile)
 {
     profile->finalPoint.reset();
     profile->initialPoint.reset();
@@ -25,7 +25,7 @@ int targetProfile_Init(pointsProfile* profile)
 
 int read_file_checkpoint(std::ifstream &inputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
 {
-    
+    return 0;
 }
 
 int loadPoints(std::ifstream cardinalLSB_read, bool *listLoaded)

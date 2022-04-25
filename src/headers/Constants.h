@@ -18,6 +18,8 @@
 #define GENERATION_E_NO_SLICES                          5u
 #define GENERATION_E_POINT_NUMBER_NOT_MATCHING          6u
 
+#define CHECKPOINT_E_OK                                 32u
+
 
 #define MEMORY_E_OK                                     64u
 #define MEMORY_E_VARIABLES_NOT_INITIALIZED              64u
