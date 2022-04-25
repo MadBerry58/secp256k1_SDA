@@ -2,4 +2,4 @@ build/**
 CMakeFiles/**
 .vscode/**
 workspace.code-workspace
-dump.cpp
+dump/**
