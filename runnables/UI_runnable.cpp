@@ -69,8 +69,19 @@ int userInterface_Start()
 
         case 'T': /////Activate test mode
             /// TODO: Enter test mode
-            std::cout << "Generate known points file\n"
-                      << UNIMPLEMENTED_FUNCTIONALITY_TAG << "\n";
+            std::cout << "Test program functionality\n"
+                      << FUNCTIONALITY_IN_DEVELOPMENT_TAG << "\n";
+            while (user_input != 'b')
+            {
+                std::cout << "\n\nPlease select an option: \n(T)est basic functionality\n";
+                std::cin >> user_input;
+                switch(user_input)
+                {
+                    case 'T':
+                        testFunctionality();
+                        break;
+                }
+            }
             break;
 
         default:

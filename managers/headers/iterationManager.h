@@ -1,0 +1,5 @@
+#ifndef SECP251K1_SANDBOX_ITERATIONMANAGER_H
+#define SECP251K1_SANDBOX_ITERATIONMANAGER_H
+#include "../../src/headers/Operators.h"
+
+#endif // #ifndef SECP251K1_SANDBOX_ITERATIONMANAGER_H

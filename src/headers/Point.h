@@ -4,6 +4,7 @@
 
 #ifndef SECP251K1_SANDBOX_POINT_H
 #define SECP251K1_SANDBOX_POINT_H
+#include <cstring>
 #include "Mod.h"
 
 class Point{
@@ -53,7 +54,7 @@ public:
     void            setFromK            (const char *kValue, int base); 
     
     ///Printout functions
-    void            printPointInfo      (char *pointName);
+    void            printPointInfo      ();
     void            printDec            ();
     void            printHex            ();
     

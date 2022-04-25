@@ -1,4 +1,4 @@
-#include "headers/functionality.h"
+#include "headers/iterationManager.h"
 
 int startIteration(bool &listLoaded, bool &pointLoaded, std::set<unsigned int> LSBset, Point runningT, Point runningNT, mpz_t &counter, std::ofstream matches_write,
                    int &jump, int subJumps, int jumps, std::ofstream checkPoint_write, Point sJ, Point G, Point T, Point J2)

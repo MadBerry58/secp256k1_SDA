@@ -10,10 +10,4 @@ set(src_files
     Point.cpp
     headers/Point.h
 )
-
-add_library(srcLib  ${src_files})
-
-target_link_libraries( srcLib
-        "/usr/lib/x86_64-linux-gnu/libgmp.a"
-        "/usr/lib/x86_64-linux-gnu/libgmpxx.a"
-)
+add_library(srcLib SHARED ${src_files})

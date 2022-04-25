@@ -4,6 +4,7 @@
 
 #include "headers/Mod.h"
 
+///Leave this here or everything goes to shit
 mpz_t moduloHalb;
 mpz_t order;
 mpz_t orderHalf;
@@ -20,15 +21,16 @@ mpz_t six;
 mpz_t seven;
 mpz_t t1;
 mpz_t t2;
+/// Leave this here or everything goes to shit
 
 void modInit()
 {
-    mpz_init_set_str(moduloHalb, moduloHalb_String, 16);
-    mpz_init_set_str(order, order_String, 16);
-    mpz_init_set_str(prime, prime_String, 16);
-    mpz_init_set_str(primeMinusOne, primeMinusOne_String, 16);
-    mpz_init_set_str(primePlusOneDivFour, primePlusOneDivFour_String, 16);
-    mpz_init_set_str(orderHalf, orderMinusOneDivTwo_String, 16);
+    mpz_init_set_str(moduloHalb, moduloHalb_String, PREFFERED_BASE);
+    mpz_init_set_str(order, order_String, PREFFERED_BASE);
+    mpz_init_set_str(prime, prime_String, PREFFERED_BASE);
+    mpz_init_set_str(primeMinusOne, primeMinusOne_String, PREFFERED_BASE);
+    mpz_init_set_str(primePlusOneDivFour, primePlusOneDivFour_String, PREFFERED_BASE);
+    mpz_init_set_str(orderHalf, orderMinusOneDivTwo_String, PREFFERED_BASE);
     mpz_init_set_d(zero, 0);
     mpz_init_set_d(one, 1);
     mpz_init_set_d(two, 2);

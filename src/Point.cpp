@@ -4,10 +4,12 @@
     Wrapper functions are provided for ease of use
     Overloaded operators are provided as wrappers for ease of use. Do ~NOT~ use for critical functionality
 */
-
-#include <cstring>
+#ifndef SECP256K1_SANDBOX_POINT_CPP
+#define SECP256K1_SANDBOX_POINT_CPP
 #include "headers/Point.h"
+
 extern mpz_t moduloHalb;
+extern mpz_t order;
 extern mpz_t one;
 extern mpz_t two;
 extern mpz_t three;
@@ -15,7 +17,6 @@ extern mpz_t four;
 extern mpz_t five;
 extern mpz_t six;
 extern mpz_t seven;
-
 
 ///Affine (cartesian) points
 Point::Point()
@@ -133,8 +134,6 @@ void Point::operator*=(mpz_t &factor)
     }
 }
 
-
-
 void Point::negate() 
 {
     neg(y, y);
@@ -184,10 +183,14 @@ void Point::multiplyBy2(Point &result)
     mul     (t1, m, result.x);  // t1       = (3 * x^2) / (2 * sqrt(x^3 + 7)) * result.x
     add     (t2, t1, n);        // t2       = (3 * x^2) / (2 * sqrt(x^3 + 7)) * result.x + n
     neg     (result.y, t2);     // result.y = -((3 * x^2) / (2 * sqrt(x^3 + 7)) * result.x + n)
+
+    mpz_mul_2exp(result.k, result.k, 1);
+    mpz_mod(result.k, result.k, order);
 }
 
 void Point::multiplyByFactor(Point &result, mpz_t &factor)
 {
+    ///TODO: implement key addition functionality
     unsigned int factorSize = mpz_sizeinbase(factor, 2);
     Point temp(xG_String, yG_String);
     mpz_set(temp.x, this->x);
@@ -213,20 +216,9 @@ void Point::multiplyByFactor(Point &result, mpz_t &factor)
     }
 }
 
-
-
 char *Point::getK() 
 {
-    if(keyKnown)
-    {
-        return mpz_get_str(outputString, PREFFERED_BASE, k);
-    }
-    else
-    {
-        mpz_get_str(outputString, PREFFERED_BASE, k);
-        strcat(outputString, "+");
-        return outputString;
-    }
+    return mpz_get_str(outputString, PREFFERED_BASE, k);
 }
 
 char *Point::getX()
@@ -271,15 +263,16 @@ void Point::reset()
 
 
 
-void Point::printPointInfo(char *pointName)
+void Point::printPointInfo()
 {
-    gmp_printf("Point ", pointName);
+
+    gmp_printf("K: %Zx\n",    k);
+    gmp_printf("X: %Zx\n",    x);
+    gmp_printf("Y: %Zx\n",      y);
     if(keyKnown)
     {
-        gmp_printf("\nK: %Zx", k);
+        gmp_printf("key unknown\n");
     }
-    gmp_printf("\nX: %Zx\n", x);
-    gmp_printf("Y: %Zx\n", y);
 }
 
 void Point::printDec()
@@ -336,3 +329,5 @@ char *Point::generateY()
 ///Jacoby (cartesian) points
 
 ///TODO: Implement Jacoby type operations for accelerated point multiplication
+
+#endif /// SECP256K1_SANDBOX_POINT_CPP

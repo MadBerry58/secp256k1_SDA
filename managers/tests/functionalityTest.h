@@ -1,7 +1,40 @@
-#ifndef SECP251K1_SANDBOX_FUNCTIONALITY_TEST_H
-#define SECP251K1_SANDBOX_FUNCTIONALITY_TEST_H
-#include "../../src/headers/Operators.h"
+#ifndef SECP251K1_SANDBOX_ITERATION_TEST_H
+#define SECP251K1_SANDBOX_ITERATION_TEST_H
+#include "../../src/headers/Point.h"
+#include "../../managers/headers/fileManager.h"
 
+#define TESTING_AUTOMATIC       0u
+#define TESTING_MANUAL          1u
+#define TEST_FAILED             0u
+#define TEST_PASSED             1u
+
+int testFunctionality(bool testingType = TESTING_MANUAL)
+{
+    ///generate points from from 2^0 to 2^256
+    std::ofstream Gfile;
+    Gfile.open("GFile");
+    if(Gfile.is_open())
+    {
+        mpz_t factor;
+        mpz_init_set_ui(factor, 2); //Test mpz functionality
+        Point G; ///Test basic point initialiser
+        G.printPointInfo();
+        for(int i = 0; i < 256; i++)
+        {
+            Gfile << "#define kG" << i << "_String \"" << G.getK() << "\"\n"
+                  << "#define xG" << i << "_String \"" << G.getX() << "\"\n"
+                  << "#define yG" << i << "_String \"" << G.getY() << "\"\n\n";
+            G *= factor;
+        }
+
+    }
+    else
+    {
+        std::cout << "Could not open file" << "\n";
+    }
+    Gfile.close();
+    return TEST_PASSED;
+}
 // int verboseTestRoutine(Point runningT, Point runningNT, Point temp, Point G, Point T, Point J, Point sJ, Point J2, mpz_t &container,
 //                        std::ofstream checkPoint_write, std::ifstream checkPoint_read, std::set<unsigned int> LSBset, mpz_t &counter,
 //                        mpz_t &search_space)
@@ -506,4 +539,4 @@
 //     return 0;
 // }
 
-#endif // SECP251K1_SANDBOX_FUNCTIONALITY_TEST_H
+#endif // SECP251K1_SANDBOX_ITERATION_TEST_H

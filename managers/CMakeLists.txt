@@ -2,8 +2,8 @@ set(manager_files
     headers/fileManager.h
     fileManager.cpp
 
-    headers/functionality.h
-    functionality.cpp
+    headers/iterationManager.h
+    iterationManager.cpp
     
     headers/memoryManager.h
     memoryManager.cpp
@@ -14,7 +14,4 @@ set(manager_files
     headers/threadManager.h
     threadManager.cpp
 )
-
-add_library(managerLib ${manager_files})
-
-target_link_libraries(managerLib srcLib)
+add_library(managerLib SHARED ${manager_files})

@@ -1,5 +1,0 @@
-#ifndef SECP251K1_SANDBOX_FUNCTIONALITY_H
-#define SECP251K1_SANDBOX_FUNCTIONALITY_H
-#include "../../src/headers/Operators.h"
-
-#endif // SECP251K1_SANDBOX_FUNCTIONALITY_H
