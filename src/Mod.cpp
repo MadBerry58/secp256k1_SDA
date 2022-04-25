@@ -2,7 +2,7 @@
 // Created by blackberry on 10.01.2021.
 //
 
-#include "../include/Mod.h"
+#include "headers/Mod.h"
 
 mpz_t moduloHalb;
 mpz_t order;

@@ -1,10 +1,11 @@
 //
 // Created by blackberry on 10.01.2021.
 
-#include "gmp.h"
-#include "Constants.h"
 #ifndef SECP251K1_SANDBOX_MOD_H
 #define SECP251K1_SANDBOX_MOD_H
+
+#include "gmp.h"
+#include "Constants.h"
 
 void modInit();
 void printConstants();

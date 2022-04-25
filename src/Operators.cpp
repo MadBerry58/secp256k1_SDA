@@ -1,7 +1,7 @@
 //
 // Created by blackberry on 25.01.2021.
 //
-#include "../include/Operators.h"
+#include "headers/Operators.h"
 
 void saveMatch(/* jump, iteration, match X, fileName */){
     /* Save iteration

@@ -78,6 +78,7 @@
 #define EOF_TAG "EOF"
 #define GENERATED_POINTS_EOF_TAG "GENERATED_POINTS_EOF"
 #define CHECKPOINT_EOF_TAG "CHECKPOINT_EOF"
+#define UNIMPLEMENTED_FUNCTIONALITY_TAG "Unimplemented yet"
 
 
 /// Known file types
@@ -97,7 +98,6 @@
 #define primePlusOneDivFour_String "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
 #define kG_String "1"
 
-
 /// G multiples
 
 /// G * 2^0
@@ -106,6 +106,10 @@
 
 /// TODO: add the multiples of G for efficient multiplication
 /// G * 2^1
+
+#define x2G_String ""
+#define y2G_String ""
+
 /// G * 2^2
 /// G * 2^3
 /// G * 2^4

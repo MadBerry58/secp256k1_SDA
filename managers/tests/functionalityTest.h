@@ -1,4 +1,6 @@
-#include "include/Operators.h"
+#ifndef SECP251K1_SANDBOX_FUNCTIONALITY_TEST_H
+#define SECP251K1_SANDBOX_FUNCTIONALITY_TEST_H
+#include "../../src/headers/Operators.h"
 
 int verboseTestRoutine(Point runningT, Point runningNT, Point temp, Point G, Point T, Point J, Point sJ, Point J2, mpz_t &container,
                        std::ofstream checkPoint_write, std::ifstream checkPoint_read, std::set<unsigned int> LSBset, mpz_t &counter,
@@ -503,3 +505,5 @@ int verboseTestRoutine(Point runningT, Point runningNT, Point temp, Point G, Poi
     }
     return 0;
 }
+
+#endif // SECP251K1_SANDBOX_FUNCTIONALITY_TEST_H

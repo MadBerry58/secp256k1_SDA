@@ -1,8 +1,4 @@
-#include "include/Operators.h"
-
-#ifndef SECP251K1_SANDBOX_FILEMANAGER_H
-#define SECP251K1_SANDBOX_FILEMANAGER_H
-
+#include "headers/fileManager.h"
 /*
     fileManager.cpp
     Provides the functionality for saving, loading and checking files used by the program
@@ -200,10 +196,8 @@ int generate_file_checkpoint(std::ofstream outputFile, Point &targetPoint, Point
     }
 }
 
-int checkIntegrity_file_checkpoint(std::ifstream &inputFile, bool writeToParameters = false,
-                                   Point &output_targetPoint, Point &output_checkOutPoint,
-                                   unsigned int output_iterationNumber, unsigned int output_numberOfSlices,
-                                   unsigned int output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize)
+int checkIntegrity_file_checkpoint(std::ifstream &inputFile, bool writeToParameters = false, Point &output_targetPoint, Point &output_checkOutPoint, unsigned int output_iterationNumber, 
+                                   unsigned int output_numberOfSlices, unsigned int output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize)
 {
     int integrityError = INTEGRITY_E_OK;
     std::string line;
@@ -329,8 +323,8 @@ int checkIntegrity_file_checkpoint(std::ifstream &inputFile, bool writeToParamet
         output_checkOutPoint = tempPoint;
         output_iterationNumber = totalIterations;
         output_numberOfSlices = sliceNumber;
-        output_sliceSize = sliceSizeContainer;
         output_pointsPerSlice = pointsPerSlice;
+        mpz_set(output_sliceSize, sliceSizeContainer);
     }
 
     return INTEGRITY_E_OK;
@@ -468,7 +462,9 @@ int checkIntegrity_file_generatedPoints(std::ifstream &inputFile)
     {
         getline(inputFile, line);
     }
+
     getline(inputFile, line);
+    
     if (line == GENERATED_POINTS_EOF_TAG)
     {
         if(sliceNumber > 1)
@@ -479,9 +475,12 @@ int checkIntegrity_file_generatedPoints(std::ifstream &inputFile)
         {
             mpz_mul_ui(temp, incrementSizeContainer, totalPoints);
         }
+    
         tempPoint.reset();
         tempPoint *= temp;
+    
         getline(inputFile, line);
+    
         if (std::stol(line, NULL, PREFFERED_BASE) != tempPoint.getLSB())
         {
             return INTEGRITY_E_INVALID_EOF_TOKEN;
@@ -498,108 +497,7 @@ int checkIntegrity_file_generatedPoints(std::ifstream &inputFile)
 int resumeGeneration();
 int expandGeneratedList();
 
-int read_file_checkpoint(std::ifstream &inputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
-{
-    std::string line;
-    mpz_t counter;
-    if (inputFile.is_open())
-    {
-        getline(inputFile, line);
-        if ("Target" == line)
-        {
-            getline(inputFile, line);
-            T.setX(line.c_str(), PREFFERED_BASE);
-            getline(inputFile, line);
-            T.setY(line.c_str(), PREFFERED_BASE);
-            std::cout << "Target:\nX: " << T.getX() << "\nY: " << T.getY() << "\n";
-            if (!T.checkY())
-            {
-                std::cout << "Target not valid\n";
-            }
-        }
-        else
-        {
-            std::cout << "Target not found\n";
-        }
-        getline(checkPoint_read, line);
-        if ("Iteration" == line)
-        {
-            getline(checkPoint_read, line);
-            mpz_set_str(counter, line.c_str(), 10);
-        }
-        else
-        {
-            std::cout << "Iteration count not found\n";
-        }
-        getline(checkPoint_read, line);
-        if ("Jump" == line)
-        {
-            getline(checkPoint_read, line);
-            *jump = std::stoi(line);
-            std::cout << "Jump:\n"
-                      << jump << "\n";
-        }
-        else
-        {
-            std::cout << "Jump not found\n";
-        }
-        getline(checkPoint_read, line);
-        if ("Running pTarget" == line)
-        {
-            getline(checkPoint_read, line);
-            runningT.setX(line.c_str(), PREFFERED_BASE);
-            getline(checkPoint_read, line);
-            runningT.setY(line.c_str(), PREFFERED_BASE);
-            std::cout << "Running pTarget:\nX: " << runningT.getX() << "\nY: " << runningT.getY() << "\n";
-        }
-        else
-        {
-            std::cout << "pTarget not found\n";
-        }
-        getline(checkPoint_read, line);
-        if ("Running nTarget" == line)
-        {
-            getline(checkPoint_read, line);
-            runningNT.setX(line.c_str(), PREFFERED_BASE);
-            getline(checkPoint_read, line);
-            runningNT.setY(line.c_str(), PREFFERED_BASE);
-            std::cout << "Running nTarget:\nX: " << runningNT.getX() << "\nY: " << runningNT.getY() << "\n";
-        }
-        else
-        {
-            std::cout << "nTarget not found\n";
-        }
-        // TODO: compare  (Target + temp) to pTarget
-        // TODO: compare (-Target + temp) to nTarget
-    }
-    checkPoint_read.close();
-    std::cout << "Checkpoint Restored\n";
-    *pointLoaded = true;
-    return 0;
-}
 
-int loadPoints(std::ifstream cardinalLSB_read, bool* listLoaded){
-    std::string line;
-    std::set<unsigned long> LSB_cardinal;
-    cardinalLSB_read.open("cardinalLSB");
-    if (cardinalLSB_read.is_open())
-    {
-        std::cout << "Loading cardinal LSB file\n";
-        while (getline(cardinalLSB_read, line))
-        {
-            LSB_cardinal.insert(std::stoul(line));
-        }
-        cardinalLSB_read.close();
-    }
-    else
-    {
-        std::cout << "Could not open cardinalLSB file\n";
-    }
-    std::cout << "Cardinal LSB list loaded\n"
-              << "Elements in set: " << LSB_cardinal.size() << "\n";
-    *listLoaded = true;
-    return 0;
-}
 
 int createNewTargetFile(Point T, Point runningT, Point runningNT, Point temp, mpz_t &search_space)
 {
@@ -659,5 +557,3 @@ int createNewTargetFile(Point T, Point runningT, Point runningNT, Point temp, mp
     jump = 0;
     return 0;
 }
-
-#endif // SECP251K1_SANDBOX_FILEMANAGER_H

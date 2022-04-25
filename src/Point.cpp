@@ -6,7 +6,7 @@
 */
 
 #include <cstring>
-#include "../include/Point.h"
+#include "headers/Point.h"
 extern mpz_t moduloHalb;
 extern mpz_t one;
 extern mpz_t two;
