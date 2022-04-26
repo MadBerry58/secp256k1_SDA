@@ -41,6 +41,9 @@ jobs:
             cd build
             make
       - run:
+          name: "List the created files"
+          command: ls
+      - run:
           name: "Save executable"
           command: |
             mkdir ../linux_package
