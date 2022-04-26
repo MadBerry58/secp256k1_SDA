@@ -30,7 +30,9 @@ jobs:
   build:
     machine:
       image: ubuntu-2004:current
+    working_directory: ~/secp256k1
     steps:
+      - checkout
       - run:
           name: "Run CMake"
           command: cmake -S ./ -B build
