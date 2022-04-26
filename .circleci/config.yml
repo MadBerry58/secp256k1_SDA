@@ -30,14 +30,14 @@ jobs:
   build:
     machine:
       image: ubuntu-2004:current
-    working_directory: ./
+    working_directory: ~/secp256k1
     steps:
       - checkout
       - run:
           name: "Run CMake"
           command: cmake -S ./ -B build
       - store_artifacts:
-          path: build/secp256k1_SDA
+          path: ./build/secp256k1_SDA
 # stages:
 #   - build
 #   - test
