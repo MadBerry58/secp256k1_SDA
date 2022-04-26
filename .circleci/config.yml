@@ -10,8 +10,6 @@ jobs:
       image: ubuntu-2004:current
       # image: ubuntu-2004-cuda-11.4:202110-01
     steps:
-      # - checkout
-      # # Whatever you want to do
       - run:
           name: "Testing"
           command: echo "hello"
@@ -21,6 +19,13 @@ jobs:
       - run: 
           name: "Check gcc"
           command: g++ -v
+      - run:
+          name: "Check CMake"
+          command: cmake --version
+      - run:
+          name: "Check for gmp"
+          command: dpkg -l | grep libgmp
+      # # Whatever you want to do
 # stages:
 #   - build
 #   - test
