@@ -46,10 +46,10 @@ jobs:
       - run:
           name: "Save executable"
           command: |
-            mkdir ../linux_package
-            cp secp256k1_SDA ../linux_package/secp256k1_SDA
+            mkdir linux_package
+            cp ./buile/secp256k1_SDA ./linux_package/secp256k1_SDA
       - store_artifacts:
-          path: ../linux_package
+          path: ./linux_package
 # stages:
 #   - build
 #   - test
