@@ -1,0 +1,39 @@
+
+stages:
+  - build
+  - test
+test-build-dependencies:
+  stage: build
+  script:
+    - g++ -v
+    - gcc -v
+
+# build-code-job:
+#   stage: build 
+#   script:
+#     - echo "Building"
+#     - mkdir build
+#     - touch build/info.txt
+#   artifacts:
+#     paths:
+#       - build/
+# test-generator-code:
+#   stage: testing
+#   script:
+#     - echo "Testing"
+#     - test -f "build/info.txt"
+# test-iterator-code:
+#   stage: testing
+#   script:
+#     - echo "Testing"
+#     - test -f "build/info.txt"
+# test-multiThread-code:
+#   stage: testing
+#   script:
+#     - echo "Testing"
+#     - test -f "build/info.txt"
+# test-connectivity-code:
+#   stage: testing
+#   script:
+#     - echo "Testing"
+#     - test -f "build/info.txt"
