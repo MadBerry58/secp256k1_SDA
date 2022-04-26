@@ -1,14 +1,26 @@
+version: 2.1
+workflows:
+  build_bot:
+    jobs:
+      - build
+
 jobs:
   build:
     machine:
-      - image: ubuntu-2004:current
+      image: ubuntu-2004:current
+      # image: ubuntu-2004-cuda-11.4:202110-01
     steps:
-      - checkout
-      # Whatever you want to do
-      - run: sudo apt-get update && sudo apt-get install -y cowsay
-      - run: cowsay Continuous Integration Rocks!
-      - run: gcc -v
-      - run: g++ -v
+      # - checkout
+      # # Whatever you want to do
+      - run:
+          name: "Testing"
+          command: echo "hello"
+      - run: 
+          name: "Check gcc"
+          command: gcc -v
+      - run: 
+          name: "Check gcc"
+          command: g++ -v
 # stages:
 #   - build
 #   - test
