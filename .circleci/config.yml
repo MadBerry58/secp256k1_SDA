@@ -39,7 +39,9 @@ jobs:
       - checkout
       - run:
           name: "Run CMake"
-          command: cmake -S ./ -B ./build
+          command: |
+            cmake -S ./ -B ./build
+            make ./build
       - store_artifacts:
           path: ./build/secp256k1_SDA
 # stages:
