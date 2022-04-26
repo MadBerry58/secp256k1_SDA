@@ -31,11 +31,6 @@ jobs:
     machine:
       image: ubuntu-2004:current
     steps:
-      - run:
-          name: Make project directory
-          command: |
-            mkdir secp256k1
-            cd secp256k1
       - checkout
       - run:
           name: "Run CMake"
