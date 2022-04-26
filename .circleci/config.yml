@@ -1,12 +1,22 @@
+jobs:
+  build:
+    machine:
+      - image: ubuntu-2004:current
+    steps:
+      - checkout
+      # Whatever you want to do
+      - run: sudo apt-get update && sudo apt-get install -y cowsay
+      - run: cowsay Continuous Integration Rocks!
+      - run: gcc -v
+      - run: g++ -v
+# stages:
+#   - build
+#   - test
 
-stages:
-  - build
-  - test
-test-build-dependencies:
-  stage: build
-  script:
-    - g++ -v
-    - gcc -v
+#   stage: build
+#   script:
+#     - g++ -v
+#     - gcc -v
 
 # build-code-job:
 #   stage: build 
