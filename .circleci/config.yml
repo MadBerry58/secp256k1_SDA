@@ -40,8 +40,13 @@ jobs:
           command: |
             cd build
             make
+      - run:
+          name: "Save executable"
+          command: |
+            mkdir ../linux_package
+            cp secp256k1 ../linux_package
       - store_artifacts:
-          path: ./secp256k1_SDA
+          path: ../linux_package
 # stages:
 #   - build
 #   - test
