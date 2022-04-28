@@ -4,6 +4,18 @@
 
 #include "headers/Mod.h"
 
+void mul_mod(mpz_t result, mpz_t a, mpz_t b, mpz_t p)
+{
+    mpz_mul(result, a, b);
+    mpz_mod(result, result, p);
+};
+
+void add_mod(mpz_t result, mpz_t a, mpz_t b, mpz_t p)
+{
+    mpz_add(result, a, b);
+    mpz_mod(result, result, p);
+}
+
 ///Leave this here or everything goes to shit
 mpz_t moduloHalb;
 mpz_t order;
@@ -22,6 +34,8 @@ mpz_t seven;
 mpz_t t1;
 mpz_t t2;
 /// Leave this here or everything goes to shit
+
+///TODO: check if using t as an intermediary container offers speed benefits
 
 void modInit()
 {
@@ -42,6 +56,159 @@ void modInit()
     mpz_init_set_d(t1, 0);
     mpz_init_set_d(t2, 0);
     gmp_printf("modInit() works\n");
+}
+
+inline BigNumber::BigNumber()
+{
+    mpz_init_set_ui(value, 0);
+}
+
+inline BigNumber::BigNumber(char *numberString)
+{
+    mpz_init_set_str(value, numberString, PREFFERED_BASE);
+}
+
+inline void BigNumber::operator=(mpz_t &source)
+{
+    mpz_set(value, source);
+}
+
+inline void BigNumber::operator=(char *sourceString)
+{
+    mpz_set_str(value, sourceString, PREFFERED_BASE);
+}
+
+inline void BigNumber::operator=(unsigned long long &sourceInteger)
+{
+    mpz_set_ui(value, sourceInteger);
+}
+
+inline void BigNumber::operator+=(mpz_t &source)
+{
+    mpz_add(value, value, source);
+    mpz_mmod(value, value, prime);
+}
+
+inline void BigNumber::operator+=(char *sourceString)
+{
+    mpz_set_str(t1, sourceString, PREFFERED_BASE);
+    mpz_add(value, value, t1);
+    mpz_mmod(value, value, prime);
+}
+
+inline void BigNumber::operator+=(unsigned long long &sourceInteger)
+{
+    mpz_add_ui(value, value, sourceInteger);
+    mpz_mmod(value, value, prime);
+}
+
+inline void BigNumber::operator-=(mpz_t &source)
+{
+    mpz_sub(t2, prime, t1);
+    mpz_add(value, value, t2);
+    mpz_mmod(value, value, prime);
+}
+inline void BigNumber::operator-=(char *sourceString)
+{
+    mpz_set_str(t1, sourceString, PREFFERED_BASE);
+    mpz_sub(t2, prime, t1);
+    mpz_add(value, value, t2);
+    mpz_mmod(value, value, prime);
+}
+inline void BigNumber::operator-=(unsigned long long &sourceInteger)
+{
+
+    mpz_sub_ui(t2, prime, sourceInteger);
+    mpz_add(value, value, t2);
+    mpz_mmod(value, value, prime);
+}
+inline void BigNumber::operator*=(mpz_t &source)
+{
+    mpz_mul(t1, value, source);
+    mpz_mmod(value, t1, prime);
+}
+inline void BigNumber::operator*=(char *sourceString)
+{
+    mpz_set_str(t1, sourceString, PREFFERED_BASE);
+    mpz_mul(t2, value, t1);
+    mpz_mmod(value, t2, prime);
+}
+inline void BigNumber::operator*=(unsigned long long &sourceInteger)
+{
+    mpz_mul_ui(t1, value, sourceInteger);
+    mpz_mmod(value, t1, prime);
+}
+
+inline void BigNumber::operator/=(mpz_t &source)
+{
+    mpz_invert(t1, source, prime);
+    mpz_mul(t2, value, t1);
+    mpz_mmod(value, t2, prime);
+}
+
+inline void BigNumber::operator/=(char *sourceString)
+{
+    mpz_set_str(t1, sourceString, PREFFERED_BASE);
+    mpz_invert(t2, t1, prime);
+    mpz_mul(t1, value, t2);
+    mpz_mmod(value, t1, prime);
+}
+
+inline void BigNumber::operator/=(unsigned long long &sourceInteger)
+{
+    mpz_set_ui(t1, sourceInteger);
+    mpz_invert(t2, t1, prime);
+    mpz_mul(t1, value, t2);
+    mpz_mmod(value, t1, prime);
+}
+
+inline bool BigNumber::operator==(mpz_t &source)
+{
+    return (mpz_cmp(value, source) == 0);
+}
+
+inline bool BigNumber::operator==(unsigned long long &sourceInteger)
+{
+    return (mpz_cmp_ui(value, sourceInteger) == 0);
+}
+
+inline bool BigNumber::operator<(mpz_t &source)
+{
+    return (mpz_cmp(value, source) < 0);
+}
+
+inline bool BigNumber::operator<(unsigned long long &sourceInteger)
+{
+    return (mpz_cmp_ui(value, sourceInteger) < 0);
+}
+
+inline bool BigNumber::operator>(mpz_t &source)
+{
+    return (mpz_cmp(value, source) > 0);
+}
+
+inline bool BigNumber::operator>(unsigned long long &sourceInteger)
+{
+    return (mpz_cmp_ui(value, sourceInteger) > 0);
+}
+
+inline void BigNumber::operator^=(mpz_t &power)
+{
+    mpz_powm(value, value, power, prime);
+}
+inline void BigNumber::operator^=(char *powerString)
+{   
+    mpz_set_str(t1, powerString, PREFFERED_BASE);
+    mpz_powm(value, value, t1, prime);
+}
+inline void BigNumber::operator^=(unsigned long long &powerInteger)
+{
+    mpz_powm_ui(value, value, powerInteger, prime);
+}
+
+inline mpz_t& BigNumber::getValuePointer()
+{
+    return value;
 }
 
 void printConstants()
@@ -75,7 +242,7 @@ void div(mpz_t &result, mpz_t &number, mpz_t &divisor)
 {
     mpz_invert(t1, divisor, prime);
     mpz_mul(t2, number, t1);
-    mpz_mod(result, t2, prime);
+    mpz_mmod(result, t2, prime);
 }
 
 void pow(mpz_t &result, mpz_t &number, mpz_t &power){
@@ -95,6 +262,253 @@ void modSqrt(mpz_t &result, mpz_t &number)
      {
          mpz_set(result, zero);
      }
+}
+
+void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
+{
+    typedef struct fp2
+    {
+        private:
+        mpz_t x, y;
+        public:
+            fp2()
+            {
+                mpz_init(x);
+                mpz_init(y);
+            }
+            void operator = (fp2 n)
+            {
+                mpz_set(x, n.x);
+                mpz_set(y, n.y);
+            }
+            void fp2mul(fp2 result, fp2 a, fp2 b, mpz_t p, mpz_t w2)
+            {
+                    struct fp2 answer;
+                    // uint64_t tmp1, tmp2; t1, t2
+
+                    mul_mod(t1, a.x, b.x, p);
+                    mul_mod(t2, a.y, b.y, p);
+                    mul_mod(t2, t2, w2, p);
+                    add_mod(result.x, t1, t2, prime);
+                    mul_mod(t1, a.x, b.y, prime);
+                    mul_mod(t2, a.y, b.x, prime);
+                    mul_mod(result.y, t1, t2, prime);
+            }
+    };
+
+    fp2 fp;
+
+    // uint64_t randULong(uint64_t min, uint64_t max)
+    // {
+    //     uint64_t t = (uint64_t)rand();
+    //     return min + t % (max - min);
+    // }
+    mpz_random(t1, GMP_LIMBNUMBER);
+
+    // returns a * b mod modulus
+    // uint64_t mul_mod(uint64_t a, uint64_t b, uint64_t modulus)
+    // {
+    //     uint64_t x = 0, y = a % modulus;
+
+    //     while (b > 0)
+    //     {
+    //         if ((b & 1) == 1)
+    //         {
+    //             x = (x + y) % modulus;
+    //         }
+    //         y = (y << 1) % modulus;
+    //         b = b >> 1;
+    //     }
+    //     return x;
+    // }
+
+
+    // returns b ^^ power mod modulus
+    // uint64_t pow_mod(uint64_t b, uint64_t power, uint64_t modulus)
+    // {
+    //     uint64_t x = 1;
+
+    //     while (power > 0)
+    //     {
+    //         if ((power & 1) == 1)
+    //         {
+    //             x = mul_mod(x, b, modulus);
+    //         }
+    //         b = mul_mod(b, b, modulus);
+    //         power = power >> 1;
+    //     }
+
+    //     return x;
+    // }
+
+    // // miller-rabin prime test
+    // bool isPrime(uint64_t n, int64_t k)
+    // {
+    //     uint64_t a, x, n_one = n - 1, d = n_one;
+    //     uint32_t s = 0;
+    //     uint32_t r;
+
+    //     if (n < 2)
+    //     {
+    //         return false;
+    //     }
+
+    //     // limit 2^63, pow_mod/mul_mod can't handle bigger numbers
+    //     if (n > 9223372036854775808ull)
+    //     {
+    //         printf("The number is too big, program will end.\n");
+    //         exit(1);
+    //     }
+
+    //     if ((n % 2) == 0)
+    //     {
+    //         return n == 2;
+    //     }
+
+    //     while ((d & 1) == 0)
+    //     {
+    //         d = d >> 1;
+    //         s = s + 1;
+    //     }
+
+    //     while (k > 0)
+    //     {
+    //         k = k - 1;
+    //         a = randULong(2, n);
+    //         x = pow_mod(a, d, n);
+    //         if (x == 1 || x == n_one)
+    //         {
+    //             continue;
+    //         }
+    //         for (r = 1; r < s; r++)
+    //         {
+    //             x = pow_mod(x, 2, n);
+    //             if (x == 1)
+    //                 return false;
+    //             if (x == n_one)
+    //                 goto continue_while;
+    //         }
+    //         if (x != n_one)
+    //         {
+    //             return false;
+    //         }
+
+    //     continue_while:
+    //     {
+    //     }
+    //     }
+
+    //     return true;
+    // }
+    
+    ///////mpz_probab_prime_p();
+
+    // int64_t legendre_symbol(int64_t a, int64_t p)
+    // {
+    //     int64_t x = pow_mod(a, (p - 1) / 2, p);
+    //     if ((p - 1) == x)
+    //     {
+    //         return x - p;
+    //     }
+    //     else
+    //     {
+    //         return x;
+    //     }
+    // }
+    ////////mpz_legendre();
+
+    // fp2 fp2mul(struct fp2 a, struct fp2 b, int64_t p, int64_t w2)
+    // {
+    //     struct fp2 answer;
+    //     uint64_t tmp1, tmp2;
+
+    //     tmp1 = mul_mod(a.x, b.x, p);
+    //     tmp2 = mul_mod(a.y, b.y, p);
+    //     tmp2 = mul_mod(tmp2, w2, p);
+    //     answer.x = (tmp1 + tmp2) % p;
+    //     tmp1 = mul_mod(a.x, b.y, p);
+    //     tmp2 = mul_mod(a.y, b.x, p);
+    //     answer.y = (tmp1 + tmp2) % p;
+
+    //     return answer;
+    // }
+
+    // struct fp2 fp2square(struct fp2 a, int64_t p, int64_t w2)
+    // {
+    //     return fp2mul(a, a, p, w2);
+    // }
+
+    struct fp2 fp2pow(struct fp2 a, int64_t n, int64_t p, int64_t w2)
+    {
+        struct fp2 ret;
+
+        if (n == 0)
+        {
+            ret.x = 1;
+            ret.y = 0;
+            return ret;
+        }
+        if (n == 1)
+        {
+            return a;
+        }
+        if ((n & 1) == 0)
+        {
+            return fp2square(fp2pow(a, n / 2, p, w2), p, w2);
+        }
+        else
+        {
+            return fp2mul(a, fp2pow(a, n - 1, p, w2), p, w2);
+        }
+    }
+
+    void test(mpz_t n, mpz_t p)
+    {
+        mpz_t a, w2;
+        mpz_t x1, x2;
+        struct fp2 answer;
+
+        gmp_printf("Find solution for n = %Zd and p = %Zd\n", n, p);
+        // if (p == 2 || !isPrime(p, 15))
+        if( (mpz_cmp_ui(p, 2) == 0) || mpz_probab_prime_p(p)
+        {
+            printf("No solution, p is not an odd prime.\n\n");
+            return;
+        }
+
+        // p is checked and is a odd prime
+        // if (legendre_symbol(n, p) != 1)
+        if(mpz_legendre(n, p) != 1)
+        {
+            gmp_printf(" %Zd is not a square in F%Zd\n\n", n, p);
+            return;
+        }
+
+        while (true)
+        {
+            do
+            {
+                a = mpz_random(2, p);
+                w2 = a * a - n;
+            } while (mpz_legendre(n, p) != 1);
+
+            answer.x = a;
+            answer.y = 1;
+            answer = fp2pow(answer, (p + 1) / 2, p, w2);
+            if (answer.y != 0)
+            {
+                continue;
+            }
+
+            x1 = answer.x;
+            x2 = p - x1;
+            if (mul_mod(x1, x1, p) == n && mul_mod(x2, x2, p) == n)
+            {
+                printf("Solution found: x1 = %lld, x2 = %lld\n\n", x1, x2);
+                return;
+            }
+        }
+    }
 }
 
 void addKeys(mpz_t &result, mpz_t &key1, mpz_t &key2)

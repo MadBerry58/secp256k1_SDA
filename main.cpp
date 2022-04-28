@@ -14,7 +14,7 @@ int main(int argc, char **argv)
     fileManager_Init();
     userInterface_Init();
     // userInterface_Start();
-    testFunctionality();
+    // testFunctionality();
 
     return 0;
 }

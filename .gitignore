@@ -4,3 +4,4 @@ CMakeFiles/**
 .vscode/**
 workspace.code-workspace
 dump/**
+src/headers/gmp/**

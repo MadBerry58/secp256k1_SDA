@@ -9,6 +9,44 @@
 void modInit();
 void printConstants();
 
+struct BigNumber
+{
+    private:
+        mpz_t value;
+
+    public:
+       inline BigNumber();
+       inline BigNumber(char *numberString);
+       inline ~BigNumber();
+       inline void operator=(mpz_t &source);
+       inline void operator=(char *sourceString);
+       inline void operator=(unsigned long long &sourceInteger);
+       inline void operator+=(mpz_t &source);
+       inline void operator+=(char *sourceString);
+       inline void operator+=(unsigned long long &sourceInteger);
+       inline void operator-=(mpz_t &source);
+       inline void operator-=(char *sourceString);
+       inline void operator-=(unsigned long long &sourceInteger);
+       inline void operator*=(mpz_t &source);
+       inline void operator*=(char *sourceString);
+       inline void operator*=(unsigned long long &sourceInteger);
+       inline void operator/=(mpz_t &source);
+       inline void operator/=(char *sourceString);
+       inline void operator/=(unsigned long long &sourceInteger);
+       inline void operator^=(mpz_t &source);
+       inline void operator^=(char *sourceString);
+       inline void operator=(unsigned long long &sourceInteger);
+       inline bool operator==(mpz_t &source);
+       inline bool operator==(unsigned long long &sourceInteger);
+       inline bool operator<(mpz_t &source);
+       inline bool operator<(unsigned long long &sourceInteger);
+       inline bool operator>(mpz_t &source);
+       inline bool operator>(unsigned long long &sourceInteger);
+       inline void operator^=(mpz_t &source);
+       inline void operator^=(char *sourceString);
+       inline void operator^=(unsigned long long &sourceInteger);
+       inline mpz_t& getValuePointer();
+};
 ///Arithmetic functions
 void neg(mpz_t &result, mpz_t &number);
 void add(mpz_t &result, mpz_t &A, mpz_t &B);

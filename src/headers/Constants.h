@@ -1,15 +1,30 @@
-//
-// Created by blackberry on 12.01.2021.
-//
+///////////////////// Initialiser values ///////////////////////
+
+/// Variable initializers
+#define INITIALVAL_BIGNUM                               0u
+#define INITIALVAL_POINT_KEY                            "1"
+#define INITIALVAL_POINT_KEY                            "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+#define INITIALVAL_POINT_KEY                            "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+#define PREFFERED_BASE                                  16u
+#define LSB_HASH_SIZE                                   unsigned long
+#define GMP_LIMBNUMBER                                  4
+
+/// Elliptic Curve Parameters
+#define moduloHalb_String                               "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE17"
+#define order_String                                    "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"
+#define orderMinusOneDivTwo_String                      "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0"
+#define prime_String                                    "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
+#define primeMinusOne_String                            "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2E"
+#define primePlusOneDivFour_String                      "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
 
 #ifndef SECP251K1_SANDBOX_CONSTANTS_H
 #define SECP251K1_SANDBOX_CONSTANTS_H
 
-#define PREFFERED_BASE                                  16u
-#define LSB_HASH_SIZE                                   unsigned long
 
+//////////////////////////// ERROR CODES /////////////////////////
+///Bitmask friendly error codes, using 16 bit masks
 
-/// Point generation errors
+/// Point generation errors     0b 00000000 00000001
 #define GENERATION_E_OK                                 0u
 #define GENERATION_E_UNKNOWN_POINT_KEY                  1u
 #define GENERATION_E_TOO_MANY_SLICES                    2u
@@ -18,19 +33,18 @@
 #define GENERATION_E_NO_SLICES                          5u
 #define GENERATION_E_POINT_NUMBER_NOT_MATCHING          6u
 
+/// Checkpoint errors           0b 00000000 00100000
 #define CHECKPOINT_E_OK                                 32u
 
-
+/// Memory management errors    0b 00000000 01000000
 #define MEMORY_E_OK                                     64u
 #define MEMORY_E_VARIABLES_NOT_INITIALIZED              64u
 
-
-/// File stream errors
+/// File stream errors          0b 00000000 10000000
 #define FILE_E_OK                                       128u
 #define FILE_E_NOT_OPEN                                 129u
 
-
-/// File integrity errors
+/// File integrity errors       0b 00000001 00000000
 #define INTEGRITY_E_OK                                  256u
 #define INTEGRITY_E_FILETYPE_MISMATCH                   257u
 #define INTEGRITY_E_UNKNOWN_FILETYPE                    258u
@@ -53,6 +67,15 @@
 #define INTEGRITY_E_UNKNOWN_EOF_TOKEN                   275u
 #define INTEGRITY_E_INVALID_EOF_TOKEN                   275u
 
+/// Further error types shall be written in the bit shifted pattern
+///                             0b 00000001 00000000
+///                             0b 00000010 00000000
+///                             0b 00000100 00000000
+///                             0b 00001000 00000000
+///                             0b 00010000 00000000
+///                             0b 00100000 00000000
+///                             0b 01000000 00000000
+///                             0b 10000000 00000000
 
 /// Verbose point generation errors
 #define VERBOSE_GENERATION_E_OK                         "Point generation parameters are valid"
@@ -65,23 +88,23 @@
 
 
 /// File tags
-#define UNCOMPRESSED_POINTS_FILE_TAG "UNCOMPRESSED_POINTS_FILE"
-#define COMPRESSED_POINTS_FILE_TAG "COMPRESSED_POINTS_FILE"
-#define HASHED_POINTS_FILE_TAG "HASH_POINTS_FILE"
-#define CHECKPOINT_FILE_TAG "CHECKPOINT_FILE"
-#define STARTING_POINT_TAG "STARTING_POINT"
-#define TARGET_POINT_TAG "TARGET_POINT"
-#define SLICE_NUMBER_TAG "NUMBER_OF_SLICES"
-#define SLICE_SIZE_TAG "SLICE_SIZE"
-#define POINTS_PER_SLICE_TAG "POINTS_PER_sLICE"
-#define TOTAL_POINT_NUMBER_TAG "TOTAL_POINTS"
-#define ITERATION_NUMBER_TAG "ITERATION_NUMBER"
-#define INCREMENT_SIZE_TAG "INCREMENT_SIZE"
-#define EOF_TAG "EOF"
-#define GENERATED_POINTS_EOF_TAG "GENERATED_POINTS_EOF"
-#define CHECKPOINT_EOF_TAG "CHECKPOINT_EOF"
-#define UNIMPLEMENTED_FUNCTIONALITY_TAG "Unimplemented yet"
-#define FUNCTIONALITY_IN_DEVELOPMENT_TAG "Functionality still under development"
+#define UNCOMPRESSED_POINTS_FILE_TAG                    "UNCOMPRESSED_POINTS_FILE"
+#define COMPRESSED_POINTS_FILE_TAG                      "COMPRESSED_POINTS_FILE"
+#define HASHED_POINTS_FILE_TAG                          "HASH_POINTS_FILE"
+#define CHECKPOINT_FILE_TAG                             "CHECKPOINT_FILE"
+#define STARTING_POINT_TAG                              "STARTING_POINT"
+#define TARGET_POINT_TAG                                "TARGET_POINT"
+#define SLICE_NUMBER_TAG                                "NUMBER_OF_SLICES"
+#define SLICE_SIZE_TAG                                  "SLICE_SIZE"
+#define POINTS_PER_SLICE_TAG                            "POINTS_PER_sLICE"
+#define TOTAL_POINT_NUMBER_TAG                          "TOTAL_POINTS"
+#define ITERATION_NUMBER_TAG                            "ITERATION_NUMBER"
+#define INCREMENT_SIZE_TAG                              "INCREMENT_SIZE"
+#define EOF_TAG                                         "EOF"
+#define GENERATED_POINTS_EOF_TAG                        "GENERATED_POINTS_EOF"
+#define CHECKPOINT_EOF_TAG                              "CHECKPOINT_EOF"
+#define UNIMPLEMENTED_FUNCTIONALITY_TAG                 "Unimplemented yet"
+#define FUNCTIONALITY_IN_DEVELOPMENT_TAG                "Functionality still under development"
 
 
 /// Known file types
@@ -92,20 +115,9 @@
 #define FILETYPE_UNKNOWN                                4u
 
 
-///Elliptic Curve Parameters
-#define moduloHalb_String "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE17"
-#define order_String "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141"
-#define orderMinusOneDivTwo_String "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF5D576E7357A4501DDFE92F46681B20A0"
-#define prime_String "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
-#define primeMinusOne_String "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2E"
-#define primePlusOneDivFour_String "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
-
-
 /// G multiples
 
-#define kG_String "1"
-#define xG_String "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-#define yG_String "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+
 
 /// TODO: add the multiples of G for efficient multiplication
 

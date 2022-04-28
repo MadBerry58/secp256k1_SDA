@@ -7,7 +7,8 @@
 #include <cstring>
 #include "Mod.h"
 
-class Point{
+class Point
+{
 private:
     mpz_t           x;
     mpz_t           y;
