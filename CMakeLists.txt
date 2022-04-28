@@ -31,6 +31,10 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(srcLib
         "/usr/lib/x86_64-linux-gnu/libgmp.so"
         "/usr/lib/x86_64-linux-gnu/libgmpxx.so"
+        # "/src/headers/gmp/libgmp.so"
+        # "/src/headers/gmp/libgmpxx.so"
+        # "/src/headers/gmp/libgmp.a"
+        # "/src/headers/gmp/libgmpxx.a"
         )
 
 target_link_libraries(${PROJECT_NAME}
