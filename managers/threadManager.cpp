@@ -7,7 +7,7 @@ int createThread()
     return 0;
 }
 
-int initThreads()
+int initThread()
 {
     return 0;
 }
@@ -18,6 +18,11 @@ int testThread()
 }
 
 int testWorkoad()
+{
+    return 0;
+}
+
+int solveChallange(/*challange hash list*/)
 {
     return 0;
 }

@@ -6,8 +6,14 @@
 #define INITIALVAL_POINT_KEY                            "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
 #define INITIALVAL_POINT_KEY                            "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
 #define PREFFERED_BASE                                  16u
-#define LSB_HASH_SIZE                                   unsigned long
-#define GMP_LIMBNUMBER                                  4
+#define LSB_HASH_TYPE                                   unsigned long
+#define LSB_STRING_SIZE                                 4u
+#define GMP_LIMBNUMBER                                  4u
+#define RANDOMNESS_SEED                                 "8157f55a7c99306c79c0766161c91e2966a73899d279b48a655fba0f1ad836f1"
+#define PRIME_TRIALS                                    23u //// Number of trials used by the mpz_probab_prime_p
+#define MESSAGE_SIZE_MAX                                512u
+#define CHALLANGE_NUMBER                                5u
+#define CHALLANGE_SIZE_MAX                              (CHALLANGE_NUMBER + 1) * LSB_STRING_SIZE
 
 /// Elliptic Curve Parameters
 #define moduloHalb_String                               "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE17"
@@ -16,6 +22,7 @@
 #define prime_String                                    "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F"
 #define primeMinusOne_String                            "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2E"
 #define primePlusOneDivFour_String                      "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
+#define primePlusOneDivTwo_String                       "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE18"
 
 #ifndef SECP251K1_SANDBOX_CONSTANTS_H
 #define SECP251K1_SANDBOX_CONSTANTS_H
@@ -67,9 +74,17 @@
 #define INTEGRITY_E_UNKNOWN_EOF_TOKEN                   275u
 #define INTEGRITY_E_INVALID_EOF_TOKEN                   275u
 
+/// Connection errors     0b 00000010 00000000
+#define CONN_MGR_E_OK                                   512u
+#define CONN_MGR_E_INVALIDADRESS                        513u
+#define CONN_MGR_E_INVALIDPORT                          514u
+#define CONN_MGR_E_SOCKETFAULT                          515U
+#define CONN_MGR_E_CONNECTFAULT                         516u
+#define CONN_MGR_E_UNKNOWN_SERVER_RESPONSE              517u
+#define CONN_MGR_E_SERVER_NOTRESPONDING                 518u
+#define CONN_MGR_E_MALFORMED_SERVER_RESPONSE            519u
+#define CONN_MGR_E_INVALID_CHALLANGE_SOLUTION           520u
 /// Further error types shall be written in the bit shifted pattern
-///                             0b 00000001 00000000
-///                             0b 00000010 00000000
 ///                             0b 00000100 00000000
 ///                             0b 00001000 00000000
 ///                             0b 00010000 00000000
@@ -114,6 +129,13 @@
 #define FILETYPE_CHECKPOINT                             3u
 #define FILETYPE_UNKNOWN                                4u
 
+/// Server APIs
+#define API_R_CONFIRM                                   "ACTION_CONFIRMED"
+#define API_R_PROGRESS_HASH_REQUESTED                   "PROGRESS_HASH_REQUESTED"
+#define API_R_INVALID_SOLUTION                          "CHALLANGE_SOLUTION_INVALID"
+#define API_S_GET_ACTIVESEARCHES                        "GET_ACTIVE"
+#define API_S_POST_REGISTERPROGRESS                     "POST_PROGRESS"
+#define API_S_POST_REGISTERPROGRESS_SOLVED              "POST_PROGRESS_SOLVED"
 
 /// G multiples
 
