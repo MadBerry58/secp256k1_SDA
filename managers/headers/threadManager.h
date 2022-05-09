@@ -5,5 +5,14 @@
 #include "threads.h"
 #include <pthread.h>
 
+int createThread();
+
+int initThread();
+
+int testThread();
+
+int testWorkoad();
+
+int solveChallange();
 
 #endif // SECP251K1_SANDBOX_THREADMANAGER_H

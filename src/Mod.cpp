@@ -33,11 +33,13 @@ mpz_t six;
 mpz_t seven;
 mpz_t t1;
 mpz_t t2;
+gmp_randstate_t randomState;
+mpz_t randomSeed;
 /// Leave this here or everything goes to shit
 
 ///TODO: check if using t as an intermediary container offers speed benefits
 
-void modInit()
+void modInit() /// https://www.youtube.com/watch?v=UmYce41wlx8
 {
     mpz_init_set_str(moduloHalb, moduloHalb_String, PREFFERED_BASE);
     mpz_init_set_str(order, order_String, PREFFERED_BASE);
@@ -56,6 +58,9 @@ void modInit()
     mpz_init_set_d(t1, 0);
     mpz_init_set_d(t2, 0);
     gmp_printf("modInit() works\n");
+    mpz_init_set_str(randomSeed, RANDOMNESS_SEED, PREFFERED_BASE);
+    gmp_randseed(randomState, randomSeed);
+    gmp_randinit_mt(randomState);
 }
 
 inline BigNumber::BigNumber()
@@ -264,17 +269,28 @@ void modSqrt(mpz_t &result, mpz_t &number)
      }
 }
 
+//// Cipolla algorithm - work in progress, do not use
 void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
 {
     typedef struct fp2
     {
         private:
-        mpz_t x, y;
+            mpz_t x, y;
         public:
             fp2()
             {
                 mpz_init(x);
                 mpz_init(y);
+            }
+            fp2(mpz_t &init_x, mpz_t &init_y)
+            {
+                mpz_init_set(x, init_x);
+                mpz_init_set(y, init_y);
+            }
+            fp2(unsigned long long &init_x, unsigned long long &init_y)
+            {
+                mpz_init_set_ui(x, init_x);
+                mpz_init_set_ui(y, init_y);
             }
             void operator = (fp2 n)
             {
@@ -283,27 +299,59 @@ void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
             }
             void fp2mul(fp2 result, fp2 a, fp2 b, mpz_t p, mpz_t w2)
             {
-                    struct fp2 answer;
-                    // uint64_t tmp1, tmp2; t1, t2
-
-                    mul_mod(t1, a.x, b.x, p);
-                    mul_mod(t2, a.y, b.y, p);
-                    mul_mod(t2, t2, w2, p);
-                    add_mod(result.x, t1, t2, prime);
-                    mul_mod(t1, a.x, b.y, prime);
-                    mul_mod(t2, a.y, b.x, prime);
-                    mul_mod(result.y, t1, t2, prime);
+                mul_mod(t1, a.x, b.x, p);
+                mul_mod(t2, a.y, b.y, p);
+                mul_mod(t2, t2, w2, p);
+                add_mod(result.x, t1, t2, prime);
+                mul_mod(t1, a.x, b.y, prime);
+                mul_mod(t2, a.y, b.x, prime);
+                mul_mod(result.y, t1, t2, prime);
+                ///Function complexity: 7*(mod) + 6*(mul) + 1*(add)
             }
-    };
+            void fp2square(fp2 &result, fp2 &a, mpz_t &prime, mpz_t &w2)
+            {
+                fp2mul(result, a, a, prime, w2);
+            }
 
-    fp2 fp;
+            void fp2pow(fp2 &result, fp2 &a, mpz_t &number, mpz_t &p, mpz_t &w2)
+            {
+                mpz_t n;
+                mpz_init_set(n, number);
+                int nZero_or_One = (mpz_cmp_ui(n, 1));
+                
+                switch(nZero_or_One)
+                {
+                    case 0: /// n == 1
+                        break;
+                    case -1: /// n < 1
+                        mpz_set_ui(result.x, 1);
+                        mpz_set_ui(result.y, 0);
+                        break;
+                    case 1:
+                        if (mpz_even_p(n))
+                        {
+                            mpz_div_2exp(n, n, 1);
+                            fp2pow(result, a, n, p, w2);
+                            fp2square(result, a, p, w2);
+                        }
+                        else
+                        {
+                            mpz_sub_ui(n, n, 1u);
+                            fp2pow(result, a, n, p, w2);
+                            fp2mul(result, a, result, p, w2);
+                        }
+                        break;
+                }
+                ///Function Complexity: Iterations*( 1*(sub) + 1(pow) + 1(mul) 
+            }
+        
+    };
 
     // uint64_t randULong(uint64_t min, uint64_t max)
     // {
     //     uint64_t t = (uint64_t)rand();
     //     return min + t % (max - min);
     // }
-    mpz_random(t1, GMP_LIMBNUMBER);
 
     // returns a * b mod modulus
     // uint64_t mul_mod(uint64_t a, uint64_t b, uint64_t modulus)
@@ -438,35 +486,11 @@ void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
     //     return fp2mul(a, a, p, w2);
     // }
 
-    struct fp2 fp2pow(struct fp2 a, int64_t n, int64_t p, int64_t w2)
-    {
-        struct fp2 ret;
-
-        if (n == 0)
-        {
-            ret.x = 1;
-            ret.y = 0;
-            return ret;
-        }
-        if (n == 1)
-        {
-            return a;
-        }
-        if ((n & 1) == 0)
-        {
-            return fp2square(fp2pow(a, n / 2, p, w2), p, w2);
-        }
-        else
-        {
-            return fp2mul(a, fp2pow(a, n - 1, p, w2), p, w2);
-        }
-    }
-
-    void test(mpz_t n, mpz_t p)
+    void test(mpz_t &n, mpz_t &p)
     {
         mpz_t a, w2;
         mpz_t x1, x2;
-        struct fp2 answer;
+        fp2 answer;
 
         gmp_printf("Find solution for n = %Zd and p = %Zd\n", n, p);
         // if (p == 2 || !isPrime(p, 15))
@@ -483,18 +507,25 @@ void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
             gmp_printf(" %Zd is not a square in F%Zd\n\n", n, p);
             return;
         }
-
+        mpz_sub(t1, p, two); /// cover the random range issue without checking the result for numbers smaller than 3
+        mpz_set_str(t1, primePlusOneDivTwo_String);
         while (true)
         {
             do
             {
-                a = mpz_random(2, p);
-                w2 = a * a - n;
-            } while (mpz_legendre(n, p) != 1);
+                ///generate a random number in the range (2, prime)
+                mpz_urandomm(a, randomState, t1); ///TODO: see if it is possible to use a pre generated set of high entropy numbers (as compared to numbers of trials neccessary for determining primality of a known number set)
+                mpz_add(a, a, two);
 
-            answer.x = a;
-            answer.y = 1;
-            answer = fp2pow(answer, (p + 1) / 2, p, w2);
+                mpz_mul(w2, a, a);
+                mpz_sub(w2, w2, n);
+            } 
+            while (mpz_legendre(w2, p) != 1);
+
+            mpz_set(answer.x, a);
+            mpz_set_ui(answer.y, 1);
+
+            fp2pow(answer, answer, t1, p, w2);
             if (answer.y != 0)
             {
                 continue;
@@ -509,10 +540,37 @@ void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
             }
         }
     }
-}
+};
 
 void addKeys(mpz_t &result, mpz_t &key1, mpz_t &key2)
 {
     mpz_add(t1, key1, key2);
     mpz_mod(result, t1, order);
+}
+
+void mpz_modSqrt(mpz_t &number, mpz_t &prime)
+{
+    if (mpz_legendre(number, prime) != 1)
+    {
+        gmp_printf(" %Zd is not a square in F%Zd\n\n", number, prime);
+        return;
+    }
+
+    mpz_t a, w2, e;
+    mpz_inits(a, w2, e);
+    while (mpz_legendre(number, prime) != 1)
+    {
+        mpz_add_ui(a, a, 1)
+        mpz_mul(w2, a, a);
+        mpz_sub(w2, w2, &number);
+        mpz_mod(w2, w2, prime);
+    }
+
+    fp2 r(1, 0), s(a, one);
+    
+    while(1)
+    {
+        mpz_add(e, prime, one);
+        mpz_probab_prime_p(e, PRIME_TRIALS);
+    }
 }
