@@ -1,19 +1,28 @@
 ///////////////////// Initialiser values ///////////////////////
 
+/// Program flags
+// #define DEBUG                                           
+#define TESTING ///WARNING! do not use during live operation!! The stdout buffer will get overloaded
+
 /// Variable initializers
 #define INITIALVAL_BIGNUM                               0u
 #define INITIALVAL_POINT_KEY                            "1"
-#define INITIALVAL_POINT_KEY                            "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
-#define INITIALVAL_POINT_KEY                            "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
+#define INITIALVAL_POINT_x                              "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
+#define INITIALVAL_POINT_y                              "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
 #define PREFFERED_BASE                                  16u
+#define LSB_READ_BASE                                   10u
 #define LSB_HASH_TYPE                                   unsigned long
 #define LSB_STRING_SIZE                                 4u
 #define GMP_LIMBNUMBER                                  4u
-#define RANDOMNESS_SEED                                 "8157f55a7c99306c79c0766161c91e2966a73899d279b48a655fba0f1ad836f1"
+#define RANDOMNESS_SEED                                 "483ada7726a3c4655da4fbfd1e1108a8fd17b448a68554199c47d08ffb10d4b8"
 #define PRIME_TRIALS                                    23u //// Number of trials used by the mpz_probab_prime_p
 #define MESSAGE_SIZE_MAX                                512u
 #define CHALLANGE_NUMBER                                5u
 #define CHALLANGE_SIZE_MAX                              (CHALLANGE_NUMBER + 1) * LSB_STRING_SIZE
+#define TEST_GENERATED_SLICE_NUMBER                     5u
+#define TEST_GENERATED_POINTS_PER_SLICE                 1000u
+#define TEST_GENERATED_POINT_NUMBER                     5000u
+#define TEST_GENERATED_INCREMENTSIZE                    "1"
 
 /// Elliptic Curve Parameters
 #define moduloHalb_String                               "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE17"
@@ -26,7 +35,7 @@
 
 #ifndef SECP251K1_SANDBOX_CONSTANTS_H
 #define SECP251K1_SANDBOX_CONSTANTS_H
-
+// 10472290570935714244214166893328940128314656840635597500498006050745359883506
 
 //////////////////////////// ERROR CODES /////////////////////////
 ///Bitmask friendly error codes, using 16 bit masks
@@ -73,8 +82,10 @@
 #define INTEGRITY_E_INCREMENT_SIZE_TOO_BIG              274u
 #define INTEGRITY_E_UNKNOWN_EOF_TOKEN                   275u
 #define INTEGRITY_E_INVALID_EOF_TOKEN                   275u
+#define INTEGRITY_E_INIT_COULDNOTOPENFILE               276u
+#define INTEGRITY_E_READ_CHECKPOINT                     277u
 
-/// Connection errors     0b 00000010 00000000
+/// Connection errors           0b 00000010 00000000
 #define CONN_MGR_E_OK                                   512u
 #define CONN_MGR_E_INVALIDADRESS                        513u
 #define CONN_MGR_E_INVALIDPORT                          514u
@@ -84,8 +95,31 @@
 #define CONN_MGR_E_SERVER_NOTRESPONDING                 518u
 #define CONN_MGR_E_MALFORMED_SERVER_RESPONSE            519u
 #define CONN_MGR_E_INVALID_CHALLANGE_SOLUTION           520u
+
+
+/// Modular Operator Errors     0b 00000100 00000000
+
+#define MOD_E_OK                                        1024u
+#define MOD_E_MPZ_ASSIGNMENT_INVALID                    1025u
+#define MOD_E_MPZ_ADDITION_INVALID                      1026u
+#define MOD_E_MOD_ADDITION_INVALID                      1027u
+#define MOD_E_MOD_SUBTRACTION_INVALID                   1028u
+#define MOD_E_MOD_SQUAREROOT_INVALID                    1029u
+
+/// Modular Operator Errors     0b 00000110 00000000
+
+#define POINT_E_OK                                      1536u
+#define POINT_E_INITIALIZATION_K_INVALID                1537u
+#define POINT_E_INITIALIZATION_X_INVALID                1538u
+#define POINT_E_INITIALIZATION_Y_INVALID                1539u
+#define POINT_E_ADDITION_K_INVALID                      1539u
+#define POINT_E_ADDITION_X_INVALID                      1540u
+#define POINT_E_ADDITION_Y_INVALID                      1541u
+#define POINT_E_SUBTRACTION_K_INVALID                   1542u
+#define POINT_E_SUBTRACTION_X_INVALID                   1543u
+#define POINT_E_SUBTRACTION_Y_INVALID                   1544u
+
 /// Further error types shall be written in the bit shifted pattern
-///                             0b 00000100 00000000
 ///                             0b 00001000 00000000
 ///                             0b 00010000 00000000
 ///                             0b 00100000 00000000
@@ -137,11 +171,20 @@
 #define API_S_POST_REGISTERPROGRESS                     "POST_PROGRESS"
 #define API_S_POST_REGISTERPROGRESS_SOLVED              "POST_PROGRESS_SOLVED"
 
+/// Function-like macros
+
+#ifdef DEBUG
+#define DEBUG_MSG(...)                          gmp_printf(__VA_ARGS__)
+#else
+#define DEBUG_MSG(...)                          
+#endif
+
+
+
+
+
 /// G multiples
-
-
-
-/// TODO: add the multiples of G for efficient multiplication
+/// Legacy char string initialization definitions
 
 /// G * 2^0
 #define kG0_String "1"
@@ -1167,5 +1210,18 @@
 #define kG255_String "8000000000000000000000000000000000000000000000000000000000000000"
 #define xG255_String "b23790a42be63e1b251ad6c94fdef07271ec0aada31db6c3e8bd32043f8be384"
 #define yG255_String "fc6b694919d55edbe8d50f88aa81f94517f004f4149ecb58d10a473deb19880e"
+
+
+///////////////////// Collector functions ///////////////////////
+
+#define COLLECTRESIDUEDEBUG /// Collect residue random keys generated by the test process
+
+#ifdef COLLECTRESIDUEDEBUG
+#define COLFO std::fstream residueFile;
+#define COLLECT(point) residueFile.open("col", std::fstream::app);residueFile << point.getK() << "\n"<< point.getX() << "\n"<< point.getY() << "\n\n";residueFile.close()
+#else
+#define COLFO
+#define COLLECT(point)
+#endif
 
 #endif //SECP251K1_SANDBOX_CONSTANTS_H

@@ -5,9 +5,18 @@
 #define SECP251K1_SANDBOX_MOD_H
 #include "gmp.h"
 #include "Constants.h"
+#include <iterator>
+#include <map>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <set>
+#include <algorithm>
+#include <cstring>
+#include <time.h>
 
-void modInit();
-void printConstants();
+unsigned int    modInit();
+void            printConstants();
 
 struct BigNumber
 {
@@ -35,16 +44,13 @@ struct BigNumber
        inline void operator/=(unsigned long long &sourceInteger);
        inline void operator^=(mpz_t &source);
        inline void operator^=(char *sourceString);
-       inline void operator=(unsigned long long &sourceInteger);
+       inline void operator^=(unsigned long long &sourceInteger);
        inline bool operator==(mpz_t &source);
        inline bool operator==(unsigned long long &sourceInteger);
        inline bool operator<(mpz_t &source);
        inline bool operator<(unsigned long long &sourceInteger);
        inline bool operator>(mpz_t &source);
        inline bool operator>(unsigned long long &sourceInteger);
-       inline void operator^=(mpz_t &source);
-       inline void operator^=(char *sourceString);
-       inline void operator^=(unsigned long long &sourceInteger);
        inline mpz_t& getValuePointer();
 };
 ///Arithmetic functions
@@ -56,6 +62,7 @@ void div(mpz_t &result, mpz_t &number, mpz_t &divisor);
 void pow(mpz_t &result, mpz_t &number, mpz_t &power);
 void addKeys(mpz_t &result, mpz_t &key1, mpz_t &key2);
 void modSqrt(mpz_t &result, mpz_t &number);
+void generateRandomKey(mpz_t &result);
 
 
 #endif //SECP251K1_SANDBOX_MOD_H

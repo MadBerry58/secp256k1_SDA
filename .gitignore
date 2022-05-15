@@ -5,3 +5,7 @@ CMakeFiles/**
 workspace.code-workspace
 dump/**
 src/headers/gmp/**
+HashedGeneratedTest.sda
+UncompressedGeneratedTest.sda
+col
+CheckpointTest.sda

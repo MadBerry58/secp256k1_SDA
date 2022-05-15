@@ -64,13 +64,14 @@ int getActiveSearches(int sockfd)
     recivedMessageSize = recv(sockfd, &line, MESSAGE_SIZE_MAX, 0);
     line[recivedMessageSize] = '\0';
     ///rebuild target files from host data -> Memory Manager
-
+    return 0;
 }
 
 int giveActiveSearches(int sockfd, char *searchList)
 {
     /// Memory Manager -> send string containing active search data
     send(sockfd, searchList, strlen(searchList), 0);
+    return 0;
 }
 
 
@@ -133,6 +134,7 @@ int postProgress(int sockfd, char *progress, char *challangeSolution)
     {
         return CONN_MGR_E_UNKNOWN_SERVER_RESPONSE;
     }
+    return 0;
 }
 
 int getProgress();

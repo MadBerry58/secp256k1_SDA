@@ -1,6 +1,6 @@
 #ifndef SECP251K1_SANDBOX_MEMORYMANAGER_H
 #define SECP251K1_SANDBOX_MEMORYMANAGER_H
-#include "../../src/headers/Operators.h"
+#include "../../src/headers/Iterators.h"
 
 struct targetProfile
 {
@@ -22,7 +22,7 @@ struct pointsProfile
     unsigned int iterationNumber;
     unsigned int numberOfSlices;
     unsigned int pointsPerSlice;
-    std::set <LSB_HASH_SIZE> knownSet;
+    std::set <LSB_HASH_TYPE> knownSet;
 };
 
 int read_file_checkpoint(std::ifstream &inputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);

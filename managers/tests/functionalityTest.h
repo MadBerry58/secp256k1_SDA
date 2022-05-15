@@ -8,25 +8,41 @@
 #define TEST_FAILED             0u
 #define TEST_PASSED             1u
 
+
+
+
+// insert elements in random order
+;
+;
+;
+
 int testFunctionality(bool testingType = TESTING_MANUAL)
 {
     ///generate points from from 2^0 to 2^256
     std::ofstream Gfile;
-    Gfile.open("GFile");
+    Gfile.open("GeneratorEnum.h");
     if(Gfile.is_open())
     {
         mpz_t factor;
         mpz_init_set_ui(factor, 2); //Test mpz functionality
         Point G; ///Test basic point initialiser
         G.printPointInfo();
-        for(int i = 0; i < 256; i++)
+        Gfile
+            << "int generatorConstantsInit()\n"
+            << "{\n"
+            << "  std::map<int, std::string> kGs;\n"
+            << "  std::map<int, std::string> xGs;\n"
+            << "  std::map<int, std::string> yGs;\n\n";
+
+        for (int i = 0; i < 256; i++)
         {
-            Gfile << "#define kG" << i << "_String \"" << G.getK() << "\"\n"
-                  << "#define xG" << i << "_String \"" << G.getX() << "\"\n"
-                  << "#define yG" << i << "_String \"" << G.getY() << "\"\n\n";
+            Gfile << "  kGs.insert(std::pair<int, std::string>(" << i << ", \" " << G.getK() << " \"));" << "\n"
+                  << "  xGs.insert(std::pair<int, std::string>(" << i << ", \" " << G.getX() << " \"));" << "\n"
+                  << "  yGs.insert(std::pair<int, std::string>(" << i << ", \" " << G.getY() << " \"));" << "\n\n";
             G *= factor;
         }
-
+        Gfile << "  return 0;\n"
+              << "}\n";
     }
     else
     {

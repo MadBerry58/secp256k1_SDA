@@ -4,18 +4,6 @@
 
 #include "headers/Mod.h"
 
-void mul_mod(mpz_t result, mpz_t a, mpz_t b, mpz_t p)
-{
-    mpz_mul(result, a, b);
-    mpz_mod(result, result, p);
-};
-
-void add_mod(mpz_t result, mpz_t a, mpz_t b, mpz_t p)
-{
-    mpz_add(result, a, b);
-    mpz_mod(result, result, p);
-}
-
 ///Leave this here or everything goes to shit
 mpz_t moduloHalb;
 mpz_t order;
@@ -35,12 +23,13 @@ mpz_t t1;
 mpz_t t2;
 gmp_randstate_t randomState;
 mpz_t randomSeed;
-/// Leave this here or everything goes to shit
 
 ///TODO: check if using t as an intermediary container offers speed benefits
 
-void modInit() /// https://www.youtube.com/watch?v=UmYce41wlx8
+unsigned int modInit() 
 {
+DEBUG_MSG("Initializing Modular library \n");
+
     mpz_init_set_str(moduloHalb, moduloHalb_String, PREFFERED_BASE);
     mpz_init_set_str(order, order_String, PREFFERED_BASE);
     mpz_init_set_str(prime, prime_String, PREFFERED_BASE);
@@ -57,10 +46,79 @@ void modInit() /// https://www.youtube.com/watch?v=UmYce41wlx8
     mpz_init_set_d(seven, 7);
     mpz_init_set_d(t1, 0);
     mpz_init_set_d(t2, 0);
-    gmp_printf("modInit() works\n");
+
+
+    if (mpz_cmp_ui(seven, 7) != 0)
+    {
+        DEBUG_MSG("MPZ initialization failed \n");
+        return MOD_E_MPZ_ASSIGNMENT_INVALID;
+    }
+    mpz_add(t1, primeMinusOne, one);
+    if (mpz_cmp(t1, prime) != 0)
+    {
+        DEBUG_MSG("MPZ addition failed \n");
+        
+        return MOD_E_MPZ_ADDITION_INVALID;
+    }
+
+    DEBUG_MSG("MPZ functionality works\n");
+
+    DEBUG_MSG("Initializing random number variables\n");
+    
+    gmp_randinit_mt(randomState);
     mpz_init_set_str(randomSeed, RANDOMNESS_SEED, PREFFERED_BASE);
     gmp_randseed(randomState, randomSeed);
-    gmp_randinit_mt(randomState);
+    
+    DEBUG_MSG("Random number variables initalized successfully\n");
+
+    DEBUG_MSG("Testing Mod addition \n");
+
+    add(t1, primeMinusOne, six);
+    if (mpz_cmp(t1, five) != 0)
+    {
+        DEBUG_MSG("Mod addition failed \n");
+        return MOD_E_MOD_ADDITION_INVALID;
+    }
+
+    DEBUG_MSG("Testing Mod subtraction \n");
+    
+    sub(t1, six, two);
+    if (mpz_cmp(t1, four) != 0)
+    {
+        DEBUG_MSG("Mod subtraction failed \n");
+        return MOD_E_MOD_SUBTRACTION_INVALID;
+    }
+
+    DEBUG_MSG("Testing Mod Square Root \n");
+
+    modSqrt(t1, six);
+
+    DEBUG_MSG("Square root of 6: %Zd \n", t1);
+
+    if (mpz_cmp_ui(t1, 0u) != 0)
+    {
+        DEBUG_MSG("Mod squareRoot 0 failed \n");
+        return MOD_E_MOD_SUBTRACTION_INVALID;
+    }
+
+    /// Power function does not work with the same return parameter as the multiplicands
+    mpz_urandomb(t1, randomState, 250u);
+    pow(t2, t1, two);
+    modSqrt(t1, t2);
+    if (mpz_cmp_ui(t1, 0u) == 0)
+    {
+        DEBUG_MSG("Mod squareRoot %Zu failed \n", t2);
+        return MOD_E_MOD_SQUAREROOT_INVALID;
+    }
+
+    DEBUG_MSG("              X: %Zu \n", t2);
+    DEBUG_MSG("sqare root pf X: %Zu \n", t1);
+
+    DEBUG_MSG("Mod functionality correctly initialized \n");
+
+    DEBUG_MSG("Mod OK \n");
+
+    return MOD_E_OK;
 }
 
 inline BigNumber::BigNumber()
@@ -228,7 +286,7 @@ void neg(mpz_t &result, mpz_t &number){
 void add(mpz_t &result, mpz_t &A, mpz_t &B)
 {
     mpz_add(t1, A, B);
-    mpz_mod(result, t1, prime);
+    mpz_mmod(result, t1, prime);
 }
 
 void sub(mpz_t &result, mpz_t &A, mpz_t &B)
@@ -240,7 +298,7 @@ void sub(mpz_t &result, mpz_t &A, mpz_t &B)
 void mul(mpz_t &result, mpz_t &number, mpz_t &multiple)
 {
     mpz_mul(t1, number, multiple);
-    mpz_mod(result, t1, prime);
+    mpz_mmod(result, t1, prime);
 }
 
 void div(mpz_t &result, mpz_t &number, mpz_t &divisor)
@@ -254,99 +312,111 @@ void pow(mpz_t &result, mpz_t &number, mpz_t &power){
     mpz_powm(result, number, power, prime);
 }
 
-void modSqrt(mpz_t &result, mpz_t &number)
+void addKeys(mpz_t &result, mpz_t &key1, mpz_t &key2)
 {
-     ///Tonelli–Shanks algorithm - since the prime always results in s = 1, only one branch of the algorithm is needed
-     pow(t1, number, primePlusOneDivFour);
-     pow(t2, t1, two);
-     if(mpz_cmp(t2, number) == 0)
-     {
-         mpz_set(result, t1);
-     }
-     else
-     {
-         mpz_set(result, zero);
-     }
+    mpz_add(t1, key1, key2);
+    mpz_mmod(result, t1, order);
 }
 
-//// Cipolla algorithm - work in progress, do not use
-void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
+void modSqrt(mpz_t &result, mpz_t &number)
 {
-    typedef struct fp2
+    ///Tonelli–Shanks algorithm - since the prime always results in s = 1, only one branch of the algorithm is needed
+    pow(t1, number, primePlusOneDivFour);
+    pow(t2, t1, two);
+    if(mpz_cmp(t2, number) == 0)
     {
-        private:
-            mpz_t x, y;
-        public:
-            fp2()
-            {
-                mpz_init(x);
-                mpz_init(y);
-            }
-            fp2(mpz_t &init_x, mpz_t &init_y)
-            {
-                mpz_init_set(x, init_x);
-                mpz_init_set(y, init_y);
-            }
-            fp2(unsigned long long &init_x, unsigned long long &init_y)
-            {
-                mpz_init_set_ui(x, init_x);
-                mpz_init_set_ui(y, init_y);
-            }
-            void operator = (fp2 n)
-            {
-                mpz_set(x, n.x);
-                mpz_set(y, n.y);
-            }
-            void fp2mul(fp2 result, fp2 a, fp2 b, mpz_t p, mpz_t w2)
-            {
-                mul_mod(t1, a.x, b.x, p);
-                mul_mod(t2, a.y, b.y, p);
-                mul_mod(t2, t2, w2, p);
-                add_mod(result.x, t1, t2, prime);
-                mul_mod(t1, a.x, b.y, prime);
-                mul_mod(t2, a.y, b.x, prime);
-                mul_mod(result.y, t1, t2, prime);
-                ///Function complexity: 7*(mod) + 6*(mul) + 1*(add)
-            }
-            void fp2square(fp2 &result, fp2 &a, mpz_t &prime, mpz_t &w2)
-            {
-                fp2mul(result, a, a, prime, w2);
-            }
+       mpz_set(result, t1);
+    }
+    else
+    {
+       mpz_set(result, zero);
+    }
+}
 
-            void fp2pow(fp2 &result, fp2 &a, mpz_t &number, mpz_t &p, mpz_t &w2)
-            {
-                mpz_t n;
-                mpz_init_set(n, number);
-                int nZero_or_One = (mpz_cmp_ui(n, 1));
-                
-                switch(nZero_or_One)
-                {
-                    case 0: /// n == 1
-                        break;
-                    case -1: /// n < 1
-                        mpz_set_ui(result.x, 1);
-                        mpz_set_ui(result.y, 0);
-                        break;
-                    case 1:
-                        if (mpz_even_p(n))
-                        {
-                            mpz_div_2exp(n, n, 1);
-                            fp2pow(result, a, n, p, w2);
-                            fp2square(result, a, p, w2);
-                        }
-                        else
-                        {
-                            mpz_sub_ui(n, n, 1u);
-                            fp2pow(result, a, n, p, w2);
-                            fp2mul(result, a, result, p, w2);
-                        }
-                        break;
-                }
-                ///Function Complexity: Iterations*( 1*(sub) + 1(pow) + 1(mul) 
-            }
-        
-    };
+void generateRandomKey(mpz_t &result)
+{
+    gmp_randseed_ui(randomState, random());
+    mpz_urandomb(result, randomState, 250u);
+}
 
+    // //// Cipolla algorithm - work in progress, do not use
+    // void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
+    // {
+    //     typedef struct fp2
+    //     {
+    //         private:
+    //             mpz_t x, y;
+    //         public:
+    //             fp2()
+    //             {
+    //                 mpz_init(x);
+    //                 mpz_init(y);
+    //             }
+    //             fp2(mpz_t &init_x, mpz_t &init_y)
+    //             {
+    //                 mpz_init_set(x, init_x);
+    //                 mpz_init_set(y, init_y);
+    //             }
+    //             fp2(unsigned long long &init_x, unsigned long long &init_y)
+    //             {
+    //                 mpz_init_set_ui(x, init_x);
+    //                 mpz_init_set_ui(y, init_y);
+    //             }
+    //             void operator = (fp2 n)
+    //             {
+    //                 mpz_set(x, n.x);
+    //                 mpz_set(y, n.y);
+    //             }
+    //             void fp2mul(fp2 result, fp2 a, fp2 b, mpz_t p, mpz_t w2)
+    //             {
+    //                 mul_mod(t1, a.x, b.x, p);
+    //                 mul_mod(t2, a.y, b.y, p);
+    //                 mul_mod(t2, t2, w2, p);
+    //                 add_mod(result.x, t1, t2, prime);
+    //                 mul_mod(t1, a.x, b.y, prime);
+    //                 mul_mod(t2, a.y, b.x, prime);
+    //                 mul_mod(result.y, t1, t2, prime);
+    //                 ///Function complexity: 7*(mod) + 6*(mul) + 1*(add)
+    //             }
+    //             void fp2square(fp2 &result, fp2 &a, mpz_t &prime, mpz_t &w2)
+    //             {
+    //                 fp2mul(result, a, a, prime, w2);
+    //             }
+
+    //             void fp2pow(fp2 &result, fp2 &a, mpz_t &number, mpz_t &p, mpz_t &w2)
+    //             {
+    //                 mpz_t n;
+    //                 mpz_init_set(n, number);
+    //                 int nZero_or_One = (mpz_cmp_ui(n, 1));
+
+    //                 switch(nZero_or_One)
+    //                 {
+    //                     case 0: /// n == 1
+    //                         break;
+    //                     case -1: /// n < 1
+    //                         mpz_set_ui(result.x, 1);
+    //                         mpz_set_ui(result.y, 0);
+    //                         break;
+    //                     case 1:
+    //                         if (mpz_even_p(n))
+    //                         {
+    //                             mpz_div_2exp(n, n, 1);
+    //                             fp2pow(result, a, n, p, w2);
+    //                             fp2square(result, a, p, w2);
+    //                         }
+    //                         else
+    //                         {
+    //                             mpz_sub_ui(n, n, 1u);
+    //                             fp2pow(result, a, n, p, w2);
+    //                             fp2mul(result, a, result, p, w2);
+    //                         }
+    //                         break;
+    //                 }
+    //                 ///Function Complexity: Iterations*( 1*(sub) + 1(pow) + 1(mul)
+    //             }
+
+    //     };
+    // }
     // uint64_t randULong(uint64_t min, uint64_t max)
     // {
     //     uint64_t t = (uint64_t)rand();
@@ -369,7 +439,6 @@ void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
     //     }
     //     return x;
     // }
-
 
     // returns b ^^ power mod modulus
     // uint64_t pow_mod(uint64_t b, uint64_t power, uint64_t modulus)
@@ -448,7 +517,7 @@ void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
 
     //     return true;
     // }
-    
+
     ///////mpz_probab_prime_p();
 
     // int64_t legendre_symbol(int64_t a, int64_t p)
@@ -486,91 +555,85 @@ void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
     //     return fp2mul(a, a, p, w2);
     // }
 
-    void test(mpz_t &n, mpz_t &p)
-    {
-        mpz_t a, w2;
-        mpz_t x1, x2;
-        fp2 answer;
+    //     void test(mpz_t &n, mpz_t &p)
+    //     {
+    //         mpz_t a, w2;
+    //         mpz_t x1, x2;
+    //         fp2 answer;
 
-        gmp_printf("Find solution for n = %Zd and p = %Zd\n", n, p);
-        // if (p == 2 || !isPrime(p, 15))
-        if( (mpz_cmp_ui(p, 2) == 0) || mpz_probab_prime_p(p)
-        {
-            printf("No solution, p is not an odd prime.\n\n");
-            return;
-        }
+    //         gmp_printf("Find solution for n = %Zd and p = %Zd\n", n, p);
+    //         // if (p == 2 || !isPrime(p, 15))
+    //         if( (mpz_cmp_ui(p, 2) == 0) || mpz_probab_prime_p(p)
+    //         {
+    //             printf("No solution, p is not an odd prime.\n\n");
+    //             return;
+    //         }
 
-        // p is checked and is a odd prime
-        // if (legendre_symbol(n, p) != 1)
-        if(mpz_legendre(n, p) != 1)
-        {
-            gmp_printf(" %Zd is not a square in F%Zd\n\n", n, p);
-            return;
-        }
-        mpz_sub(t1, p, two); /// cover the random range issue without checking the result for numbers smaller than 3
-        mpz_set_str(t1, primePlusOneDivTwo_String);
-        while (true)
-        {
-            do
-            {
-                ///generate a random number in the range (2, prime)
-                mpz_urandomm(a, randomState, t1); ///TODO: see if it is possible to use a pre generated set of high entropy numbers (as compared to numbers of trials neccessary for determining primality of a known number set)
-                mpz_add(a, a, two);
+    //         // p is checked and is a odd prime
+    //         // if (legendre_symbol(n, p) != 1)
+    //         if(mpz_legendre(n, p) != 1)
+    //         {
+    //             gmp_printf(" %Zd is not a square in F%Zd\n\n", n, p);
+    //             return;
+    //         }
+    //         mpz_sub(t1, p, two); /// cover the random range issue without checking the result for numbers smaller than 3
+    //         mpz_set_str(t1, primePlusOneDivTwo_String);
+    //         while (true)
+    //         {
+    //             do
+    //             {
+    //                 ///generate a random number in the range (2, prime)
+    //                 mpz_urandomm(a, randomState, t1); ///TODO: see if it is possible to use a pre generated set of high entropy numbers (as compared to numbers of trials neccessary for determining primality of a known number set)
+    //                 mpz_add(a, a, two);
 
-                mpz_mul(w2, a, a);
-                mpz_sub(w2, w2, n);
-            } 
-            while (mpz_legendre(w2, p) != 1);
+    //                 mpz_mul(w2, a, a);
+    //                 mpz_sub(w2, w2, n);
+    //             }
+    //             while (mpz_legendre(w2, p) != 1);
 
-            mpz_set(answer.x, a);
-            mpz_set_ui(answer.y, 1);
+    //             mpz_set(answer.x, a);
+    //             mpz_set_ui(answer.y, 1);
 
-            fp2pow(answer, answer, t1, p, w2);
-            if (answer.y != 0)
-            {
-                continue;
-            }
+    //             fp2pow(answer, answer, t1, p, w2);
+    //             if (answer.y != 0)
+    //             {
+    //                 continue;
+    //             }
 
-            x1 = answer.x;
-            x2 = p - x1;
-            if (mul_mod(x1, x1, p) == n && mul_mod(x2, x2, p) == n)
-            {
-                printf("Solution found: x1 = %lld, x2 = %lld\n\n", x1, x2);
-                return;
-            }
-        }
-    }
-};
+    //             x1 = answer.x;
+    //             x2 = p - x1;
+    //             if (mul_mod(x1, x1, p) == n && mul_mod(x2, x2, p) == n)
+    //             {
+    //                 printf("Solution found: x1 = %lld, x2 = %lld\n\n", x1, x2);
+    //                 return;
+    //             }
+    //         }
+    //     }
+    // };
 
-void addKeys(mpz_t &result, mpz_t &key1, mpz_t &key2)
-{
-    mpz_add(t1, key1, key2);
-    mpz_mod(result, t1, order);
-}
+    // void mpz_modSqrt(mpz_t &number, mpz_t &prime)
+    // {
+    //     if (mpz_legendre(number, prime) != 1)
+    //     {
+    //         gmp_printf(" %Zd is not a square in F%Zd\n\n", number, prime);
+    //         return;
+    //     }
 
-void mpz_modSqrt(mpz_t &number, mpz_t &prime)
-{
-    if (mpz_legendre(number, prime) != 1)
-    {
-        gmp_printf(" %Zd is not a square in F%Zd\n\n", number, prime);
-        return;
-    }
+    //     mpz_t a, w2, e;
+    //     mpz_inits(a, w2, e);
+    //     while (mpz_legendre(number, prime) != 1)
+    //     {
+    //         mpz_add_ui(a, a, 1)
+    //         mpz_mul(w2, a, a);
+    //         mpz_sub(w2, w2, &number);
+    //         mpz_mod(w2, w2, prime);
+    //     }
 
-    mpz_t a, w2, e;
-    mpz_inits(a, w2, e);
-    while (mpz_legendre(number, prime) != 1)
-    {
-        mpz_add_ui(a, a, 1)
-        mpz_mul(w2, a, a);
-        mpz_sub(w2, w2, &number);
-        mpz_mod(w2, w2, prime);
-    }
+    //     fp2 r(1, 0), s(a, one);
 
-    fp2 r(1, 0), s(a, one);
-    
-    while(1)
-    {
-        mpz_add(e, prime, one);
-        mpz_probab_prime_p(e, PRIME_TRIALS);
-    }
-}
+    //     while(1)
+    //     {
+    //         mpz_add(e, prime, one);
+    //         mpz_probab_prime_p(e, PRIME_TRIALS);
+    //     }
+    // }

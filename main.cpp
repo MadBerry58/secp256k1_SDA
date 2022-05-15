@@ -2,6 +2,7 @@
 #include "managers/headers/fileManager.h"
 #include "runnables/headers/UI_runnable.h"
 
+
 int main(int argc, char **argv)
 {
     // for(;;)
@@ -11,10 +12,10 @@ int main(int argc, char **argv)
     // switch(getopt())
     std::cout << "It's alive!\n" << std::endl;
     modInit();
+    pointInit();
     fileManager_Init();
-    userInterface_Init();
-    // userInterface_Start();
-    testFunctionality();
+    // testFunctionality();
+    
 
     return 0;
 }

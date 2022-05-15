@@ -4,7 +4,7 @@ project(CMake_Build VERSION 0.1.0)
 include(CTest)
 enable_testing()
 
-#add_compile_options(-fPIC)
+add_compile_options(-fPIC)
 
 project(secp256k1_SDA)
 set(CMAKE_CXX_STANDARD 14)
@@ -29,8 +29,11 @@ add_subdirectory(managers)
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
 target_link_libraries(srcLib
-        "/usr/lib/x86_64-linux-gnu/libgmp.so"
-        "/usr/lib/x86_64-linux-gnu/libgmpxx.so"
+        # "/usr/lib/x86_64-linux-gnu/libgmp.so"
+        # "/usr/lib/x86_64-linux-gnu/libgmpxx.so"
+
+        "/usr/lib/x86_64-linux-gnu/libgmp.a"
+        "/usr/lib/x86_64-linux-gnu/libgmpxx.a"
         )
 
 target_link_libraries(${PROJECT_NAME}

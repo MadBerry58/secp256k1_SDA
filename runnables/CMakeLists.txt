@@ -8,4 +8,5 @@ set(runnable_files
     headers/UI_runnable.h
     UI_runnable.cpp
 )
-add_library(runnableLib SHARED ${runnable_files})
+add_library(runnableLib ${runnable_files})
+# add_library(runnableLib SHARED ${runnable_files})
