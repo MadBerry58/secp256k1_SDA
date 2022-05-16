@@ -36,8 +36,8 @@ public:
     void            operator=               (Point &source);
     void            operator=               (mpz_t &key);
     void            operator=               (char  *keyString);
-    void            operator-=              (Point &source);
-    void            operator+=              (Point &source);
+    Point&          operator-=              (Point &source);
+    Point&          operator+=              (Point &source);
     void            operator*=              (mpz_t &factor);
     bool            operator==              (Point &source);
     bool            operator!=              (Point &source);
@@ -45,6 +45,7 @@ public:
     ///Arithmetic functions 
     void            negate                  ();
     void            addPoint                (Point &result, Point &B);
+    void            subPoint                (Point &result, Point &B);
     void            multiplyBy2             (Point &result);
     void            multiplyByFactor        (Point &result, mpz_t &factor);
 

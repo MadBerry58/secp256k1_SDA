@@ -27,20 +27,20 @@ struct pointsStringProfile
 
 unsigned int    fileManager_Init                        ();
 
-int             generationSanityCheck                   (Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, \
-                                                            unsigned int pointsPerSlice, mpz_t &incrementSize);
+int             generationSanityCheck                   (Point &startingPoint, unsigned long numberOfPoints, unsigned long numberOfSlices, \
+                                                           unsigned long pointsPerSlice, mpz_t &incrementSize);
 
-int             generateHashedPointsFile                (std::ofstream &outputFile, Point &startingPoint, unsigned int numberOfPoints, \
-                                                            unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);
+int             generateHashedPointsFile                (std::ofstream &outputFile, Point &startingPoint, unsigned long numberOfPoints, \
+                                                           unsigned long numberOfSlices, unsigned long pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);
 
-int             generateUncompressedPointsFile          (std::ofstream &outputFile, Point &startingPoint, unsigned int numberOfPoints, \
-                                                            unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);
+int             generateUncompressedPointsFile          (std::ofstream &outputFile, Point &startingPoint, unsigned long numberOfPoints, \
+                                                           unsigned long numberOfSlices, unsigned long pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);
 
-int             generate_file_checkpoint                (std::ofstream &outputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, \
-                                                            unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);
+int             generate_file_checkpoint                (std::ofstream &outputFile, Point &targetPoint, Point &checkOutPoint, unsigned long &iterationNumber, \
+                                                           unsigned long &numberOfSlices, unsigned long &pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize);
 
-int             checkIntegrity_file_checkpoint          (std::ifstream &inputFile, Point &output_targetPoint, Point &output_checkOutPoint, unsigned int output_iterationNumber, \
-                                                        unsigned int output_numberOfSlices, unsigned int output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize, \
+int             checkIntegrity_file_checkpoint          (std::ifstream &inputFile, Point &output_targetPoint, Point &output_checkOutPoint, unsigned long &output_iterationNumber, \
+                                                        unsigned long &output_numberOfSlices, unsigned long &output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize, \
                                                         bool writeToParameters = false);
 
 int             resumeGeneration                        ();

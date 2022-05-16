@@ -8,6 +8,8 @@
 #define SECP256K1_SANDBOX_POINT_CPP
 #include "headers/Point.h"
 
+// #define POINTDEBUG
+
 unsigned int returnValue = 0u;
 
 extern mpz_t moduloHalb;
@@ -101,8 +103,28 @@ unsigned int pointInit()
         return POINT_E_ADDITION_Y_INVALID;
     }
 
-    localTempPoint2 = (char*)(kG1_String);
+    localTempPoint1 = (char *)(kG2_String);
+
+    localTempPoint2 = (char *)(kG1_String);
+
+#ifdef POINTDEBUG
+    printf("tempInitialPointK: %s\n",   localTempPoint1.getK());
+    printf("tempInitialPointX: %s\n",   localTempPoint1.getX());
+    printf("tempInitialPointY: %s\n\n", localTempPoint1.getY());
+
+    printf("tempSubtractedPointK: %s\n",   localTempPoint2.getK());
+    printf("tempSubtractedPointX: %s\n",   localTempPoint2.getX());
+    printf("tempSubtractedPointY: %s\n\n", localTempPoint2.getY());
+#endif
+
     localTempPoint1 -= localTempPoint2;
+        // localTempPoint1.subPoint(localTempPoint1, localTempPoint2);
+
+#ifdef POINTDEBUG
+    printf("tempResultPointK: %s\n", localTempPoint1.getK());
+    printf("tempResultPointX: %s\n",   localTempPoint1.getX());
+    printf("tempResultPointY: %s\n\n", localTempPoint1.getY());
+#endif
 
     DEBUG_MSG("%s\n", localTempPoint1.getK());
     if (strcmp(localTempPoint1.getK(), kG1_String) != 0)
@@ -212,32 +234,48 @@ void Point::operator=(Point &source)
 void Point::operator=(mpz_t &key)
 {
     this->reset();
-    *this *= key;
+    this->multiplyByFactor(*this, key);
 }
 
 void Point::operator=(char *keyString)
 {
-    this->reset();
     mpz_set_str(t1, keyString, PREFFERED_BASE);
-    *this = t1;
+    this->reset();
+    this->multiplyByFactor(*this, t1);
 }
 
-void Point::operator-=(Point &source)
+Point& Point::operator-=(Point &source)
 {
-    mpz_sub(source.k, order, source.k);
-    mpz_sub(source.y, prime, source.y);
+#ifdef POINTDEBUG
+    gmp_printf("subtractantPointK: %s\n",   this->getK());
+    gmp_printf("subtractantPointX: %s\n",   this->getX());
+    gmp_printf("subtractantPointY: %s\n\n", this->getY());
+
+    gmp_printf("subtractedPointK: %s\n",   source.getK());
+    gmp_printf("subtractedPointX: %s\n",   source.getX());
+    gmp_printf("subtractedPointY: %s\n\n", source.getY());
+#endif
+
+    this->negate();
+
+#ifdef POINTDEBUG
+    gmp_printf("negatedPointK: %s\n",   this->getK());
+    gmp_printf("negatedPointX: %s\n",   this->getX());
+    gmp_printf("negatedPointY: %s\n\n", this->getY());
+#endif
+
     *this += source;
-    mpz_sub(source.k, order, source.k);
-    mpz_sub(source.y, prime, source.y);
-//     localTempPoint1 = source; ///Throwaway temporary
-//     mpz_sub(localTempPoint1.k, order, localTempPoint1.k);
-//     mpz_sub(localTempPoint1.y, prime, localTempPoint1.y);
+    
+    this->negate();
+
+    return *this;
 }
 
-void Point::operator+=(Point &source)
+Point &Point::operator+=(Point &source)
 {
     /// TODO:  test to see if it's consistent with the addPoint function
-    addKeys(this->k, source.k, this->k);
+    mpz_add(t1, source.k, this->k);
+    mpz_mmod(this->k, t1, order);
 
     sub(t1, source.y, this->y);     /// t1 = By - Ay mod p
     sub(t2, source.x, this->x);     /// t2 = Bx - Ax mod p
@@ -250,6 +288,7 @@ void Point::operator+=(Point &source)
     mul(t1, m, this->x);            /// t1 = m * Cx
     add(t2, t1, n);                 /// t2 = t1 + n
     neg(this->y, t2);               /// Cy = neg(t2)
+    return *this;
 }
 
 void Point::operator*=(mpz_t &factor)
@@ -300,18 +339,41 @@ void Point::addPoint(Point &result, Point &B)
 //    result.x  = sub(sub(mul(m,m) ,(xP1)) , (xP2));
 //    result.y  = neg(add(mul(m,result.x) , n));
 
-    addKeys (result.k, this->k, B.k);
-    sub     (t1, B.y, this->y);         /// t1  = By - Ay mod p
-    sub     (t2, B.x, this->x);         /// t2  = Bx - Ax mod p
-    div     (m, t1, t2);                /// m   = t1 / t2 mod p
-    mul     (t1, m, this->x);           /// t1  = m * Ax mod p
-    sub     (n, this->y, t1);           /// n   = Ax - t1 mod p
-    pow     (t1, m, two);               /// t1  = m * m
-    sub     (t2, t1, this->x);          /// t2  = t1 - Ax
-    sub     (result.x, t2, B.x);        /// Cx  = t2 - Bx
-    mul     (t1, m, result.x);          /// t1  = m * Cx
-    add     (t2, t1, n);                /// t2  = t1 + n
-    neg     (result.y, t2);             /// Cy  = neg(t2)
+mpz_add(t1, this->k, B.k);
+mpz_mmod(result.k, t1, order);
+
+sub(t1, B.y, this->y);  /// t1  = By - Ay mod p
+sub(t2, B.x, this->x);  /// t2  = Bx - Ax mod p
+div(m, t1, t2);         /// m   = t1 / t2 mod p
+mul(t1, m, this->x);    /// t1  = m * Ax mod p
+sub(n, this->y, t1);    /// n   = Ax - t1 mod p
+pow(t1, m, two);        /// t1  = m * m
+sub(t2, t1, this->x);   /// t2  = t1 - Ax
+sub(result.x, t2, B.x); /// Cx  = t2 - Bx
+mul(t1, m, result.x);   /// t1  = m * Cx
+add(t2, t1, n);         /// t2  = t1 + n
+neg(result.y, t2);      /// Cy  = neg(t2)
+}
+
+void Point::subPoint(Point &result, Point &B)
+{
+    B.negate();
+    mpz_add(t1, this->k, B.k);
+    mpz_mmod(result.k, t1, order);
+
+    sub(t1, B.y, this->y);  /// t1  = By - Ay mod p
+    sub(t2, B.x, this->x);  /// t2  = Bx - Ax mod p
+    div(m, t1, t2);         /// m   = t1 / t2 mod p
+    mul(t1, m, this->x);    /// t1  = m * Ax mod p
+    sub(n, this->y, t1);    /// n   = Ax - t1 mod p
+    pow(t1, m, two);        /// t1  = m * m
+    sub(t2, t1, this->x);   /// t2  = t1 - Ax
+    sub(result.x, t2, B.x); /// Cx  = t2 - Bx
+    mul(t1, m, result.x);   /// t1  = m * Cx
+    add(t2, t1, n);         /// t2  = t1 + n
+    neg(result.y, t2);      /// Cy  = neg(t2)
+
+    B.negate();
 }
 
 void Point::multiplyBy2(Point &result)
@@ -344,46 +406,70 @@ void Point::multiplyBy2(Point &result)
 
 }
 
+// void Point::multiplyByFactor(Point &result, mpz_t &factor)
+// {
+//     unsigned long factorSize = mpz_sizeinbase(factor, 2);
+
+//     localTempPoint1 = *this;
+
+//     unsigned long i = 0;
+
+//     while (mpz_tstbit(factor, i) == 0) /// covers the case when factor's LSB is not 0
+//     {
+//         localTempPoint1.multiplyBy2(localTempPoint1);
+//         ++i;
+//     }
+//     result = localTempPoint1;
+
+//     ++i;
+//     for (i; i < factorSize; ++i)
+//     {
+//         if (mpz_tstbit(factor, i))
+//         {
+//             result += localTempPoint1;
+//         }
+//         localTempPoint1.multiplyBy2(localTempPoint1);
+//     }
+// }
+
 void Point::multiplyByFactor(Point &result, mpz_t &factor)
 {
-    unsigned int factorSize = mpz_sizeinbase(factor, 2);
+    unsigned long factorSize = mpz_sizeinbase(factor, 2);
+    Point temp(*this);
 
-    localTempPoint1 = *this;
-
-    unsigned int i = 0;
+    unsigned long i = 0;
 
     while (mpz_tstbit(factor, i) == 0) /// covers the case when factor's LSB is not 0
     {
-        localTempPoint1.multiplyBy2(localTempPoint1);
+        temp.multiplyBy2(temp);
         ++i;
     }
-    result = localTempPoint1;
-
+    result = temp;
+    
     ++i;
     for (i; i < factorSize; ++i)
     {
+        temp.multiplyBy2(temp);
         if (mpz_tstbit(factor, i))
         {
-            result += localTempPoint1;
+            result += temp;
         }
-        localTempPoint1.multiplyBy2(localTempPoint1);
     }
 }
 
-
 char *Point::getK() 
 {
-    return mpz_get_str(outputString, PREFFERED_BASE, this->k);
+    return mpz_get_str(NULL, PREFFERED_BASE, this->k);
 }
 
 char *Point::getX()
 {
-    return mpz_get_str(outputString, PREFFERED_BASE, this->x);
+    return mpz_get_str(NULL, PREFFERED_BASE, this->x);
 }
 
 char *Point::getY()
 {
-    return mpz_get_str(outputString, PREFFERED_BASE, this->y);
+    return mpz_get_str(NULL, PREFFERED_BASE, this->y);
 }
 
 LSB_HASH_TYPE Point::getLSB()
@@ -481,7 +567,6 @@ bool Point::isKeyKnown()
 {
     return this->keyKnown;
 }
-
 
 ///Tester functions
 

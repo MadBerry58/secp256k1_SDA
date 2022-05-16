@@ -9,9 +9,9 @@
 #define INITIALVAL_POINT_KEY                            "1"
 #define INITIALVAL_POINT_x                              "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
 #define INITIALVAL_POINT_y                              "483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8"
-#define PREFFERED_BASE                                  16u
+#define PREFFERED_BASE                                  16u ///TODO: remove string definition dependencies to allow modification
 #define LSB_READ_BASE                                   10u
-#define LSB_HASH_TYPE                                   unsigned long
+#define LSB_HASH_TYPE                                   unsigned long int
 #define LSB_STRING_SIZE                                 4u
 #define GMP_LIMBNUMBER                                  4u
 #define RANDOMNESS_SEED                                 "483ada7726a3c4655da4fbfd1e1108a8fd17b448a68554199c47d08ffb10d4b8"
@@ -81,9 +81,19 @@
 #define INTEGRITY_E_SLICE_SIZE_TOO_BIG                  273u
 #define INTEGRITY_E_INCREMENT_SIZE_TOO_BIG              274u
 #define INTEGRITY_E_UNKNOWN_EOF_TOKEN                   275u
-#define INTEGRITY_E_INVALID_EOF_TOKEN                   275u
-#define INTEGRITY_E_INIT_COULDNOTOPENFILE               276u
-#define INTEGRITY_E_READ_CHECKPOINT                     277u
+#define INTEGRITY_E_INVALID_EOF_TOKEN                   276u
+#define INTEGRITY_E_INIT_COULDNOTOPENFILE               277u
+#define INTEGRITY_E_READ_CHECKPOINT                     278u
+
+/// Filer manager errors        0b 00000001 10000000
+#define INTEGRITY_E_FILE_INIT_OK                        384u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_TARGET         385u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_CHECKOUT       386u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_ITERATION      387u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_SLICENO        388u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_POINTSPERSLICE 389u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_SLICESIZE      390u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_INCREMENTSIZE  391u
 
 /// Connection errors           0b 00000010 00000000
 #define CONN_MGR_E_OK                                   512u

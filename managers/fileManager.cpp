@@ -20,7 +20,7 @@ COLFO
 
 unsigned int fileManager_Init()
 {
-    unsigned int errorNo = 0;
+   unsigned long errorNo = 0;
     tempPoint.reset();
     remainderPoint.reset();
     containerPoint.reset();
@@ -59,6 +59,7 @@ unsigned int fileManager_Init()
 
     DEBUG_MSG("Uncompressed file generated successfully\n");
 
+
     tempOutput.open("CheckpointTest.sda", std::ofstream::trunc);
     if (!tempOutput.is_open())
     {
@@ -82,27 +83,45 @@ unsigned int fileManager_Init()
     mpz_t dummyIncrementSize;
     mpz_init_set_ui(dummyIncrementSize, random());
     
+
     mpz_t dummySliceSize;
     mpz_init(dummySliceSize);
     mpz_mdiv_ui(dummySliceSize, orderHalf, dummyNumberOfSlices);
     
     mpz_t dummyCheckoutKey;
-    mpz_init(dummyCheckoutKey);
-    mpz_mul_ui(dummyCheckoutKey, sliceSizeContainer, dummyIterationNumber / dummyPointsPerSlice);
-    mpz_addmul_ui(dummyCheckoutKey, incrementSizeContainer, dummyIterationNumber % dummyPointsPerSlice);
-    mpz_add(dummyCheckoutKey, dummyCheckoutKey, dummyKey);
+    mpz_init_set(dummyCheckoutKey, dummyKey);
+    mpz_addmul_ui(dummyCheckoutKey, dummyIncrementSize, dummyIterationNumber);
+
+    DEBUG_MSG("\nDummy checkout key: %Zx\n\n", dummyCheckoutKey);
+
 
     Point dummyCheckout(dummyCheckoutKey);
     COLLECT(dummyCheckout);
-    
+
+    DEBUG_MSG("\nGenerated dummyTarget K: %s\n", dummyTarget.getK());
+    DEBUG_MSG("Generated dummyTarget X: %s\n", dummyTarget.getX());
+    DEBUG_MSG("Generated dummyTarget Y: %s\n", dummyTarget.getY());
+    DEBUG_MSG("Generated dummyCheckout K: %s\n", dummyCheckout.getK());
+    DEBUG_MSG("Generated dummyCheckout X: %s\n", dummyCheckout.getX());
+    DEBUG_MSG("Generated dummyCheckout Y: %s\n", dummyCheckout.getY());
+    DEBUG_MSG("Generated dummyIterationNumber: %x\n", dummyIterationNumber);
+    DEBUG_MSG("Generated dummyNumberOfSlices: %x\n", dummyNumberOfSlices);
+    DEBUG_MSG("Generated dummyPointsPerSlice: %x\n", dummyPointsPerSlice);
+    DEBUG_MSG("Generated dummySliceSize: %Zx\n", dummySliceSize);
+    DEBUG_MSG("Generated dummyIncrementSize: %Zx\n", dummyIncrementSize);
+    mpz_mul_ui(temp, dummyIncrementSize, dummyIterationNumber);
+    DEBUG_MSG("Generated total iteration size: %Zx\n\n", temp);
+
     if ((errorNo = generate_file_checkpoint(tempOutput, dummyTarget, dummyCheckout, dummyIterationNumber, dummyNumberOfSlices, dummyPointsPerSlice, dummySliceSize, dummyIncrementSize)) != CHECKPOINT_E_OK)
     {
         DEBUG_MSG("Checkpoint file generation failed with error code %d", errorNo);
     }
-    
     tempOutput.close();
-
     DEBUG_MSG("Checkpoint file generated successfully\n");
+    
+
+
+
 
     tempInput.open("CheckpointTest.sda");
     if (!tempInput.is_open())
@@ -112,7 +131,7 @@ unsigned int fileManager_Init()
     }
 
     Point dummyOutputTarget;
-    Point dummyOutputCheckpoint;
+    Point dummyOutputCheckout;
     mpz_t dummyOutputSliceSize;
     mpz_t dummyOutputIncrementSize;
     mpz_init(dummyOutputSliceSize);
@@ -121,7 +140,7 @@ unsigned int fileManager_Init()
     unsigned long dummyOutputNumberOfSlices;
     unsigned long dummyOutputPointsPerSlice;
 
-    if ((errorNo = checkIntegrity_file_checkpoint(tempInput, dummyOutputTarget, dummyOutputCheckpoint, dummyOutputIterationNumber, dummyOutputNumberOfSlices, dummyOutputPointsPerSlice, dummyOutputSliceSize, dummyOutputIncrementSize, true)) != INTEGRITY_E_OK)
+    if ((errorNo = checkIntegrity_file_checkpoint(tempInput, dummyOutputTarget, dummyOutputCheckout, dummyOutputIterationNumber, dummyOutputNumberOfSlices, dummyOutputPointsPerSlice, dummyOutputSliceSize, dummyOutputIncrementSize, true)) != INTEGRITY_E_OK)
     {
         DEBUG_MSG("Checkpoint reading failed with code %d\n", errorNo);
         return INTEGRITY_E_READ_CHECKPOINT;
@@ -130,41 +149,48 @@ unsigned int fileManager_Init()
     DEBUG_MSG("Checkpoint file read successfully\n");
 
     ///Implement checking error codes
-    if      (dummyTarget != dummyOutputTarget)
+    if      (!(dummyTarget == dummyOutputTarget))
     {
         DEBUG_MSG("Target not matching\n");
+        return INTEGRITY_E_FILE_INIT_MISMATCHED_TARGET;
     }
-    else if (dummyCheckout != dummyOutputCheckpoint)
+    if (!(dummyCheckout == dummyOutputCheckout))
     {
-        DEBUG_MSG("Checkout not matching\n");
+        DEBUG_MSG("Checkout %s not matching \n    read %s\n", dummyCheckout.getK(), dummyOutputCheckout.getK() );
+        return INTEGRITY_E_FILE_INIT_MISMATCHED_CHECKOUT;
     }
-    else if (dummyIterationNumber != dummyOutputIterationNumber)
+    if (dummyIterationNumber != dummyOutputIterationNumber)
     {
-        DEBUG_MSG("Iteration number not matching\n");
+        DEBUG_MSG("Iteration number %lu not matching read %lu\n", dummyIterationNumber, dummyOutputIterationNumber);
+        return INTEGRITY_E_FILE_INIT_MISMATCHED_ITERATION;
     }
-    else if (dummyNumberOfSlices != dummyOutputNumberOfSlices)
+    if (dummyNumberOfSlices != dummyOutputNumberOfSlices)
     {
-        DEBUG_MSG("Number of slices not matching\n");
+        DEBUG_MSG("Number of slices %lu not matching read %lu\n", dummyNumberOfSlices, dummyOutputNumberOfSlices);
+        return INTEGRITY_E_FILE_INIT_MISMATCHED_SLICENO;
     }
-    else if (dummyPointsPerSlice != dummyOutputPointsPerSlice)
+    if (dummyPointsPerSlice != dummyOutputPointsPerSlice)
     {
-        DEBUG_MSG("Points per slice not matching\n");
+        DEBUG_MSG("Points per slice %lu not matching read %lu\n", dummyPointsPerSlice, dummyOutputPointsPerSlice);
+        return INTEGRITY_E_FILE_INIT_MISMATCHED_POINTSPERSLICE;
     }
-    else if (mpz_cmp(dummySliceSize, dummyOutputSliceSize) != 0)
+    if (mpz_cmp(dummySliceSize, dummyOutputSliceSize) != 0)
     {
-        DEBUG_MSG("Slice size not matching\n");
+        DEBUG_MSG("Slice size %Zx not matching read %Zx\n", dummySliceSize, dummyOutputSliceSize);
+        return INTEGRITY_E_FILE_INIT_MISMATCHED_SLICESIZE;
     }
-    else if (mpz_cmp(dummyIncrementSize, dummyOutputIncrementSize) != 0)
+    if (mpz_cmp(dummyIncrementSize, dummyOutputIncrementSize) != 0)
     {
-        DEBUG_MSG("Increment size not matching\n");
+        DEBUG_MSG("Increment size %Zx not matching read %Zx\n", dummyIncrementSize, dummyOutputIncrementSize);
+        return INTEGRITY_E_FILE_INIT_MISMATCHED_INCREMENTSIZE;
     }
 
     gmp_printf("FileManager OK\n");
     tempOutput.close();
-    return INTEGRITY_E_OK;
+    return INTEGRITY_E_FILE_INIT_OK;
 }
 
-int generationSanityCheck(Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &incrementSize)
+int generationSanityCheck(Point &startingPoint, unsigned long numberOfPoints,unsigned long numberOfSlices, unsigned long pointsPerSlice, mpz_t &incrementSize)
 {
     ///TODO: check for negative inputs
     mpz_set_d(temp, 0);
@@ -201,7 +227,7 @@ int generationSanityCheck(Point &startingPoint, unsigned int numberOfPoints, uns
     return GENERATION_E_OK;
 }
 
-int generateHashedPointsFile(std::ofstream &outputFile, Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
+int generateHashedPointsFile(std::ofstream &outputFile, Point &startingPoint,unsigned long numberOfPoints, unsigned long numberOfSlices, unsigned long pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
 {
     ////TODO: preallocate needed space
     ////TODO: add low entropy bitsets
@@ -261,7 +287,7 @@ int generateHashedPointsFile(std::ofstream &outputFile, Point &startingPoint, un
     return GENERATION_E_OK;
 }
 
-int generateUncompressedPointsFile(std::ofstream &outputFile, Point &startingPoint, unsigned int numberOfPoints, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
+int generateUncompressedPointsFile(std::ofstream &outputFile, Point &startingPoint, unsigned long numberOfPoints,unsigned long numberOfSlices,unsigned long pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
 {
     ////TODO: implement validation before calling the function
     // TODO: preallocate needed space
@@ -327,7 +353,7 @@ int generateUncompressedPointsFile(std::ofstream &outputFile, Point &startingPoi
     return GENERATION_E_OK;
 }
 
-int generate_file_checkpoint(std::ofstream &outputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
+int generate_file_checkpoint(std::ofstream &outputFile, Point &targetPoint, Point &checkOutPoint, unsigned long &iterationNumber, unsigned long &numberOfSlices, unsigned long &pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
 {
     if (outputFile.is_open())
     {
@@ -342,7 +368,7 @@ int generate_file_checkpoint(std::ofstream &outputFile, Point &targetPoint, Poin
                    << numberOfSlices << "\n"
 
                    << SLICE_SIZE_TAG << "\n"
-                   << mpz_get_str(NULL, PREFFERED_BASE, incrementSize) << "\n"
+                   << mpz_get_str(NULL, PREFFERED_BASE, sliceSize) << "\n"
 
                    << POINTS_PER_SLICE_TAG << "\n"
                    << pointsPerSlice << "\n"
@@ -353,10 +379,9 @@ int generate_file_checkpoint(std::ofstream &outputFile, Point &targetPoint, Poin
                    << INCREMENT_SIZE_TAG << "\n"
                    << mpz_get_str(NULL, PREFFERED_BASE, incrementSize) << "\n"
 
-                   << EOF_TAG << "\n"
-                   << CHECKPOINT_EOF_TAG << "\n";
+                   << CHECKPOINT_EOF_TAG << "\n"
 
-        outputFile << checkOutPoint.getLSB() << "\n";
+                   << checkOutPoint.getLSB() << "\n";
     }
     else
     {
@@ -365,13 +390,13 @@ int generate_file_checkpoint(std::ofstream &outputFile, Point &targetPoint, Poin
     return CHECKPOINT_E_OK;
 }
 
-int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targetPoint, Point &output_checkOutPoint, unsigned int output_iterationNumber,
-                                   unsigned int output_numberOfSlices, unsigned int output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize, 
+int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targetPoint, Point &output_checkOutPoint, unsigned long &output_iterationNumber,
+                                   unsigned long &output_numberOfSlices, unsigned long &output_pointsPerSlice, mpz_t &output_sliceSize, mpz_t &output_incrementSize, 
                                    bool writeToParameters)
 {
     int integrityError = INTEGRITY_E_OK;
     std::string line;
-    unsigned int fileType = FILETYPE_UNKNOWN;
+   unsigned long fileType = FILETYPE_UNKNOWN;
     unsigned long long sliceNumber = 0, pointsPerSlice = 0, totalIterations = 0;
     if (!inputFile.is_open())
     {
@@ -418,7 +443,7 @@ int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targe
     if (line == SLICE_NUMBER_TAG)
     {
         getline(inputFile, line);
-        sliceNumber = std::stoll(line, 0, LSB_READ_BASE);
+        sliceNumber = std::stoull(line, 0, LSB_READ_BASE);
     }
     else
     {
@@ -440,7 +465,7 @@ int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targe
     if (line == POINTS_PER_SLICE_TAG)
     {
         getline(inputFile, line);
-        pointsPerSlice = std::stoll(line, 0, LSB_READ_BASE);
+        pointsPerSlice = std::stoull(line, 0, LSB_READ_BASE);
     }
     else
     {
@@ -451,7 +476,7 @@ int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targe
     if (line == ITERATION_NUMBER_TAG)
     {
         getline(inputFile, line);
-        totalIterations = std::stoll(line, 0, LSB_READ_BASE);
+        totalIterations = std::stoull(line, 0, LSB_READ_BASE);
     }
     else
     {
@@ -473,16 +498,35 @@ int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targe
     tempPoint = temp;
     tempPoint += containerPoint;
 
+    DEBUG_MSG("\nGenerated dummyOutputTarget K: %s\n", containerPoint.getK());
+    DEBUG_MSG("Generated dummyOutputTarget X: %s\n", containerPoint.getX());
+    DEBUG_MSG("Generated dummyOutputTarget Y: %s\n", containerPoint.getY());
+    DEBUG_MSG("Generated dummyOutputCheckout K: %s\n", tempPoint.getK());
+    DEBUG_MSG("Generated dummyOutputCheckout X: %s\n", tempPoint.getX());
+    DEBUG_MSG("Generated dummyOutputCheckout Y: %s\n", tempPoint.getY());
+    DEBUG_MSG("Generated dummyOutputIterationNumber: %x\n", totalIterations);
+    DEBUG_MSG("Generated dummyOutputNumberOfSlices: %x\n", sliceNumber);
+    DEBUG_MSG("Generated dummyOutputPointsPerSlice: %x\n", pointsPerSlice);
+    DEBUG_MSG("Generated dummyOutputSliceSize: %Zx\n", sliceSizeContainer);
+    DEBUG_MSG("Generated dummyOutputIncrementSize: %Zx\n", incrementSizeContainer);
+    DEBUG_MSG("Generated total iteration size: %Zx\n\n", temp);
+
     getline(inputFile, line);
     if(line == CHECKPOINT_EOF_TAG)
     {
         getline(inputFile, line);
-        LSB_HASH_TYPE container = std::stoull(line.c_str(), NULL, LSB_READ_BASE);
-        if (container != tempPoint.getLSB())
+        LSB_HASH_TYPE container = std::stoull(line, NULL, LSB_READ_BASE);
+        if ((tempPoint.getLSB()) != container)
         {
-            DEBUG_MSG("File EOF: %lu\nPoint EOF: %lu\n", container, tempPoint.getLSB());
+            // DEBUG_MSG("File EOF: %x\nPoint EOF: %x\n", container, tempPoint.getLSB());
             return INTEGRITY_E_INVALID_EOF_TOKEN;
         }
+        DEBUG_MSG("Read output       EOF: %lu\n", container);
+        DEBUG_MSG("nGenerated output EOF: %lu\n", tempPoint.getLSB());
+    }
+    else
+    {
+        return INTEGRITY_E_READ_CHECKPOINT;
     }
 
     if (writeToParameters)
@@ -492,6 +536,7 @@ int checkIntegrity_file_checkpoint(std::ifstream &inputFile, Point &output_targe
         output_iterationNumber = totalIterations;
         output_numberOfSlices = sliceNumber;
         output_pointsPerSlice = pointsPerSlice;
+        mpz_set(output_incrementSize, incrementSizeContainer);
         mpz_set(output_sliceSize, sliceSizeContainer);
     }
 
@@ -503,7 +548,7 @@ int checkIntegrity_file_generatedPoints(std::ifstream &inputFile)
     ///Create dedicated error codes starting with 32
     int integrityError = INTEGRITY_E_OK;
     std::string line;
-    unsigned int fileType = FILETYPE_UNKNOWN;
+   unsigned long fileType = FILETYPE_UNKNOWN;
     unsigned long long sliceNumber = 0, pointsPerSlice = 0, totalPoints = 0;
     if(!inputFile.is_open())
     {

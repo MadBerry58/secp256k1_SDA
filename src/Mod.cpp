@@ -28,7 +28,7 @@ mpz_t randomSeed;
 
 unsigned int modInit() 
 {
-DEBUG_MSG("Initializing Modular library \n");
+    DEBUG_MSG("Initializing Modular library \n");
 
     mpz_init_set_str(moduloHalb, moduloHalb_String, PREFFERED_BASE);
     mpz_init_set_str(order, order_String, PREFFERED_BASE);
@@ -116,7 +116,7 @@ DEBUG_MSG("Initializing Modular library \n");
 
     DEBUG_MSG("Mod functionality correctly initialized \n");
 
-    DEBUG_MSG("Mod OK \n");
+    printf("Mod OK \n");
 
     return MOD_E_OK;
 }
