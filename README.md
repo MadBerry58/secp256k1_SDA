@@ -9,6 +9,7 @@ This is because the search space, although vast, can be searched through by mult
 
 This program aims to demonstrate this kind of attack for the secp256k1_SDA elliptic curve, allowing the user to choose between different worker configuration and attack algorithms.
 
+A simple architecture document can be found inside the documentation folder
 
 Explanation:
 
