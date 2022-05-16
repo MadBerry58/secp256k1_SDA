@@ -9,3 +9,4 @@ HashedGeneratedTest.sda
 UncompressedGeneratedTest.sda
 col
 CheckpointTest.sda
+GeneratorEnum.h
