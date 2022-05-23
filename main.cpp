@@ -37,7 +37,6 @@ int main(int argc, char **argv)
             {"checkpointFile",          required_argument,  0,                      'c'},
             {"serverAdress",            required_argument,  0,                      's'},
             {"knownPointsFile",         required_argument,  0,                      'k'},
-            {"loadProfileFile",         required_argument,  0,                      'f'},
 
             {"help",                    optional_argument,  0,                      'h'},
             {0, 0, 0, 0}
@@ -80,7 +79,7 @@ int main(int argc, char **argv)
                 break;
 
             case '?': // getopt returneaza '?' cand optiunea nu este cunoscuta
-                printf("Argumentul %s este eronat", (char *)(&optiune));
+                printf("Argumentul %s este eronat\n", (char *)(&optiune));
                 exit(EXIT_FAILURE);
             }
     }
