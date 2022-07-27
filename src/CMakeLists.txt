@@ -4,8 +4,8 @@ set(src_files
     Mod.cpp
     headers/Mod.h
     
-    headers/Iterators.h
-    Iterators.cpp
+    headers/Algorithms.h
+    Algorithms.cpp
 
     Point.cpp
     headers/Point.h

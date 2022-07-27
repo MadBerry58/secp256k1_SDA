@@ -1,0 +1,93 @@
+Build Main Visual interface
+    Build SM testing interface
+Build Thread_Manager
+    
+Build Client SM
+    Create basic connection functionality
+        Establish SOCKET connection to Client_Handler SM
+        Establish SOCKET connection to Server_Frontend SM
+        Create basic message-response functionality
+    Create API connections
+        Create basic API message interface
+        Test API message-response functionality
+    Test dummy API functionality
+        Bind API functionality to a dummy function
+    Test basic API functionality
+        Bind API functionality to basic functionality
+    Test partial API functionality
+        Bind basic live functionality
+    Test total API functionality
+        Test run full functionality scenario
+
+
+Build Client_Handler SM
+    Create basic connection functionality
+        Establish SOCKET connection to Client SM
+        Create basic message-response functionality
+    Create API connections
+        Create basic API message interface
+        Test API message-response functionality
+    Test dummy API functionality
+        Bind API functionality to a dummy function
+    Test basic API functionality
+        Bind API functionality to basic functionality
+    Test partial API functionality
+        Bind basic live functionality
+    Test total API functionality
+        Test run full functionality scenario
+
+
+Build Server_Frontend SM
+    Create basic connection functionality
+        Establish SOCKET connection to Client SM
+        Establish SOCKET connection to Satellite SM
+        Create basic message-response functionality
+    Create API connections
+        Create basic API message interface
+        Test API message-response functionality
+    Test dummy API functionality
+        Bind API functionality to a dummy function
+    Test basic API functionality
+        Bind API functionality to basic functionality
+    Test partial API functionality
+        Bind basic live functionality
+    Test total API functionality
+        Test run full functionality scenario
+
+
+*Build Satellite SM
+    Create basic connection functionality
+        Establish SOCKET connection to Server_Frontend SM
+        Establish SOCKET connection to Satellite_Handler SM
+        Create basic message-response functionality
+    Create API connections
+        Create basic API message interface
+        Test API message-response functionality
+    Test dummy API functionality
+        Bind API functionality to a dummy function
+    Test basic API functionality
+        Bind API functionality to basic functionality
+    Test partial API functionality
+        Bind basic live functionality
+    Test total API functionality
+        Test run full functionality scenario
+
+
+*Build Satellite_Handler SM
+    Create basic connection functionality
+        Establish SOCKET connection to Satellite SM
+        Create basic message-response functionality
+    Create API connections
+        Create basic API message interface
+        Test API message-response functionality
+    Test dummy API functionality
+        Bind API functionality to a dummy function
+    Test basic API functionality
+        Bind API functionality to basic functionality
+    Test partial API functionality
+        Bind basic live functionality
+    Test total API functionality
+        Test run full functionality scenario
+
+General modifications:
+    Replace error returns with error containers and diag flags

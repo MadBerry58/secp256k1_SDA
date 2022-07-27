@@ -1,10 +1,15 @@
+#ifndef SECP251K1_SANDBOX_CONSTANTS_H
+#define SECP251K1_SANDBOX_CONSTANTS_H
 ///////////////////// Initialiser values ///////////////////////
 
-/// Program flags
-// #define DEBUG                                           
+/// Build flags
+// #define DEBUG
+#define TARGET_DEBUG
 #define TESTING ///WARNING! do not use during live operation!! The stdout buffer will get overloaded
 
 /// Variable initializers
+
+#define MAX_MESSAGE_LINE                                2048u
 #define INITIALVAL_BIGNUM                               0u
 #define INITIALVAL_POINT_KEY                            "1"
 #define INITIALVAL_POINT_x                              "79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798"
@@ -13,16 +18,25 @@
 #define LSB_READ_BASE                                   10u
 #define LSB_HASH_TYPE                                   unsigned long int
 #define LSB_STRING_SIZE                                 4u
+#define SOLUTION_STRING_SIZE                            10u
 #define GMP_LIMBNUMBER                                  4u
 #define RANDOMNESS_SEED                                 "483ada7726a3c4655da4fbfd1e1108a8fd17b448a68554199c47d08ffb10d4b8"
 #define PRIME_TRIALS                                    23u //// Number of trials used by the mpz_probab_prime_p
 #define MESSAGE_SIZE_MAX                                512u
+#define MESSAGE_QUEUE_SIZE                              10u
 #define CHALLANGE_NUMBER                                5u
-#define CHALLANGE_SIZE_MAX                              (CHALLANGE_NUMBER + 1) * LSB_STRING_SIZE
+#define CHALLANGE_SIZE_MAX                              (CHALLANGE_NUMBER) * LSB_STRING_SIZE
+#define SOLUTION_SIZE_MAX                               (CHALLANGE_NUMBER) * SOLUTION_STRING_SIZE
 #define TEST_GENERATED_SLICE_NUMBER                     5u
 #define TEST_GENERATED_POINTS_PER_SLICE                 1000u
 #define TEST_GENERATED_POINT_NUMBER                     5000u
 #define TEST_GENERATED_INCREMENTSIZE                    "1"
+#define PROGRESSDATA_INDEXLENGTH                        5u
+#define PROGRESSDATA_HASHLENGTH                         5u
+#define PROGRESSDATA_TOTALCHECKBYTES                    PROGRESSDATA_INDEXLENGTH + PROGRESSDATA_HASHLENGTH
+#define PROGRESSDATA_DATACONTAINERSIZE                  MAX_MESSAGE_LINE - PROGRESSDATA_TOTALCHECKBYTES
+#define PORTLENGTH                                      10u       // port length shall be 10 characters long. any smaller character size will have to use padding
+#define HANDLERTOKENSIZE                                32u // handler confirmation token size
 
 /// Elliptic Curve Parameters
 #define moduloHalb_String                               "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE17"
@@ -33,8 +47,6 @@
 #define primePlusOneDivFour_String                      "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
 #define primePlusOneDivTwo_String                       "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE18"
 
-#ifndef SECP251K1_SANDBOX_CONSTANTS_H
-#define SECP251K1_SANDBOX_CONSTANTS_H
 // 10472290570935714244214166893328940128314656840635597500498006050745359883506
 
 //////////////////////////// ERROR CODES /////////////////////////
@@ -95,17 +107,40 @@
 #define INTEGRITY_E_FILE_INIT_MISMATCHED_SLICESIZE      390u
 #define INTEGRITY_E_FILE_INIT_MISMATCHED_INCREMENTSIZE  391u
 
-/// Connection errors           0b 00000010 00000000
-#define CONN_MGR_E_OK                                   512u
-#define CONN_MGR_E_INVALIDADRESS                        513u
-#define CONN_MGR_E_INVALIDPORT                          514u
-#define CONN_MGR_E_SOCKETFAULT                          515U
-#define CONN_MGR_E_CONNECTFAULT                         516u
-#define CONN_MGR_E_UNKNOWN_SERVER_RESPONSE              517u
-#define CONN_MGR_E_SERVER_NOTRESPONDING                 518u
-#define CONN_MGR_E_MALFORMED_SERVER_RESPONSE            519u
-#define CONN_MGR_E_INVALID_CHALLANGE_SOLUTION           520u
 
+
+#define CLIENT_UNITIALIZED                               400u
+
+#define THREAD_MGR_E_OK                                  450u
+#define THREAD_MGR_E_UNKNOWN_ALGORITHM                   451u
+#define THREAD_MGR_E_UNKNOWN_MEM_DISTRIBUTION            452u
+
+#define CONN_MGR_E_OK                                    500u
+#define CONN_MGR_E_UNKNOWN_SERVER_RESPONSE               501u
+#define CONN_MGR_E_SERVER_NOTRESPONDING                  502u
+#define CONN_MGR_E_MALFORMED_SERVER_RESPONSE             503u
+#define CONN_MGR_E_INVALID_CHALLANGE_SOLUTION            504u
+#define CONN_MGR_E_CONNECTFAULT                          508u
+#define CONN_MGR_E_SOCKETFAULT                           509u
+#define CONN_MGR_E_INVALIDPORT                           510u
+#define CONN_MGR_E_INVALIDADRESS                         511u
+/// Client state machine connection errors           0b 00000010 00000000
+
+#define CLIENT_SM_E_OK                                   512u
+#define CLIENT_SM_E_INVALIDADRESS                        513u
+#define CLIENT_SM_E_INVALIDPORT                          514u
+#define CLIENT_SM_E_SOCKETFAULT                          515U
+#define CLIENT_SM_E_CONNECTFAULT                         516u
+#define CLIENT_SM_E_UNKNOWN_SERVER_RESPONSE              517u
+#define CLIENT_SM_E_SERVER_NOTRESPONDING                 518u
+#define CLIENT_SM_E_MALFORMED_SERVER_RESPONSE            519u
+#define CLIENT_SM_E_MALFORMED_HANDLER_RESPONSE           520u
+#define CLIENT_SM_E_INVALID_CHALLANGE_SOLUTION           521u
+
+#define CLIENT_HANDLER_SM_E_OK                           551u
+#define CLIENT_HANDLER_SM_E_CONFIRMCONNECTION            552u
+#define CLIENT_HANDLER_SM_E_INVALID_CHALLANGE_SOLUTION   553u
+#define CLIENT_HANDLER_SM_E_SOCKETFAULT                  554u
 
 /// Modular Operator Errors     0b 00000100 00000000
 
@@ -146,22 +181,7 @@
 #define VERBOSE_GENERATION_E_POINT_NUMBER_NOT_MATCHING  "Points per slice and point number should match for continuous generation"
 
 
-/// File tags
-#define UNCOMPRESSED_POINTS_FILE_TAG                    "UNCOMPRESSED_POINTS_FILE"
-#define COMPRESSED_POINTS_FILE_TAG                      "COMPRESSED_POINTS_FILE"
-#define HASHED_POINTS_FILE_TAG                          "HASH_POINTS_FILE"
-#define CHECKPOINT_FILE_TAG                             "CHECKPOINT_FILE"
-#define STARTING_POINT_TAG                              "STARTING_POINT"
-#define TARGET_POINT_TAG                                "TARGET_POINT"
-#define SLICE_NUMBER_TAG                                "NUMBER_OF_SLICES"
-#define SLICE_SIZE_TAG                                  "SLICE_SIZE"
-#define POINTS_PER_SLICE_TAG                            "POINTS_PER_sLICE"
-#define TOTAL_POINT_NUMBER_TAG                          "TOTAL_POINTS"
-#define ITERATION_NUMBER_TAG                            "ITERATION_NUMBER"
-#define INCREMENT_SIZE_TAG                              "INCREMENT_SIZE"
-#define EOF_TAG                                         "EOF"
-#define GENERATED_POINTS_EOF_TAG                        "GENERATED_POINTS_EOF"
-#define CHECKPOINT_EOF_TAG                              "CHECKPOINT_EOF"
+
 #define UNIMPLEMENTED_FUNCTIONALITY_TAG                 "Unimplemented yet"
 #define FUNCTIONALITY_IN_DEVELOPMENT_TAG                "Functionality still under development"
 
@@ -173,23 +193,32 @@
 #define FILETYPE_CHECKPOINT                             3u
 #define FILETYPE_UNKNOWN                                4u
 
-/// Server APIs
-#define API_R_CONFIRM                                   "ACTION_CONFIRMED"
-#define API_R_PROGRESS_HASH_REQUESTED                   "PROGRESS_HASH_REQUESTED"
-#define API_R_INVALID_SOLUTION                          "CHALLANGE_SOLUTION_INVALID"
-#define API_S_GET_ACTIVESEARCHES                        "GET_ACTIVE"
-#define API_S_POST_REGISTERPROGRESS                     "POST_PROGRESS"
-#define API_S_POST_REGISTERPROGRESS_SOLVED              "POST_PROGRESS_SOLVED"
+// Iteration algorithm types
+#define ITERATION_ALGORITHM_INVALID                     0u
+#define ITERATION_ALGORITHM_CONTINUOUS_STEPS            1u
+#define ITERATION_ALGORITHM_SLICED_STEPS                2u
+#define ITERATION_ALGORITHM_CONTINUOUS_MULTIPLY         3u
+#define ITERATION_ALGORITHM_CONTINUOUS_DOUBLING         4U
+#define ITERATION_ALGORITHM_BTREE_SUBDIVISION           5U
+
+// Workload distribution types
+#define WORKLOAD_DISTRIBUTION_INVALID                   0u
+#define WORKLOAD_DISTRIBUTION_SYNCED                    1u
+#define WORKLOAD_DISTRIBUTION_SLICED                    2u
+#define WORKLOAD_DISTRIBUTION_SCATTERED                 3u
 
 /// Function-like macros
-
 #ifdef DEBUG
 #define DEBUG_MSG(...)                          gmp_printf(__VA_ARGS__)
 #else
 #define DEBUG_MSG(...)                          
 #endif
 
-
+#ifdef TARGET_DEBUG
+#define TARGET_DEBUG_MSG(...)                   gmp_printf(__VA_ARGS__)
+#else
+#define TARGET_DEBUG_MSG(...)
+#endif
 
 
 

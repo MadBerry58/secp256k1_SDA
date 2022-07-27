@@ -312,6 +312,25 @@ void Point::operator*=(mpz_t &factor)
     /// factor ^ 1 leaves the number unchanged   
 }
 
+void Point::operator/= (mpz_t &factor)
+{
+    returnValue = mpz_cmp_ui(factor, 1u);
+    if  (returnValue < 0)
+        this->reset();
+    else if
+        (returnValue > 0)
+    {
+        if(mpz_cmp_ui(factor, 2u) > 0)
+        {
+            this->multiplyByFactor(*this, factor);
+        }
+        else
+        {
+            this->multiplyBy2(*this);
+        }
+    }
+}
+
 bool Point::operator==(Point &source)
 {
     return (
@@ -402,8 +421,6 @@ void Point::multiplyBy2(Point &result)
     mul     (t1, m, result.x);  // t1       = (3 * x^2) / (2 * sqrt(x^3 + 7)) * result.x
     add     (t2, t1, n);        // t2       = (3 * x^2) / (2 * sqrt(x^3 + 7)) * result.x + n
     neg     (result.y, t2);     // result.y = -((3 * x^2) / (2 * sqrt(x^3 + 7)) * result.x + n)
-
-
 }
 
 // void Point::multiplyByFactor(Point &result, mpz_t &factor)

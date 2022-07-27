@@ -3,7 +3,7 @@
 
 #ifndef SECP251K1_SANDBOX_MOD_H
 #define SECP251K1_SANDBOX_MOD_H
-#include "gmp.h"
+#include <gmp.h>
 #include "Constants.h"
 #include <iterator>
 #include <map>

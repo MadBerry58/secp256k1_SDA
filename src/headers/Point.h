@@ -39,6 +39,7 @@ public:
     Point&          operator-=              (Point &source);
     Point&          operator+=              (Point &source);
     void            operator*=              (mpz_t &factor);
+    void            operator/=              (mpz_t &factor);
     bool            operator==              (Point &source);
     bool            operator!=              (Point &source);
 

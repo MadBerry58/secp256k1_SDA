@@ -1,5 +1,7 @@
 .gitignore
 build/**
+sampleCode/**
+pythonCrawler/**
 CMakeFiles/**
 .vscode/**
 workspace.code-workspace
@@ -10,3 +12,4 @@ UncompressedGeneratedTest.sda
 col
 CheckpointTest.sda
 GeneratorEnum.h
+secp256k1-SDA.code-workspace
