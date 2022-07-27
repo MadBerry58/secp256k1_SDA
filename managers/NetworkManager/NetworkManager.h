@@ -9,6 +9,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <thread>
 
 struct Challange
 {
@@ -73,6 +74,8 @@ struct ClientData
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY); 
     }
 };
+
+unsigned int init_NetworkManager(std::string message);
 
 char *messageCRC(char *message);
 int connectToServer(char *serverAdress, char *serverPort, int &sockfd);

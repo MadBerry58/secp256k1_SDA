@@ -1,5 +1,11 @@
 #include "ClientSM.h"
 
+void init_ClientSM(clientSMStruct message)
+{
+    std::cout << "ClientSM started with message: " << message.dummyData << std::endl;
+}
+
+
 // unsigned int clientFrontendSM_TCP(char *serverAdressString, int serverPort, bool &hostNotification, int &hostCommand, bool &SMnotification,
 //                      ClientSMConnection connectionSM_state, Challange &challangeBundle, Solution &solutionBundle,
 //                      ProgressPackage progressData)

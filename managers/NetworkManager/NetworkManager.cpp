@@ -3,6 +3,14 @@
 struct sockaddr_in cli_addr, serv_addr;
 struct hostent *he;
 
+unsigned int init_NetworkManager(std::string message)
+{
+    startDummySM(message);
+    startClientSM(message);
+    std::cout << "Network Manager initialized successfully\n" << std::endl;
+    return 0;
+}
+
 /* Utility Functions */
 int sendMessage_TCP(char *message, unsigned int messageSize)
 {

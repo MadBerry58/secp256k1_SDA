@@ -423,32 +423,6 @@ void Point::multiplyBy2(Point &result)
     neg     (result.y, t2);     // result.y = -((3 * x^2) / (2 * sqrt(x^3 + 7)) * result.x + n)
 }
 
-// void Point::multiplyByFactor(Point &result, mpz_t &factor)
-// {
-//     unsigned long factorSize = mpz_sizeinbase(factor, 2);
-
-//     localTempPoint1 = *this;
-
-//     unsigned long i = 0;
-
-//     while (mpz_tstbit(factor, i) == 0) /// covers the case when factor's LSB is not 0
-//     {
-//         localTempPoint1.multiplyBy2(localTempPoint1);
-//         ++i;
-//     }
-//     result = localTempPoint1;
-
-//     ++i;
-//     for (i; i < factorSize; ++i)
-//     {
-//         if (mpz_tstbit(factor, i))
-//         {
-//             result += localTempPoint1;
-//         }
-//         localTempPoint1.multiplyBy2(localTempPoint1);
-//     }
-// }
-
 void Point::multiplyByFactor(Point &result, mpz_t &factor)
 {
     unsigned long factorSize = mpz_sizeinbase(factor, 2);
@@ -550,7 +524,6 @@ void Point::printHex()
     }
     gmp_printf("\n");
 }
-
 
 bool Point::checkY() 
 {

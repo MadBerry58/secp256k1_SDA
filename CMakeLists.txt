@@ -9,6 +9,9 @@ include(CPack)
 
 set(SOURCE_FILES main.cpp)
 
+# set(THREADS_PREFER_PTHREAD_FLAG ON)
+# find_package(Threads REQUIRED)
+
 include_directories(src)
 include_directories(managers)
 
@@ -25,4 +28,5 @@ target_link_libraries(srcLib gmp)
 target_link_libraries(${PROJECT_NAME}
         srcLib
         managerLib
+        # Threads::Threads
 )

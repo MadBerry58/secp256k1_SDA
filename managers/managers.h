@@ -8,10 +8,6 @@
 #include "NetworkManager/NetworkManager.h"
 #include "UIManager/UIManager.h"
 
-unsigned int init_FileManager();
-unsigned int init_IterationManager();
-unsigned int init_MemoryManager();
-unsigned int init_NetworkManager();
-unsigned int init_UIManager();
+unsigned int init_managers(std::string initData);
 
 #endif

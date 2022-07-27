@@ -25,4 +25,12 @@ enum ClientSMConnection
     CLIENT_SM_STATE_SHUTDOWN
 };
 
+struct clientSMStruct
+{
+    std::string dummyData;
+    Point pointBuffer[256];
+};
+
+void init_ClientSM(clientSMStruct message);
+
 #endif

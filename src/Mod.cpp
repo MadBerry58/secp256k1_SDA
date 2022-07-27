@@ -171,6 +171,7 @@ inline void BigNumber::operator-=(mpz_t &source)
     mpz_add(value, value, t2);
     mpz_mmod(value, value, prime);
 }
+
 inline void BigNumber::operator-=(char *sourceString)
 {
     mpz_set_str(t1, sourceString, PREFFERED_BASE);
@@ -178,24 +179,27 @@ inline void BigNumber::operator-=(char *sourceString)
     mpz_add(value, value, t2);
     mpz_mmod(value, value, prime);
 }
+
 inline void BigNumber::operator-=(unsigned long long &sourceInteger)
 {
-
     mpz_sub_ui(t2, prime, sourceInteger);
     mpz_add(value, value, t2);
     mpz_mmod(value, value, prime);
 }
+
 inline void BigNumber::operator*=(mpz_t &source)
 {
     mpz_mul(t1, value, source);
     mpz_mmod(value, t1, prime);
 }
+
 inline void BigNumber::operator*=(char *sourceString)
 {
     mpz_set_str(t1, sourceString, PREFFERED_BASE);
     mpz_mul(t2, value, t1);
     mpz_mmod(value, t2, prime);
 }
+
 inline void BigNumber::operator*=(unsigned long long &sourceInteger)
 {
     mpz_mul_ui(t1, value, sourceInteger);
@@ -259,11 +263,13 @@ inline void BigNumber::operator^=(mpz_t &power)
 {
     mpz_powm(value, value, power, prime);
 }
+
 inline void BigNumber::operator^=(char *powerString)
 {   
     mpz_set_str(t1, powerString, PREFFERED_BASE);
     mpz_powm(value, value, t1, prime);
 }
+
 inline void BigNumber::operator^=(unsigned long long &powerInteger)
 {
     mpz_powm_ui(value, value, powerInteger, prime);
@@ -338,302 +344,3 @@ void generateRandomKey(mpz_t &result)
     gmp_randseed_ui(randomState, random());
     mpz_urandomb(result, randomState, 250u);
 }
-
-    // //// Cipolla algorithm - work in progress, do not use
-    // void modSqrt(mpz_t &result, mpz_t &number, mpz_t &primeModulo)
-    // {
-    //     typedef struct fp2
-    //     {
-    //         private:
-    //             mpz_t x, y;
-    //         public:
-    //             fp2()
-    //             {
-    //                 mpz_init(x);
-    //                 mpz_init(y);
-    //             }
-    //             fp2(mpz_t &init_x, mpz_t &init_y)
-    //             {
-    //                 mpz_init_set(x, init_x);
-    //                 mpz_init_set(y, init_y);
-    //             }
-    //             fp2(unsigned long long &init_x, unsigned long long &init_y)
-    //             {
-    //                 mpz_init_set_ui(x, init_x);
-    //                 mpz_init_set_ui(y, init_y);
-    //             }
-    //             void operator = (fp2 n)
-    //             {
-    //                 mpz_set(x, n.x);
-    //                 mpz_set(y, n.y);
-    //             }
-    //             void fp2mul(fp2 result, fp2 a, fp2 b, mpz_t p, mpz_t w2)
-    //             {
-    //                 mul_mod(t1, a.x, b.x, p);
-    //                 mul_mod(t2, a.y, b.y, p);
-    //                 mul_mod(t2, t2, w2, p);
-    //                 add_mod(result.x, t1, t2, prime);
-    //                 mul_mod(t1, a.x, b.y, prime);
-    //                 mul_mod(t2, a.y, b.x, prime);
-    //                 mul_mod(result.y, t1, t2, prime);
-    //                 ///Function complexity: 7*(mod) + 6*(mul) + 1*(add)
-    //             }
-    //             void fp2square(fp2 &result, fp2 &a, mpz_t &prime, mpz_t &w2)
-    //             {
-    //                 fp2mul(result, a, a, prime, w2);
-    //             }
-
-    //             void fp2pow(fp2 &result, fp2 &a, mpz_t &number, mpz_t &p, mpz_t &w2)
-    //             {
-    //                 mpz_t n;
-    //                 mpz_init_set(n, number);
-    //                 int nZero_or_One = (mpz_cmp_ui(n, 1));
-
-    //                 switch(nZero_or_One)
-    //                 {
-    //                     case 0: /// n == 1
-    //                         break;
-    //                     case -1: /// n < 1
-    //                         mpz_set_ui(result.x, 1);
-    //                         mpz_set_ui(result.y, 0);
-    //                         break;
-    //                     case 1:
-    //                         if (mpz_even_p(n))
-    //                         {
-    //                             mpz_div_2exp(n, n, 1);
-    //                             fp2pow(result, a, n, p, w2);
-    //                             fp2square(result, a, p, w2);
-    //                         }
-    //                         else
-    //                         {
-    //                             mpz_sub_ui(n, n, 1u);
-    //                             fp2pow(result, a, n, p, w2);
-    //                             fp2mul(result, a, result, p, w2);
-    //                         }
-    //                         break;
-    //                 }
-    //                 ///Function Complexity: Iterations*( 1*(sub) + 1(pow) + 1(mul)
-    //             }
-
-    //     };
-    // }
-    // uint64_t randULong(uint64_t min, uint64_t max)
-    // {
-    //     uint64_t t = (uint64_t)rand();
-    //     return min + t % (max - min);
-    // }
-
-    // returns a * b mod modulus
-    // uint64_t mul_mod(uint64_t a, uint64_t b, uint64_t modulus)
-    // {
-    //     uint64_t x = 0, y = a % modulus;
-
-    //     while (b > 0)
-    //     {
-    //         if ((b & 1) == 1)
-    //         {
-    //             x = (x + y) % modulus;
-    //         }
-    //         y = (y << 1) % modulus;
-    //         b = b >> 1;
-    //     }
-    //     return x;
-    // }
-
-    // returns b ^^ power mod modulus
-    // uint64_t pow_mod(uint64_t b, uint64_t power, uint64_t modulus)
-    // {
-    //     uint64_t x = 1;
-
-    //     while (power > 0)
-    //     {
-    //         if ((power & 1) == 1)
-    //         {
-    //             x = mul_mod(x, b, modulus);
-    //         }
-    //         b = mul_mod(b, b, modulus);
-    //         power = power >> 1;
-    //     }
-
-    //     return x;
-    // }
-
-    // // miller-rabin prime test
-    // bool isPrime(uint64_t n, int64_t k)
-    // {
-    //     uint64_t a, x, n_one = n - 1, d = n_one;
-    //     uint32_t s = 0;
-    //     uint32_t r;
-
-    //     if (n < 2)
-    //     {
-    //         return false;
-    //     }
-
-    //     // limit 2^63, pow_mod/mul_mod can't handle bigger numbers
-    //     if (n > 9223372036854775808ull)
-    //     {
-    //         printf("The number is too big, program will end.\n");
-    //         exit(1);
-    //     }
-
-    //     if ((n % 2) == 0)
-    //     {
-    //         return n == 2;
-    //     }
-
-    //     while ((d & 1) == 0)
-    //     {
-    //         d = d >> 1;
-    //         s = s + 1;
-    //     }
-
-    //     while (k > 0)
-    //     {
-    //         k = k - 1;
-    //         a = randULong(2, n);
-    //         x = pow_mod(a, d, n);
-    //         if (x == 1 || x == n_one)
-    //         {
-    //             continue;
-    //         }
-    //         for (r = 1; r < s; r++)
-    //         {
-    //             x = pow_mod(x, 2, n);
-    //             if (x == 1)
-    //                 return false;
-    //             if (x == n_one)
-    //                 goto continue_while;
-    //         }
-    //         if (x != n_one)
-    //         {
-    //             return false;
-    //         }
-
-    //     continue_while:
-    //     {
-    //     }
-    //     }
-
-    //     return true;
-    // }
-
-    ///////mpz_probab_prime_p();
-
-    // int64_t legendre_symbol(int64_t a, int64_t p)
-    // {
-    //     int64_t x = pow_mod(a, (p - 1) / 2, p);
-    //     if ((p - 1) == x)
-    //     {
-    //         return x - p;
-    //     }
-    //     else
-    //     {
-    //         return x;
-    //     }
-    // }
-    ////////mpz_legendre();
-
-    // fp2 fp2mul(struct fp2 a, struct fp2 b, int64_t p, int64_t w2)
-    // {
-    //     struct fp2 answer;
-    //     uint64_t tmp1, tmp2;
-
-    //     tmp1 = mul_mod(a.x, b.x, p);
-    //     tmp2 = mul_mod(a.y, b.y, p);
-    //     tmp2 = mul_mod(tmp2, w2, p);
-    //     answer.x = (tmp1 + tmp2) % p;
-    //     tmp1 = mul_mod(a.x, b.y, p);
-    //     tmp2 = mul_mod(a.y, b.x, p);
-    //     answer.y = (tmp1 + tmp2) % p;
-
-    //     return answer;
-    // }
-
-    // struct fp2 fp2square(struct fp2 a, int64_t p, int64_t w2)
-    // {
-    //     return fp2mul(a, a, p, w2);
-    // }
-
-    //     void test(mpz_t &n, mpz_t &p)
-    //     {
-    //         mpz_t a, w2;
-    //         mpz_t x1, x2;
-    //         fp2 answer;
-
-    //         gmp_printf("Find solution for n = %Zd and p = %Zd\n", n, p);
-    //         // if (p == 2 || !isPrime(p, 15))
-    //         if( (mpz_cmp_ui(p, 2) == 0) || mpz_probab_prime_p(p)
-    //         {
-    //             printf("No solution, p is not an odd prime.\n\n");
-    //             return;
-    //         }
-
-    //         // p is checked and is a odd prime
-    //         // if (legendre_symbol(n, p) != 1)
-    //         if(mpz_legendre(n, p) != 1)
-    //         {
-    //             gmp_printf(" %Zd is not a square in F%Zd\n\n", n, p);
-    //             return;
-    //         }
-    //         mpz_sub(t1, p, two); /// cover the random range issue without checking the result for numbers smaller than 3
-    //         mpz_set_str(t1, primePlusOneDivTwo_String);
-    //         while (true)
-    //         {
-    //             do
-    //             {
-    //                 ///generate a random number in the range (2, prime)
-    //                 mpz_urandomm(a, randomState, t1); ///TODO: see if it is possible to use a pre generated set of high entropy numbers (as compared to numbers of trials neccessary for determining primality of a known number set)
-    //                 mpz_add(a, a, two);
-
-    //                 mpz_mul(w2, a, a);
-    //                 mpz_sub(w2, w2, n);
-    //             }
-    //             while (mpz_legendre(w2, p) != 1);
-
-    //             mpz_set(answer.x, a);
-    //             mpz_set_ui(answer.y, 1);
-
-    //             fp2pow(answer, answer, t1, p, w2);
-    //             if (answer.y != 0)
-    //             {
-    //                 continue;
-    //             }
-
-    //             x1 = answer.x;
-    //             x2 = p - x1;
-    //             if (mul_mod(x1, x1, p) == n && mul_mod(x2, x2, p) == n)
-    //             {
-    //                 printf("Solution found: x1 = %lld, x2 = %lld\n\n", x1, x2);
-    //                 return;
-    //             }
-    //         }
-    //     }
-    // };
-
-    // void mpz_modSqrt(mpz_t &number, mpz_t &prime)
-    // {
-    //     if (mpz_legendre(number, prime) != 1)
-    //     {
-    //         gmp_printf(" %Zd is not a square in F%Zd\n\n", number, prime);
-    //         return;
-    //     }
-
-    //     mpz_t a, w2, e;
-    //     mpz_inits(a, w2, e);
-    //     while (mpz_legendre(number, prime) != 1)
-    //     {
-    //         mpz_add_ui(a, a, 1)
-    //         mpz_mul(w2, a, a);
-    //         mpz_sub(w2, w2, &number);
-    //         mpz_mod(w2, w2, prime);
-    //     }
-
-    //     fp2 r(1, 0), s(a, one);
-
-    //     while(1)
-    //     {
-    //         mpz_add(e, prime, one);
-    //         mpz_probab_prime_p(e, PRIME_TRIALS);
-    //     }
-    // }
