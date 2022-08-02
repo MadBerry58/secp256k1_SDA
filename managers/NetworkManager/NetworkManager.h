@@ -1,49 +1,9 @@
 #ifndef SECP251K1_SANDBOX_NETWORKMANAGER_H
 #define SECP251K1_SANDBOX_NETWORKMANAGER_H
-#include "../managers.h"
+
+#include "../../TypeDef.h"
+
 #include "StateMachines/StateMachines.h"
-#include <sys/socket.h>
-#include <resolv.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <thread>
-
-struct Challange
-{
-    char key[CHALLANGE_NUMBER][LSB_STRING_SIZE];
-    bool updatedFlag = false;
-};
-
-struct Solution
-{
-    char solution[CHALLANGE_NUMBER][SOLUTION_STRING_SIZE];
-    bool solutionReady = true;
-};
-
-struct ProgressPackage
-{
-    char *serializedProgressData;
-    char *dataSize;
-    char progressDataHash[32];
-};
-
-
-
-struct ClientHandlerData
-{
-    char *clientAdressString;
-    int &clientPort;
-    bool &hostNotification;
-    int &hostCommand;
-    bool &SMnotification;
-    Challange &challangeBundle;
-    Solution &solutionBundle;
-    ProgressPackage &progressData;
-    sockaddr_in serv_addr;
-};
 
 struct ServerHandlerData
 {

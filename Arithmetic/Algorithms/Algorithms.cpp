@@ -1,4 +1,4 @@
-#include "headers/Algorithms.h"
+#include "Algorithms.h"
 
 ///TODO: Implement iteration algorithms:
 /*

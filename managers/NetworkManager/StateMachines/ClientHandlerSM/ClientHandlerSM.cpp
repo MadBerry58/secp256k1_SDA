@@ -1,5 +1,10 @@
 #include "ClientHandlerSM.h"
 
+void init_ClientHandlerSM(clientHandlerSMStruct *messageStruct)
+{
+    
+}
+
 // int clientHandlerSM(struct ClientHandlerData initializingData)
 // {
 //     initializingData.connectionSM_state = CLIENT_HANDLER_SM_UNINITIALIZED;

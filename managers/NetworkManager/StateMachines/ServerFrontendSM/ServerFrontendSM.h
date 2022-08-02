@@ -1,7 +1,9 @@
 #ifndef SECP251K1_SANDBOX_NETWORKMANAGER_FRONTEND_SM_H
 #define SECP251K1_SANDBOX_NETWORKMANAGER_FRONTEND_SM_H
 
-#include "../StateMachines.h"
+#include "../../../../TypeDef.h"
+
+void init_ServerFrontendSM(serverSMStruct *messageStruct);
 
 //ServerFrontendSM input messages
 enum HostSMCommands

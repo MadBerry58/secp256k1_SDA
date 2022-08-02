@@ -1,7 +1,8 @@
 #ifndef SECP251K1_SANDBOX_MANAGERS_H
 #define SECP251K1_SANDBOX_MANAGERS_H
 
-#include "../src/headers/Algorithms.h"
+#include "../TypeDef.h"
+
 #include "FileManager/FileManager.h"
 #include "IterationManager/IterationManager.h"
 #include "MemoryManager/MemoryManager.h"

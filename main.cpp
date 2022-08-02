@@ -1,6 +1,6 @@
-#include "managers/FileManager/FileManager.h"
-#include "managers/UIManager/UIManager.h"
-#include <getopt.h>
+#include "TypeDef.h"
+#include "Arithmetic/Arithmetic.h"
+#include "managers/managers.h"
 
 #define FLAG_OPERATION_NONE             0u
 #define FLAG_OPERATION_UI               1u

@@ -21,9 +21,6 @@ set(manager_files
     NetworkManager/NetworkManager.h
     NetworkManager/NetworkManager.cpp
 
-        NetworkManager/StateMachines/DummySM/DummySM.h
-        NetworkManager/StateMachines/DummySM/DummySM.cpp
-
         NetworkManager/StateMachines/StateMachines.h
         NetworkManager/StateMachines/StateMachines.cpp
 

@@ -1,8 +1,8 @@
 #include "ClientSM.h"
 
-void init_ClientSM(clientSMStruct message)
+void init_ClientSM(clientSMStruct *message)
 {
-    std::cout << "ClientSM started with message: " << message.dummyData << std::endl;
+    std::cout << "ClientSM started with message: " << message->dummyData << std::endl;
 }
 
 

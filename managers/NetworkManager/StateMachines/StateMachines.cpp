@@ -1,43 +1,56 @@
-#include "../NetworkManager.h"
+#include "StateMachines.h"
 
 unsigned int startClientSM(std::string message)
 {
     clientSMStruct messageStruct;
     messageStruct.dummyData = message;
-    std::thread ClientSMThread(init_ClientSM, messageStruct);
-    ClientSMThread.join();
+    std::thread clientSMThread(init_ClientSM, &messageStruct);
+    clientSMThread.join();
     std::cout << "\n\nClientSM thread stopped\n" << std::endl;
     return 0;
 }
 
-unsigned int startClientHandlerSM(/**protocol**/)
+unsigned int startClientHandlerSM(std::string message)
 {
+    clientHandlerSMStruct messageStruct;
+    messageStruct.dummyData = message;
+    std::thread clientHandlerSMThread(init_ClientHandlerSM, &messageStruct);
+    clientHandlerSMThread.join();
+    std::cout << "\n\nClientHandlerSM thread stopped\n" << std::endl;
     return 0;
 }
 
-unsigned int startSatelliteSM(/**protocol**/)
+unsigned int startSatelliteSM(std::string message)
 {
+    satelliteSMStruct messageStruct;
+    messageStruct.dummyData = message;
+    std::thread satelliteSMThread(init_SatelliteSM, &messageStruct);
+    satelliteSMThread.join();
+    std::cout << "\n\nSatelliteSM thread stopped\n" << std::endl;
     return 0;
 }
 
-unsigned int startSatelliteHandlerSM(/**protocol**/)
+unsigned int startSatelliteHandlerSM(std::string message)
 {
+    satelliteHandlerSMStruct messageStruct;
+    messageStruct.dummyData = message;
+    std::thread satelliteHandlerSMThread(init_SatelliteHandlerSM, &messageStruct);
+    satelliteHandlerSMThread.join();
+    std::cout << "\n\nSatelliteHandlerSM thread stopped\n" << std::endl;
     return 0;
 }
 
-unsigned int startServerFrontendSM(/**protocol**/)
+unsigned int startServerFrontendSM(std::string message)
 {
-    return 0;
-}
+    serverSMStruct messageStruct;
 
-unsigned int startDummySM(std::string message)
-{
-    dummyStruct messageStruct;
-    messageStruct.dummyInt = 36u;
-    strcpy(messageStruct.dummyBuffer, "Test Buffer message");
-    messageStruct.dummyString = message;
-    std::thread dummyThread(init_dummySM, messageStruct);
-    dummyThread.join();
-    std::cout << "\n\nDummy thread stopped\n" << std::endl;
+    messageStruct.dummyData = message;
+    
+    std::thread serverFrontendSMThread(init_ServerFrontendSM, &messageStruct);
+
+    serverFrontendSMThread.join();
+    std::cout << "\n"
+              << "\n" 
+              << "ServerSM thread stopped\n" << std::endl;
     return 0;
 }

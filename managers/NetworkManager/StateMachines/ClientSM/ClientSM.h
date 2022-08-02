@@ -1,36 +1,8 @@
 #ifndef SECP251K1_SANDBOX_NETWORKMANAGER_CLIENT_SM_H
 #define SECP251K1_SANDBOX_NETWORKMANAGER_CLIENT_SM_H
 
-#include "../StateMachines.h"
+#include "../../../../TypeDef.h"
 
-//ClientSM input messages
-//ClientSM output messages
-#define CLIENT_SM_REQUEST_HANDLER "CSM_RequestHandler"
-#define CLIENT_SM_REQUEST_REGISTERCHALLANGE "CSM_RequestRegisterChallange"
-#define CLIENT_SM_REQUEST_REGISTERPROGRESS "CSM_RequestRegisterProgress"
-#define CLIENT_SM_REQUEST_PROGRESSDATASPACE "CSM_RequestProgressDataStorageSpace"
-
-//ClientSM states
-enum ClientSMConnection
-{
-    CLIENT_SM_STATE_UNITIALIZED,
-    CLIENT_SM_STATE_INIT,
-    CLIENT_SM_STATE_REQUESTING_HANDLER,
-    CLIENT_SM_STATE_CONNECTING_TO_HANDLER,
-    CLIENT_SM_STATE_CONNECTED,
-    CLIENT_SM_STATE_REQUESTING_PROGRESS_REGISTRATION,
-    CLIENT_SM_STATE_SEND_CHALLENGE_SOLUTION,
-    CLIENT_SM_STATE_SENDING_PROGRESS,
-    CLIENT_SM_STATE_DISCONNECTED,
-    CLIENT_SM_STATE_SHUTDOWN
-};
-
-struct clientSMStruct
-{
-    std::string dummyData;
-    Point pointBuffer[256];
-};
-
-void init_ClientSM(clientSMStruct message);
+void init_ClientSM(clientSMStruct *message);
 
 #endif

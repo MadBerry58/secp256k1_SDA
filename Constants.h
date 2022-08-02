@@ -207,19 +207,6 @@
 #define WORKLOAD_DISTRIBUTION_SLICED                    2u
 #define WORKLOAD_DISTRIBUTION_SCATTERED                 3u
 
-/// Function-like macros
-#ifdef DEBUG
-#define DEBUG_MSG(...)                          gmp_printf(__VA_ARGS__)
-#else
-#define DEBUG_MSG(...)                          
-#endif
-
-#ifdef TARGET_DEBUG
-#define TARGET_DEBUG_MSG(...)                   gmp_printf(__VA_ARGS__)
-#else
-#define TARGET_DEBUG_MSG(...)
-#endif
-
 
 
 /// G multiples

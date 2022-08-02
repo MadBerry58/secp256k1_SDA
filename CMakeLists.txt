@@ -7,26 +7,21 @@ set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
 include(CPack)
 
-set(SOURCE_FILES main.cpp)
+set(SOURCE_FILES main.cpp Constants.h TypeDef.h)
 
-# set(THREADS_PREFER_PTHREAD_FLAG ON)
-# find_package(Threads REQUIRED)
-
-include_directories(src)
+include_directories(Arithmetic)
 include_directories(managers)
 
-link_directories(src)
+link_directories(Arithmetic)
 link_directories(managers)
 
-add_subdirectory(src)
+add_subdirectory(Arithmetic)
 add_subdirectory(managers)
 
 add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 
-target_link_libraries(srcLib gmp)
-
 target_link_libraries(${PROJECT_NAME}
+        gmp
         srcLib
         managerLib
-        # Threads::Threads
 )

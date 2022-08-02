@@ -2,6 +2,11 @@
 
 ///// PURPLE CIRCLE /////
 
+void init_ServerFrontendSM(serverSMStruct *messageStruct)
+{
+    
+}
+
 void mainLogic()
 {   
     ServerSMFrontendStates serverFrontendState = SERVER_FRONTEND_UNITIALIZED;

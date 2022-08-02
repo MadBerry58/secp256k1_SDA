@@ -6,7 +6,9 @@
 */
 #ifndef SECP256K1_SANDBOX_POINT_CPP
 #define SECP256K1_SANDBOX_POINT_CPP
-#include "headers/Point.h"
+#include "Point.h"
+
+#include "../ModularArithmetic/Mod.h"
 
 // #define POINTDEBUG
 

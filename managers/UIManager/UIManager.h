@@ -1,7 +1,7 @@
 #ifndef SECP251K1_SANDBOX_UIRUNNABLE_H
 #define SECP251K1_SANDBOX_UIRUNNABLE_H
 
-#include "../managers.h"
+#include "../../TypeDef.h"
 
 #include "TestUI/TestUI.h"
 #include "ServerUI/ServerUI.h"

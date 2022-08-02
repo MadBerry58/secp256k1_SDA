@@ -5,7 +5,6 @@ struct hostent *he;
 
 unsigned int init_NetworkManager(std::string message)
 {
-    startDummySM(message);
     startClientSM(message);
     std::cout << "Network Manager initialized successfully\n" << std::endl;
     return 0;

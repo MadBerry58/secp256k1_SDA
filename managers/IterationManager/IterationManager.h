@@ -2,8 +2,6 @@
 #define SECP251K1_SANDBOX_THREADMANAGER_H
 
 #include "../managers.h"
-#include "threads.h"
-#include <pthread.h>
 
 int iterationManagers_init();
 

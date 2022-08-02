@@ -1,6 +1,8 @@
 #ifndef SECP251K1_SANDBOX_FILEMANAGER_H
 #define SECP251K1_SANDBOX_FILEMANAGER_H
-#include "../managers.h"
+
+#include "../../TypeDef.h"
+#include "../../Arithmetic/ModularArithmetic/Mod.h"
 
 /// File tags
 #define UNCOMPRESSED_POINTS_FILE_TAG                    "UNCOMPRESSED_POINTS_FILE"
@@ -18,29 +20,6 @@
 #define EOF_TAG                                         "EOF"
 #define GENERATED_POINTS_EOF_TAG                        "GENERATED_POINTS_EOF"
 #define CHECKPOINT_EOF_TAG                              "CHECKPOINT_EOF"
-
-struct targetStringProfile
-{
-    std::string targetPoint;
-    std::string checkOutPoint;
-    std::string sliceSize;
-    std::string incrementSize;
-    std::string iterationNumber;
-    std::string numberOfSlices;
-    std::string pointsPerSlice;
-};
-
-struct pointsStringProfile
-{
-    std::string initialPoint;
-    std::string finalPoint;
-    std::string sliceSize;
-    std::string incrementSize;
-    std::string iterationNumber;
-    std::string numberOfSlices;
-    std::string pointsPerSlice;
-    std::set<LSB_HASH_TYPE>* knownSet;
-};
 
 unsigned int    fileManager_Init                        ();
 
