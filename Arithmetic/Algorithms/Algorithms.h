@@ -11,7 +11,7 @@ unsigned int continuousSteps();
 unsigned int slicedSteps();
 unsigned int continuousMultiply();
 unsigned int continuousDoubling();
-unsigned int bTreeSubdivision();
+unsigned int bTreeSubdivision(unsigned int databaseSize, mpz_t searchPosition);
 
 
 #endif // SECP251K1_SANDBOX_ALGORITHMS_H

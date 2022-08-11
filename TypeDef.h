@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <thread>
 #include <getopt.h>
+#include <math.h>
 // #include <pthread.h>
 // #include "threads.h"
 
