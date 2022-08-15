@@ -16,7 +16,6 @@ Point containerPoint;
 Point remainderPoint;
 std::ofstream tempOutput;
 std::ifstream tempInput;
-COLFO
 
 unsigned int fileManager_Init()
 {
@@ -198,7 +197,7 @@ int generationSanityCheck(Point &startingPoint, unsigned long numberOfPoints,uns
     {
         return GENERATION_E_UNKNOWN_POINT_KEY;
     }
-    
+
     if(numberOfSlices > numberOfPoints)
     {
         return GENERATION_E_TOO_MANY_SLICES;

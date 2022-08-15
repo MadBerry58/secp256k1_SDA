@@ -12,7 +12,7 @@ static char counterOutput[1024];
 static char user_input = 's';
 static std::string user_long_input = "s";
 
-int userInterface_Init();
-int userInterface_Start();
+int UserInterfaceSM_Init();
+int UserInterfaceSM_Start(UISMStruct UIdata);
 
 #endif // SECP251K1_SANDBOX_UIRUNNABLE_H

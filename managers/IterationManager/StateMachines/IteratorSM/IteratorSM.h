@@ -3,4 +3,6 @@
 
 #include "../StateMachines.h"
 
+unsigned int IteratorSM();
+
 #endif

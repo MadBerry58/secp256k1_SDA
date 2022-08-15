@@ -14,7 +14,7 @@ unsigned int startClientHandlerSM(std::string message)
 {
     clientHandlerSMStruct messageStruct;
     messageStruct.dummyData = message;
-    std::thread clientHandlerSMThread(init_ClientHandlerSM, &messageStruct);
+    std::thread clientHandlerSMThread(ClientHandlerSM, &messageStruct);
     clientHandlerSMThread.join();
     std::cout << "\n\nClientHandlerSM thread stopped\n" << std::endl;
     return 0;
@@ -40,17 +40,9 @@ unsigned int startSatelliteHandlerSM(std::string message)
     return 0;
 }
 
-unsigned int startServerFrontendSM(std::string message)
+std::thread *startServerFrontendSM(ServerFrontendSMStruct messageStruct)
 {
-    serverSMStruct messageStruct;
-
-    messageStruct.dummyData = message;
-    
-    std::thread serverFrontendSMThread(init_ServerFrontendSM, &messageStruct);
-
-    serverFrontendSMThread.join();
-    std::cout << "\n"
-              << "\n" 
-              << "ServerSM thread stopped\n" << std::endl;
-    return 0;
+    std::thread serverFrontendSMThread(ServerFrontendSM, &messageStruct);
+    messageStruct.ownerThreadAdress = &serverFrontendSMThread;
+    return &serverFrontendSMThread;
 }

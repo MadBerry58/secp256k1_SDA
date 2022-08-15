@@ -12,7 +12,7 @@
 
 // #define POINTDEBUG
 
-unsigned int returnValue = 0u;
+unsigned long long returnValue = 0u;
 
 extern mpz_t moduloHalb;
 extern mpz_t order;
@@ -293,7 +293,25 @@ Point &Point::operator+=(Point &source)
     return *this;
 }
 
-void Point::operator*=(mpz_t &factor)
+Point& Point::operator*=(unsigned long long factor)
+{
+    ///TODO: Check if operator matches multiplyByFactor and multiplyBy2 functions
+    if (factor > 0)
+    {
+        if(factor > 2u)
+        {
+            this->multiplyByFactor(*this, factor);
+        }
+        else
+        {
+            this->multiplyBy2(*this);
+        }
+    }
+    return *this;
+    /// factor ^ 1 leaves the number unchanged   
+}
+
+Point& Point::operator*=(mpz_t &factor)
 {
     ///TODO: Check if operator matches multiplyByFactor and multiplyBy2 functions
     returnValue = mpz_cmp_ui(factor, 1u);
@@ -311,10 +329,11 @@ void Point::operator*=(mpz_t &factor)
             this->multiplyBy2(*this);
         }
     }
+    return *this;
     /// factor ^ 1 leaves the number unchanged   
 }
 
-void Point::operator/= (mpz_t &factor)
+Point& Point::operator/= (mpz_t &factor)
 {
     returnValue = mpz_cmp_ui(factor, 1u);
     if  (returnValue < 0)
@@ -331,6 +350,7 @@ void Point::operator/= (mpz_t &factor)
             this->multiplyBy2(*this);
         }
     }
+    return *this;
 }
 
 bool Point::operator==(Point &source)
@@ -444,6 +464,30 @@ void Point::multiplyByFactor(Point &result, mpz_t &factor)
     {
         temp.multiplyBy2(temp);
         if (mpz_tstbit(factor, i))
+        {
+            result += temp;
+        }
+    }
+}
+
+void Point::multiplyByFactor(Point &result, unsigned long long &factor)
+{
+    unsigned int factorSize = log2(factor);
+    Point temp(*this);
+
+    unsigned long long i = 1ll;
+
+    while (factor ^ i) /// covers the case when factor's LSB is not 0
+    {
+        temp.multiplyBy2(temp);
+        i <<= 1;
+    }
+    result = temp;
+    
+    for (;i != 0; i <<= 1) //by left-shitfing i outside the allowed register, a value of 0 is obtained
+    {
+        temp.multiplyBy2(temp);
+        if (factor & i)
         {
             result += temp;
         }

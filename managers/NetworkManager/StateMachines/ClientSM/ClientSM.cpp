@@ -5,6 +5,12 @@ void init_ClientSM(clientSMStruct *message)
     std::cout << "ClientSM started with message: " << message->dummyData << std::endl;
 }
 
+void start_ClientSM()
+{
+    //send starting acknowledgement
+    //send started acknowledgement
+    //send waiting for command acknowledgement
+}
 
 // unsigned int clientFrontendSM_TCP(char *serverAdressString, int serverPort, bool &hostNotification, int &hostCommand, bool &SMnotification,
 //                      ClientSMConnection connectionSM_state, Challange &challangeBundle, Solution &solutionBundle,

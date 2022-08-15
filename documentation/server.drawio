@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="FP2rdn6OG4W3p1-Ou6rB" name="High Level Communication Diagram">
-        <mxGraphModel dx="2379" dy="1916" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1955" dy="1748" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -3744,6 +3744,14 @@
                 <mxCell id="s_gDF6SHxyeUuSUpxeop-1391" value="" style="rhombus;whiteSpace=wrap;html=1;fillColor=none;" vertex="1" parent="LbqAoKC9yY7TSO-3Z9vQ-1">
                     <mxGeometry x="4880" y="2560" width="80" height="80" as="geometry"/>
                 </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+    <diagram id="s4fRP2SWtSLnjmTdJHv4" name="Network Manager">
+        <mxGraphModel dx="1105" dy="648" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="TDyibSXSZ6xO0_F-lJiC-0"/>
+                <mxCell id="TDyibSXSZ6xO0_F-lJiC-1" parent="TDyibSXSZ6xO0_F-lJiC-0"/>
             </root>
         </mxGraphModel>
     </diagram>

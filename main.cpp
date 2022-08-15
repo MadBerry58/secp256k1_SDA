@@ -11,6 +11,8 @@
 static int verbose_flag = false;
 static int operation_flag = 0u;
 
+UISMStruct UIdata;
+
 std::ifstream inputFile;
 
 int main(int argc, char **argv)
@@ -159,8 +161,8 @@ int main(int argc, char **argv)
             gmp_printf("Please choose the desired operating mode: \n./secp256k1_SDA --userInterface | resumeIteration | generateKnownPoints | tuneSystemLoad\n");
             break;
         case FLAG_OPERATION_UI:
-            userInterface_Init();
-            userInterface_Start();
+            UserInterfaceSM_Init();
+            UserInterfaceSM_Start(UIdata);
             break;
         case FLAG_OPERATION_RESUME:
             /* Check for local checkpoint file */

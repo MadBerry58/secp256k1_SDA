@@ -3,4 +3,6 @@
 
 #include "../../../../Arithmetic/Algorithms/Algorithms.h"
 
+unsigned int CoordinatorSM();
+
 #endif

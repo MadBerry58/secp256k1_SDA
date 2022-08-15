@@ -1,7 +1,11 @@
 #include "CoordinatorSM.h"
 
-int threadManager()
+unsigned int CoordinatorSM()
 {   
+    //initialize coordinatorSM
+        //establish connection to memory manager - initialize buffers for result storage
+        //establish connection to network manager - associate a clientSM for data output
+        //establish connection to file manager - create a file stream buffer for saving constant data and checkpoint
     unsigned int workerNumber;
     unsigned int iterationAlgorithm; 
     unsigned int workloadDistribution;

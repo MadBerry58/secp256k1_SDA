@@ -56,8 +56,9 @@ public:
     void            operator=               (char  *keyString);
     Point&          operator-=              (Point &source);
     Point&          operator+=              (Point &source);
-    void            operator*=              (mpz_t &factor);
-    void            operator/=              (mpz_t &factor);
+    Point&          operator*=              (mpz_t &factor);
+    Point&          operator*=              (unsigned long long factor);
+    Point&          operator/=              (mpz_t &factor);
     bool            operator==              (Point &source);
     bool            operator!=              (Point &source);
 
@@ -67,6 +68,7 @@ public:
     void            subPoint                (Point &result, Point &B);
     void            multiplyBy2             (Point &result);
     void            multiplyByFactor        (Point &result, mpz_t &factor);
+    void            multiplyByFactor        (Point &result, unsigned long long &factor);
 
     ///Getters  
     char*           getX                    ();
@@ -153,7 +155,6 @@ struct algorithmParams
     mpz_t iterationMask; /* The thart position of the iteration encoded in bitmask form */
 
 };
-
 struct targetStringProfile
 {
     std::string targetPoint;
@@ -164,7 +165,6 @@ struct targetStringProfile
     std::string numberOfSlices;
     std::string pointsPerSlice;
 };
-
 struct pointsStringProfile
 {
     std::string initialPoint;
@@ -176,19 +176,16 @@ struct pointsStringProfile
     std::string pointsPerSlice;
     std::set<LSB_HASH_TYPE>* knownSet;
 };
-
 struct Challange
 {
     char key[CHALLANGE_NUMBER][LSB_STRING_SIZE];
     bool updatedFlag = false;
 };
-
 struct Solution
 {
     char solution[CHALLANGE_NUMBER][SOLUTION_STRING_SIZE];
     bool solutionReady = true;
 };
-
 struct ProgressPackage
 {
     char *serializedProgressData;
@@ -196,69 +193,105 @@ struct ProgressPackage
     char progressDataHash[32];
 };
 
-struct ClientHandlerData
+typedef enum //ClientHandlerSM states
 {
-    char *clientAdressString;
-    int &clientPort;
-    bool &hostNotification;
-    int &hostCommand;
-    bool &SMnotification;
-    Challange &challangeBundle;
-    Solution &solutionBundle;
-    ProgressPackage &progressData;
-    sockaddr_in serv_addr;
-};
-
-//ClientSM input messages
-//ClientSM output messages
-#define CLIENT_SM_REQUEST_HANDLER "CSM_RequestHandler"
-#define CLIENT_SM_REQUEST_REGISTERCHALLANGE "CSM_RequestRegisterChallange"
-#define CLIENT_SM_REQUEST_REGISTERPROGRESS "CSM_RequestRegisterProgress"
-#define CLIENT_SM_REQUEST_PROGRESSDATASPACE "CSM_RequestProgressDataStorageSpace"
-
-//ClientSM states
-enum ClientSMConnection
-{
-    CLIENT_SM_STATE_UNITIALIZED,
-    CLIENT_SM_STATE_INIT,
-    CLIENT_SM_STATE_REQUESTING_HANDLER,
-    CLIENT_SM_STATE_CONNECTING_TO_HANDLER,
-    CLIENT_SM_STATE_CONNECTED,
-    CLIENT_SM_STATE_REQUESTING_PROGRESS_REGISTRATION,
-    CLIENT_SM_STATE_SEND_CHALLENGE_SOLUTION,
-    CLIENT_SM_STATE_SENDING_PROGRESS,
-    CLIENT_SM_STATE_DISCONNECTED,
-    CLIENT_SM_STATE_SHUTDOWN
-};
-
-struct clientSMStruct
-{    std::string dummyData;
-    Point pointBuffer[256];
-};
-
+    CLIENT_HANDLER_SM_UNINITIALIZED,
+    CLIENT_HANDLER_SM_INITIALIZING,
+    CLIENT_HANDLER_SM_INITIALIZED,
+    CLIENT_HANDLER_SM_AWAITINGHANDSHAKE,
+    CLIENT_HANDLER_SM_RECIVED_CONNECTIONREQUEST,
+    CLIENT_HANDLER_SM_CONNECTED,
+    CLIENT_HANDLER_SM_RECIVED_REGISTERPROGRESS_REQUEST,
+    CLIENT_HANDLER_SM_REGISTERING_PROGRESS,
+    CLIENT_HANDLER_SM_DISCONNECTED,
+    CLIENT_HANDLER_SM_SHUTDOWN_REQUESTED
+} ClientHandlerStates;
 struct clientHandlerSMStruct
 {    
     std::string dummyData;
+    ClientHandlerStates SMstate = CLIENT_HANDLER_SM_UNINITIALIZED;
     Point pointBuffer[256];
 };
 
+struct clientSMStruct
+{   
+    std::string dummyData;
+    Point pointBuffer[256];
+};
 struct satelliteSMStruct
 {    
     std::string dummyData;
     Point pointBuffer[256];
 };
-
 struct satelliteHandlerSMStruct
 {    
     std::string dummyData;
     Point pointBuffer[256];
 };
 
-struct serverSMStruct
-{    
+////ServerFrontendSM protocol data
+typedef enum //ServerFrontendSM input messages
+{
+    NO_INPUT,
+    START,
+    PRINT_DATA,
+    RESTART,
+    STOP,
+    SHUTDOWN
+} ServerFrontendSM_input;
+typedef enum //ServerFrontendSM output messages
+{
+    NO_OUTPUT,
+    SOCKET_AVAILABLE
+} ServerFrontendSM_output;
+typedef enum //ServerFrontendSM states
+{
+    UNINITIALIZED,
+    INITIALIZING,
+    INITIALIZED,
+    LISTENING,
+    CHECK_REQUESTBUFFER,
+    FAULT,
+    CLIENT_CONNECTION_REQUESTED,
+    SHUTDOWN_REQUESTED
+} ServerFrontendSM_state;
+#define BUFFERED_SOCKETS 5u //the ammount of buffered sockets the frontend can hold before refusing new ones
+typedef struct //ServerFrontendSM initialization data
+{
     std::string dummyData;
-    Point pointBuffer[256];
-};
+    int server_tcp_port = -1;
+    char serverHostName[MAXHOSTNAMELEN] = {0};
+    struct hostent *he;
+    struct sockaddr_in serv_addr;
+    int sockfd = -1;
+    char *ServerName;
+    bool bindedSM = false;
+    ServerFrontendSM_input inputMessage; //will have to be made platform independent
+    ServerFrontendSM_output outputMessage;
+    
+    struct sockaddr_in cli_addr;
+    socklen_t clilen;
+    int newsockfd;
+    char line[MAX_MESSAGE_LINE];
+
+    ServerFrontendSM_state SMstate = UNINITIALIZED;
+    unsigned int error = 0u;
+
+    std::thread *ownerThreadAdress;
+}ServerFrontendSMStruct;
+
+typedef enum
+{
+    UI_UNINITIALIZED,
+    UI_RUNNING,
+    UI_STOPPED,
+    UI_FAULT
+} UserInterfaceState;
+typedef struct //ServerFrontendSM initialization data
+{
+    UserInterfaceState SMstate;
+    char *user_input;
+}UISMStruct;
 
 /// Function-like macros
 #ifdef DEBUG

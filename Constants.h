@@ -9,6 +9,7 @@
 
 /// Variable initializers
 
+#define MAX_HOST_NAME_LENGTH                            64u
 #define MAX_MESSAGE_LINE                                2048u
 #define INITIALVAL_BIGNUM                               0u
 #define INITIALVAL_POINT_KEY                            "1"
@@ -46,8 +47,6 @@
 #define primeMinusOne_String                            "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2E"
 #define primePlusOneDivFour_String                      "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
 #define primePlusOneDivTwo_String                       "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE18"
-
-// 10472290570935714244214166893328940128314656840635597500498006050745359883506
 
 //////////////////////////// ERROR CODES /////////////////////////
 ///Bitmask friendly error codes, using 16 bit masks
@@ -142,6 +141,16 @@
 #define CLIENT_HANDLER_SM_E_INVALID_CHALLANGE_SOLUTION   553u
 #define CLIENT_HANDLER_SM_E_SOCKETFAULT                  554u
 
+#define SERVER_FRONTEND_SM_E_OK                          751u
+#define SERVER_FRONTEND_SM_E_INVALID_SM_STATE            752u
+#define SERVER_FRONTEND_SM_E_INVALID_CHALLANGE_SOLUTION  753u
+#define SERVER_FRONTEND_SM_E_SOCKETFAULT                 754u
+#define SERVER_FRONTEND_SM_E_ADRESSFAULT                 755u
+#define SERVER_FRONTEND_SM_E_UNINITIALIZED               755u
+#define SERVER_FRONTEND_SM_E_CONNECTION_FAILED           756u
+
+
+
 /// Modular Operator Errors     0b 00000100 00000000
 
 #define MOD_E_OK                                        1024u
@@ -163,6 +172,8 @@
 #define POINT_E_SUBTRACTION_K_INVALID                   1542u
 #define POINT_E_SUBTRACTION_X_INVALID                   1543u
 #define POINT_E_SUBTRACTION_Y_INVALID                   1544u
+
+
 
 /// Further error types shall be written in the bit shifted pattern
 ///                             0b 00001000 00000000
