@@ -10,5 +10,6 @@
 #include "UIManager/UIManager.h"
 
 unsigned int init_managers(std::string initData);
+unsigned int sendMessage(auto message, bool *notificationFlag, auto *messageContainer);
 
 #endif

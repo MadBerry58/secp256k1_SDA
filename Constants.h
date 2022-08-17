@@ -60,6 +60,10 @@
 #define GENERATION_E_NO_SLICES                          5u
 #define GENERATION_E_POINT_NUMBER_NOT_MATCHING          6u
 
+#define COMM_E_OK                                       16u
+#define COMM_E_NOTIFICATION_PRESENT                     17u
+
+
 /// Checkpoint errors           0b 00000000 00100000
 #define CHECKPOINT_E_OK                                 32u
 
@@ -148,6 +152,16 @@
 #define SERVER_FRONTEND_SM_E_ADRESSFAULT                 755u
 #define SERVER_FRONTEND_SM_E_UNINITIALIZED               755u
 #define SERVER_FRONTEND_SM_E_CONNECTION_FAILED           756u
+
+#define ITERATOR_SM_E_OK                          751u
+#define ITERATOR_SM_E_INVALID_SM_STATE            752u
+#define ITERATOR_SM_E_INVALID_RX                  753u
+#define ITERATOR_SM_E_INVALID_ALGORITHM_ID        754u
+#define ITERATOR_SM_E_ADRESSFAULT                 755u
+#define ITERATOR_SM_E_UNINITIALIZED               755u
+#define ITERATOR_SM_E_CONNECTION_FAILED           756u
+#define ITERATOR_SM_E_CONNECTION_TIMEOUT          757u
+#define ITERATOR_SM_E_CONNECTION_INVALID_RESPONSE 758u
 
 
 

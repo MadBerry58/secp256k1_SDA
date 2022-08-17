@@ -149,12 +149,13 @@ struct BigNumber
        inline mpz_t& getValuePointer();
 };
 
-struct algorithmParams
+typedef struct
 {
     Point target;
     mpz_t iterationMask; /* The thart position of the iteration encoded in bitmask form */
 
-};
+}algorithmStruct;
+
 struct targetStringProfile
 {
     std::string targetPoint;
@@ -192,6 +193,56 @@ struct ProgressPackage
     char *dataSize;
     char progressDataHash[32];
 };
+
+#define ITERATOR_SM_RETRY_COUNT 3u
+#define ITERATOR_SM_RETRY_DELAY 0.4
+typedef enum //ITERATOR_SM input commands
+{
+    ITERATOR_SM_RX_NONE,
+    ITERATOR_SM_RX_START,
+    ITERATOR_SM_RX_SHUTDOWN,
+    ITERATOR_SM_RX_CONFIRM_CONNECTION_REQUEST,
+    ITERATOR_SM_RX_CONFIRM_BUFFER_REQUEST,
+    ITERATOR_SM_RX_CONTINUE
+}IteratorSM_input;
+typedef enum //IteratorSM output commands
+{
+    ITERATOR_SM_TX_NONE,
+    ITERATOR_SM_TX_REQUEST_CONNECTION,
+    ITERATOR_SM_TX_REQUEST_POINT_BUFFER
+}IteratorSM_output;
+typedef enum //ITERATOR_SM states
+{
+    ITERATOR_SM_STATE_UNINITIALIZED,
+    ITERATOR_SM_STATE_READY,
+    ITERATOR_SM_STATE_RUNNING,
+    ITERATOR_SM_STATE_WAITING,
+    ITERATOR_SM_STATE_FAULT,
+    ITERATOR_SM_STATE_SHUTDOWN
+} IteratorSMState;
+typedef enum //IteratorSM iteration algorithm type
+{
+    ITERATOR_SM_ALGORITHM_UNDEFINED,
+    ITERATOR_SM_ALGORITHM_CONTINUOUS_STEPS,
+    ITERATOR_SM_ALGORITHM_SLICED_STEPS,
+    ITERATOR_SM_ALGORITHM_CONTINUOUS_MULTIPLY,
+    ITERATOR_SM_ALGORITHM_CONTINUOUS_DOUBLING,
+    ITERATOR_SM_ALGORITHM_BTREE_SUBDIVISION
+} IteratorSM_Algorithm;
+typedef struct //ITERATOR_SM structure
+{
+    bool RxNotificationFlag; //flag signaling the presence of an incomming message
+    IteratorSM_input RxFlag; /* Incomming message container */
+    bool TxNotificationFlag = false; //flag signaling the presence of an outgoing message
+    IteratorSM_output TxFlag; 
+
+    Point **buffer;     //pointer to a Point buffer array. The pointer is used to allow buffer swapping by the coordinator, in order to reduce downtime
+    unsigned long long errorNo; //variable holding the error code associated to the FAULT state
+
+    IteratorSMState SMstate = ITERATOR_SM_STATE_UNINITIALIZED;
+    IteratorSM_Algorithm algorithm = ITERATOR_SM_ALGORITHM_UNDEFINED;
+
+} IteratorSMStruct;
 
 typedef enum //ClientHandlerSM states
 {
@@ -287,10 +338,15 @@ typedef enum
     UI_STOPPED,
     UI_FAULT
 } UserInterfaceState;
+
 typedef struct //ServerFrontendSM initialization data
 {
     UserInterfaceState SMstate;
-    char *user_input;
+    char user_input;
+    std::string checkpointFileName;
+    std::string knownPointsFileName;
+    std::string serverAdress;
+    std::string serverPort;
 }UISMStruct;
 
 /// Function-like macros
