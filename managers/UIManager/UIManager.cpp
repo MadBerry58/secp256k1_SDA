@@ -4,7 +4,7 @@
 
 ////TODO: Move UI functionality into a sepparate thread to allow for a main program loop running in the background
 
-int UserInterfaceSM_Init()
+int UserInterfaceSM_Init(UISMStruct UIdata)
 {
     std::cout << "Initialize user interface\n"
               << UNIMPLEMENTED_FUNCTIONALITY_TAG << "\n";

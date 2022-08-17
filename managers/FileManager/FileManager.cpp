@@ -70,7 +70,6 @@ unsigned int fileManager_Init()
     mpz_init(dummyKey);
     generateRandomKey(dummyKey);
     Point dummyTarget(dummyKey);
-    COLLECT(dummyTarget);
 
     srandom(time(NULL));
     unsigned long dummyIterationNumber = random();
@@ -95,7 +94,6 @@ unsigned int fileManager_Init()
 
 
     Point dummyCheckout(dummyCheckoutKey);
-    COLLECT(dummyCheckout);
 
     DEBUG_MSG("\nGenerated dummyTarget K: %s\n", dummyTarget.getK());
     DEBUG_MSG("Generated dummyTarget X: %s\n", dummyTarget.getX());
