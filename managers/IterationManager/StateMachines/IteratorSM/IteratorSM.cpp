@@ -1,5 +1,5 @@
 #include "IteratorSM.h"
-#include "../../../Arithmetic/Algorithms/Algorithms.h"
+#include "../../../Arithmetic/Arithmetic.h"
 
 unsigned int IteratorSM(IteratorSMStruct data)
 {
@@ -12,7 +12,7 @@ unsigned int IteratorSM(IteratorSMStruct data)
                 /* Initialize the state machine */
                 
                 /* establish connection with a coordinatorSM */
-                sendMessage(ITERATOR_SM_TX_REQUEST_CONNECTION, &data.TxNotificationFlag, &data.TxFlag);
+                // sendMessage(ITERATOR_SM_TX_REQUEST_CONNECTION, &data.TxNotificationFlag, &data.TxFlag);
                 while (false == data.RxNotificationFlag) /* wait for coordinator to process the request*/
                 {
                     sleep(ITERATOR_SM_RETRY_DELAY);
@@ -36,6 +36,7 @@ unsigned int IteratorSM(IteratorSMStruct data)
 
                 /* Initialize necessary algorithm data structures */
                 switch (data.algorithm)
+                // (*fun_ptr_arr[ch])(a, b);
                 {
                     case ITERATOR_SM_ALGORITHM_UNDEFINED:
                         data.SMstate = ITERATOR_SM_STATE_FAULT;
@@ -60,6 +61,7 @@ unsigned int IteratorSM(IteratorSMStruct data)
                     
                     case ITERATOR_SM_ALGORITHM_BTREE_SUBDIVISION:
                         /* Initiate variable containers (assuming constant data is located inside IteratorSM) */
+                        void (*fun_ptr)(int) = &fun;
                         break;
 
                     default:

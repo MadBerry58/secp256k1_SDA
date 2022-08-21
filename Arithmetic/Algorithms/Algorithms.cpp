@@ -111,6 +111,80 @@ unsigned int continuousDoubling()
     return 0;
 }
 
+unsigned int init_bTreeSubdivision(void **args, unsigned int arg_no)
+{
+    DEBUG_MSG("Accessed the algorithm\n");
+    static bool constDataInitialized;
+    
+    unsigned int databaseSize = *(unsigned int*)(args[0]);
+    unsigned int depthMin     = *(unsigned int*)(args[1]);
+    unsigned int depthMax     = *(unsigned int*)(args[2]);
+    bool         evenNodesAbsent;                                           /* Flag indicating the presence of even nodes inside the search gap */
+    int          depth               = 0;                                   /* variable used for indicating the current tree depth during the iteration*/
+    int          bandWidth;
+    int          outOfBand_JumpDepth;
+    mpz_t        parityBitset;
+    mpz_t        fullMask;
+    mpz_t        segmentSize;
+    mpz_t        branchBitset;
+    mpz_t        minDepthMask;
+    mpz_t        searchBandMask;
+    mpz_t        maskContainer1;
+    mpz_t        maskContainer2;
+    mpz_t        addNodesBitset;
+    mpz_t        comParityBitset;
+    mpz_t        outOfBandMasks    [depthMin];                              /* generate masks for the bit distance between the minDepth and the current highest node*/ 
+    Point        one               (xG0_String, yG0_String, kG0_String);    /* point G0 is generated for later use */
+    Point        two               (xG1_String, yG1_String, kG1_String);    /* point G1 is generated for later use */
+    Point        gappedSegments    [(depthMin + 2)];                        /* an extra container slot is added for holding (segment) */
+    mpz_set_str( branchBitset,     (const char*)(args[3]), PREFFERED_BASE);
+
+    /* Generate constant iteration data */
+    /* All the operations in this area will be done only once*/
+    /* Extract data and generate order specific iteration structures*/
+    bandWidth = (depthMax - depthMin);                      /* the number of levels for which the points will be computed */
+    mpz_init_set_str(parityBitset, order_String, PREFFERED_BASE); /*parity bitset is equivalent to the number bit representation*/
+    mpz_init(comParityBitset); mpz_com(comParityBitset, parityBitset); /* complementary parity bitset is reversed for later use */
+    mpz_init_set_str(segmentSize, orderMinusOneDivTwo_String, PREFFERED_BASE);
+    mpz_init(fullMask);                         /* Bitmask covering the full search depth*/
+    
+    /* Generate the necessary bitmasks */
+    mpz_setbit(fullMask, depthMax);                                     /* Set fullMask to 2^depthMax */
+    mpz_sub_ui(fullMask, fullMask, 1ul);                                /* Set fullMask to 2^depthMax - 1 */
+    mpz_init(minDepthMask);                     /* Bitmask covering the bits from 0 to minDepth*/
+    mpz_div_2exp(minDepthMask, fullMask, bandWidth); /*right shift the full mask with bandWidh places*/
+    mpz_init(searchBandMask);                   /* Bitmask covering the bits from minDepth to maxDepth*/
+    mpz_xor(searchBandMask, fullMask, minDepthMask); /*xor the full mask and the minDepthMask to get the new mask*/
+    mpz_init_set(outOfBandMasks[depth], fullMask);                      /* if iteration is on node 0, all the nodes from minDepth to 0 are considered */
+    for(; depth < depthMin; ++depth)                    
+    {
+        mpz_init_set(outOfBandMasks[depth], outOfBandMasks[depth + 1]); /* initiate the next mask with the value of the current one */
+        mpz_clrbit(outOfBandMasks[depth + 1], depth);                   /* reset the bit representing the current position from the next mask */
+    }/* Final mask of depthMin should be an empty bitmask */
+    mpz_init(maskContainer1);                    /* temporary container */
+    mpz_init(maskContainer2);                    /* temporary container - variables are initialized with 0*/
+    mpz_init(addNodesBitset);                    /* container variable representing the nodes that should be considered when outside the search band */
+    mpz_xor(maskContainer1, searchBandMask, comParityBitset);           /* check if any even nodes are inside the search gap */
+    evenNodesAbsent = (0ul == (mpz_cmp_ui(maskContainer1, 0lu)));       /* if no even nodes are found, set the flag as TRUE*/
+    /* Determine the depth at which the first point computation will occur after reentering the search band */
+    /* If no even nodes are present, the next jump depth is going to be depthMin. Otherwise, the next jump depth will be the first even node after depthMin */
+
+    outOfBand_JumpDepth = ( (evenNodesAbsent * depthMax) + (!evenNodesAbsent * (depthMin + mpz_scan0(parityBitset, depthMin))) );
+    mpz_div_2exp(segmentSize,parityBitset, depthMin);                   /* Right shift the order to get the necessary segment */
+    gappedSegments[depthMin + evenNodesAbsent] = segmentSize;           /* Generate the last points to be used on the terminal nodes */
+    gappedSegments[0] = one;                                            /* Save the unaltered segment size in the last element of the array */
+    gappedSegments[0].addPoint(gappedSegments[1], gappedSegments[depthMin + evenNodesAbsent]);
+    if(evenNodesAbsent)
+    {
+        gappedSegments[1] += gappedSegments[depthMin + evenNodesAbsent];
+    }
+
+    for(depth = 1; depth < depthMin; ++depth)
+    {
+        gappedSegments[depth - 1].addPoint(gappedSegments[depth], one);
+    }
+}
+
 /**
  * @brief This algorithm checks points by continuously dividing the search subspace in half
  * @param databaseSize  
@@ -130,100 +204,23 @@ unsigned int continuousDoubling()
  */
 unsigned int bTreeSubdivision(void **args, unsigned int arg_no)
 {
-    DEBUG_MSG("Accessed the algorithm\n");
-    static bool constDataInitialized;
-    
-    unsigned int databaseSize = *(unsigned int*)(args[0]);
-    unsigned int depthMin = *(unsigned int*)(args[1]);
-    unsigned int depthMax = *(unsigned int*)(args[2]);
-    mpz_t branchBitset; mpz_set_str(branchBitset, (const char*)(args[3]), PREFFERED_BASE);
-    bool *runFlag = (bool*)(args[4]);
-    int   depth =           0;                                          /* variable used for indicating the current tree depth during the iteration*/
-    int   gap_size =        0;                                          /* the gap size left by computing points on the layers above the current depth */
-
-    int   bandWidth;
-    mpz_t parityBitset;
-    mpz_t comParityBitset;
-    mpz_t segmentSize;
-    mpz_t fullMask;
-    mpz_t minDepthMask;
-    mpz_t searchBandMask;
-    mpz_t outOfBandMasks   [depthMin];       /* generate masks for the bit distance between the minDepth and the current highest node*/ 
-    mpz_t maskContainer1;  
-    mpz_t maskContainer2;  
-    mpz_t addNodesBitset;  
-    bool  evenNodesAbsent;                   /* Flag indicating the presence of even nodes inside the search gap */
-
-    /* Generate constant iteration data */
-    /* All the operations in this area will be done only once*/
-    if(constDataInitialized == false)
-    {
-    /* Extract data and generate order specific iteration structures*/
-        bandWidth =       (depthMax - depthMin);                      /* the number of levels for which the points will be computed */
-        mpz_init_set_str(parityBitset, order_String, PREFFERED_BASE); /*parity bitset is equivalent to the number bit representation*/
-        mpz_init(comParityBitset); mpz_com(comParityBitset, parityBitset); /* complementary parity bitset is reversed for later use */
-        mpz_init_set_str(segmentSize, orderMinusOneDivTwo_String, PREFFERED_BASE);
-        mpz_init(fullMask);                         /* Bitmask covering the full search depth*/
-        
-        /* Generate the necessary bitmasks */
-        mpz_setbit(fullMask, depthMax);                                     /* Set fullMask to 2^depthMax */
-        mpz_sub_ui(fullMask, fullMask, 1ul);                                /* Set fullMask to 2^depthMax - 1 */
-        mpz_init(minDepthMask);                     /* Bitmask covering the bits from 0 to minDepth*/
-        mpz_div_2exp(minDepthMask, fullMask, bandWidth); /*right shift the full mask with bandWidh places*/
-        mpz_init(searchBandMask);                   /* Bitmask covering the bits from minDepth to maxDepth*/
-        mpz_xor(searchBandMask, fullMask, minDepthMask); /*xor the full mask and the minDepthMask to get the new mask*/
-        mpz_init_set(outOfBandMasks[depth], fullMask);                      /* if iteration is on node 0, all the nodes from minDepth to 0 are considered */
-        for(; depth < depthMin; ++depth)                    
-        {
-            mpz_init_set(outOfBandMasks[depth], outOfBandMasks[depth + 1]); /* initiate the next mask with the value of the current one */
-            mpz_clrbit(outOfBandMasks[depth + 1], depth);                   /* reset the bit representing the current position from the next mask */
-        }/* Final mask of depthMin should be an empty bitmask */
-        mpz_init(maskContainer1);                    /* temporary container */
-        mpz_init(maskContainer2);                    /* temporary container - variables are initialized with 0*/
-        mpz_init(addNodesBitset);                    /* container variable representing the nodes that should be considered when outside the search band */
-        mpz_xor(maskContainer1, searchBandMask, comParityBitset);           /* check if any even nodes are inside the search gap */
-        evenNodesAbsent = (0ul == (mpz_cmp_ui(maskContainer1, 0lu)));       /* if no even nodes are found, set the flag as TRUE*/
-        /* Determine the depth at which the first point computation will occur after reentering the search band */
-        /* If no even nodes are present, the next jump depth is going to be depthMin. Otherwise, the next jump depth will be the first even node after depthMin */
-    }
-
-
-
-    
-
-
-
-    
-
-    
-    Point one                (xG0_String, yG0_String, kG0_String);      /* point G0 is generated for later use */
-    Point two                (xG1_String, yG1_String, kG1_String);      /* point G1 is generated for later use */
-    Point R;
-
-    #ifdef BTREE_BITMASKED /* bitmasked version of the tree algorithm */
-    
-    int   outOfBand_JumpDepth;
-    
-    if(constDataInitialized == false)
-    {
-        outOfBand_JumpDepth = ( (evenNodesAbsent * depthMax) + (!evenNodesAbsent * (depthMin + mpz_scan0(parityBitset, depthMin))) );
-    }
-
-    Point gappedSegments     [(depthMin + 2)];                          /* an extra container slot is added for holding (segment) */
-    mpz_div_2exp(segmentSize,parityBitset, depthMin);                   /* Right shift the order to get the necessary segment */
-    gappedSegments[depthMin + evenNodesAbsent] = segmentSize;           /* Generate the last points to be used on the terminal nodes */
-    gappedSegments[0] = one;                                            /* Save the unaltered segment size in the last element of the array */
-    gappedSegments[0].addPoint(gappedSegments[1], gappedSegments[depthMin + evenNodesAbsent]);
-    if(evenNodesAbsent)
-    {
-        gappedSegments[1] += gappedSegments[depthMin + evenNodesAbsent];
-    }
-
-    for(depth = 1; depth < depthMin; ++depth)
-    {
-        gappedSegments[depth - 1].addPoint(gappedSegments[depth], one);
-    }
-
+    mpz_t          maskContainer1;  
+    mpz_t          maskContainer2;  
+    mpz_t          addNodesBitset;  
+    mpz_t          branchBitset;
+    Point          R;
+    unsigned int   databaseSize        = *(unsigned int*)(args[0] );
+    unsigned int   depthMin            = *(unsigned int*)(args[1] );
+    unsigned int   depthMax            = *(unsigned int*)(args[2] );
+    bool          *runFlag             =  (bool*)        (args[3] );
+    int            depth               = *(int*)         (args[4] ); /* variable used for indicating the current tree depth during the iteration*/
+    int            gap_size            = *(int*)         (args[5] ); /* the gap size left by computing points on the layers above the current depth */
+    mpz_t         *comParityBitset     =  (mpz_t*)       (args[6] );
+    mpz_t        **outOfBandMasks      =  (mpz_t**)      (args[7] ); /* generate masks for the bit distance between the minDepth and the current highest node*/ 
+    Point         *one                 =  (Point*)       (args[10]);
+    Point        **gappedSegments      =  (Point**)      (args[11]); /* an extra container slot is added for holding (segment) */
+    int            outOfBand_JumpDepth = *(int*)         (args[12]);
+    mpz_set_str   (branchBitset,          (const char*)  (args[13]), PREFFERED_BASE);
 
 
     // Standard BTree bitmasked iterator
@@ -264,36 +261,34 @@ unsigned int bTreeSubdivision(void **args, unsigned int arg_no)
         DEBUG_MSG("depth is not in a valid range");
     }
 
-    while(depth > -1) /* as long as the end of the iteration has not been reached*/
+    while(depth > -1) /* as long as the end of the iteration has not been reached */
     ////TODO: replace with a precalculated number of steps, and/or make loop dependent on outside control
     ////OBS:  if no stopping mechanism is provided, the algorithm could in theory loop around the search bamd and start the calculations again, with an offset 
     {
-        if(depth == depthMax) /* node is terminal*/
-        {/*to optimize the number of operations (namely the reassignment of gap_size), terminal nodes will also do a point computation, by calculating the jumps and landing on the node after the first addition */
-            mpz_com(maskContainer1, branchBitset);                  /* reverse bitset to remove leading bits */
-            depth = mpz_sizeinbase(maskContainer1, 2);              /* determine the most significant bit (former most significant 0 bit, lowest unvisited branch) */
-            mpz_com(maskContainer1, branchBitset);                  /* reverse bitset to restore initial data while leaving out the initial leading bits */
-            mpz_setbit(branchBitset, depth);                        /* set current node as visited */
-            mpz_ior(addNodesBitset, comParityBitset, branchBitset); /* regenerate the addNodesBitset */
-            gap_size = 1u;                                          /* at least one gap is needed */
-            if(depth < depthMin)                                    /* next unvisited branch is outside search band*/
-            {
-                mpz_and(maskContainer1, outOfBandMasks[depth], addNodesBitset); /* isolate the bits representing nodes that need to be added from the current depth to min depth */
-                gap_size += mpz_popcount(maskContainer1); /* count the number of gaps that have to be added to the jump (accounting for the reentry node as well)*/
-                depth = outOfBand_JumpDepth; /*set depth on the search band reentry depth*/
-            }
-            R += gappedSegments[depth];
-        }
-        else if(mpz_tstbit(addNodesBitset,depth)) /* node is not terminal*/
+      if(depth == depthMax) /* node is terminal*/
+      {/* to optimize the number of operations (namely the reassignment of gap_size), terminal nodes will also do a point computation, by calculating the jumps and landing on the node after the first addition */
+        mpz_com(maskContainer1, branchBitset);                  /* reverse bitset to remove leading bits */
+        depth = mpz_sizeinbase(maskContainer1, 2);              /* determine the most significant bit (former most significant 0 bit, lowest unvisited branch) */
+        mpz_com(maskContainer1, branchBitset);                  /* reverse bitset to restore initial data while leaving out the initial leading bits */
+        mpz_setbit(branchBitset, depth);                        /* set current node as visited */
+        mpz_ior(addNodesBitset, *comParityBitset, branchBitset);/* regenerate the addNodesBitset */
+        gap_size = 1u;                                          /* at least one gap is needed */
+        if(depth < depthMin)                                    /* next unvisited branch is outside search band*/
         {
-            R += one;  /* compute point addition*/
-            ////TODO: encapsulate the point computation call to allow for registration of the point without increasing the code volume
+            mpz_and(maskContainer1, *outOfBandMasks[depth], addNodesBitset); /* isolate the bits representing nodes that need to be added from the current depth to min depth */
+            gap_size += mpz_popcount(maskContainer1); /* count the number of gaps that have to be added to the jump (accounting for the reentry node as well)*/
+            depth = outOfBand_JumpDepth; /*set depth on the search band reentry depth*/
         }
-        depth++; /* step down*/
+        R += *gappedSegments[depth];
+      }
+      else if(mpz_tstbit(addNodesBitset,depth)) /* node is not terminal*/
+      {
+        R += *one;  /* compute point addition*/
+        ////TODO: encapsulate the point computation call to allow for registration of the point without increasing the code volume
+      }
+      depth++; /* step down*/
     }
     #endif //BTREE_BITMASKED_EXPERIMENTAL
-
-    #endif
 
 
     // BTree implemented using pre generated 'for' loops

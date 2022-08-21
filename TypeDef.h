@@ -149,13 +149,6 @@ struct BigNumber
        inline mpz_t& getValuePointer();
 };
 
-typedef struct
-{
-    Point target;
-    mpz_t iterationMask; /* The thart position of the iteration encoded in bitmask form */
-
-}algorithmStruct;
-
 struct targetStringProfile
 {
     std::string targetPoint;
@@ -235,6 +228,7 @@ typedef struct //ITERATOR_SM structure
     IteratorSM_input RxFlag; /* Incomming message container */
     bool TxNotificationFlag = false; //flag signaling the presence of an outgoing message
     IteratorSM_output TxFlag; 
+    unsigned int (*iterationAlgorithm)(void **args, unsigned int arg_no) = nullptr;
 
     Point **buffer;     //pointer to a Point buffer array. The pointer is used to allow buffer swapping by the coordinator, in order to reduce downtime
     unsigned long long errorNo; //variable holding the error code associated to the FAULT state
