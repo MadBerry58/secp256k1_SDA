@@ -3,6 +3,7 @@
 
 #include "../StateMachines.h"
 
-unsigned int IteratorSM(IteratorSMStruct data);
+unsigned int init_IteratorSM(IteratorSMStruct *data);
+unsigned int IteratorSM(IteratorSMStruct *data);
 
 #endif

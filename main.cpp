@@ -1,4 +1,4 @@
-#include "TypeDef.h"RESUME
+#include "TypeDef.h"
 #include "Arithmetic/Arithmetic.h"
 #include "managers/managers.h"
 

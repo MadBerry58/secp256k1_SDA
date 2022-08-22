@@ -1,6 +1,10 @@
 #include "SatelliteSM.h"
 
-void init_SatelliteSM(satelliteSMStruct *messageStruct)
+unsigned int init_SatelliteSM(satelliteSMStruct *messageStruct)
 {
-    
+    return 0;
+}
+unsigned int SatelliteSM(satelliteSMStruct *messageStruct)
+{
+    return 0;
 }

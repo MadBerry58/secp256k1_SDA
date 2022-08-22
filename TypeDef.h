@@ -149,6 +149,18 @@ struct BigNumber
        inline mpz_t& getValuePointer();
 };
 
+typedef struct
+{
+    pthread_mutex_t      portLock            = PTHREAD_MUTEX_INITIALIZER;
+    unsigned int         bufferWriteIndex    = 0u;
+    unsigned int         bufferReadIndex     = 0u;
+    unsigned int         bufferSize          = 0u;
+    bool*                messagePresentFlag  = nullptr;
+    unsigned int*        messageContainer    = nullptr;
+    unsigned long long*  messageBuffer       = nullptr;
+    
+} Port;
+
 struct targetStringProfile
 {
     std::string targetPoint;
@@ -235,8 +247,52 @@ typedef struct //ITERATOR_SM structure
 
     IteratorSMState SMstate = ITERATOR_SM_STATE_UNINITIALIZED;
     IteratorSM_Algorithm algorithm = ITERATOR_SM_ALGORITHM_UNDEFINED;
-
+    std::thread *stateMachineHandle;
 } IteratorSMStruct;
+
+typedef enum
+{
+    COORDINATOR_SM_DISTRIBUTION_UNDEFINED,
+    COORDINATOR_SM_DISTRIBUTION_VERTICAL_SYNCED,
+    COORDINATOR_SM_DISTRIBUTION_HORIZONTAL_SYNCED,
+    COORDINATOR_SM_DISTRIBUTION_SCATTERED
+} CoordinatorSM_workDist;
+typedef struct //CoordinatorSM structure
+{
+    Port                  *memoryManagerPort  = nullptr;
+    Port                  *networkManagerPort = nullptr;
+    Port                  *fileManagerPort    = nullptr;
+    unsigned int           workerNumber       = 0u;
+    unsigned int           workerBufferSize   = 0u;
+    IteratorSM_Algorithm   chosenAlgorithm    = ITERATOR_SM_ALGORITHM_UNDEFINED;
+    CoordinatorSM_workDist distribution       = COORDINATOR_SM_DISTRIBUTION_UNDEFINED;
+    std::thread           *stateMachineHandle;
+
+}CoordinatorSMStruct;
+
+typedef struct //IteratorManager initializer data
+{
+    Port iterationManagerRxPort;
+    unsigned int iteratorNumber = 0;
+
+}IterationManagerData;
+
+typedef struct 
+{
+    Port networkManagerRxPort;
+}NetworkManagerData;
+
+typedef struct {
+    Port uiManagerRxPort;
+}UIManagerData;
+
+typedef struct {
+    Port memoryManagerRxPort;
+}MemoryManagerData;
+
+typedef struct {
+    Port fileManagerRxPort;
+}FileManagerData;
 
 typedef enum //ClientHandlerSM states
 {
@@ -256,22 +312,26 @@ struct clientHandlerSMStruct
     std::string dummyData;
     ClientHandlerStates SMstate = CLIENT_HANDLER_SM_UNINITIALIZED;
     Point pointBuffer[256];
+    std::thread *stateMachineHandle;
 };
 
 struct clientSMStruct
 {   
     std::string dummyData;
     Point pointBuffer[256];
+    std::thread *stateMachineHandle;
 };
 struct satelliteSMStruct
 {    
     std::string dummyData;
     Point pointBuffer[256];
+    std::thread *stateMachineHandle;
 };
 struct satelliteHandlerSMStruct
 {    
     std::string dummyData;
     Point pointBuffer[256];
+    std::thread *stateMachineHandle;
 };
 
 ////ServerFrontendSM protocol data
@@ -322,7 +382,7 @@ typedef struct //ServerFrontendSM initialization data
     ServerFrontendSM_state SMstate = UNINITIALIZED;
     unsigned int error = 0u;
 
-    std::thread *ownerThreadAdress;
+    std::thread *stateMachineHandle;
 }ServerFrontendSMStruct;
 
 typedef enum

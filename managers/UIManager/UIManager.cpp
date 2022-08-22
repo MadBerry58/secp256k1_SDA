@@ -1,6 +1,6 @@
 #include "UIManager.h"
 
-
+UIManagerData uiManagerDataStructure;
 
 ////TODO: Move UI functionality into a sepparate thread to allow for a main program loop running in the background
 

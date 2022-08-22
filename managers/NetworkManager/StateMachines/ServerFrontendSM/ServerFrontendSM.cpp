@@ -6,6 +6,11 @@ char *generateHandlerToken(char *token)
     return token;
 }
 
+unsigned int init_ServerFrontendSM(ServerFrontendSMStruct *messageStruct)
+{
+    return 0;
+}
+
 unsigned int ServerFrontendSM(ServerFrontendSMStruct *messageStruct)
 {
     while(messageStruct->SMstate != SHUTDOWN_REQUESTED)
@@ -118,6 +123,7 @@ unsigned int ServerFrontendSM(ServerFrontendSMStruct *messageStruct)
 
                 break;
         }
+    return 0;
 }
 
 #undef LOCAL_DEBUG_MSG

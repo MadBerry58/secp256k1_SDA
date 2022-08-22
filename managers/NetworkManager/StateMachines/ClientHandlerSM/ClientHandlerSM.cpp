@@ -1,5 +1,10 @@
 #include "ClientHandlerSM.h"
 
+unsigned int init_ClientHandlerSM(clientHandlerSMStruct *messageStruct)
+{
+    return 0;
+}
+
 unsigned int ClientHandlerSM(clientHandlerSMStruct *messageStruct)
 {
     while(messageStruct->SMstate != CLIENT_HANDLER_SM_SHUTDOWN_REQUESTED)

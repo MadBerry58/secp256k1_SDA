@@ -1,16 +1,14 @@
 #include "NetworkManager.h"
-#define MAX_SM_NUMBER 32u
-bool rxFlag = false; // flag indicating if a message is present in the Rx buffer
-unsigned int RxBuffer = 0;
 
-unsigned int RxFlags[MAX_SM_NUMBER] = {0u}; //flag variables used by the state machines to signal a change in the state
-unsigned int TxFlags[MAX_SM_NUMBER] = {0u}; //flag variables used by the main program to notify state machines
+NetworkManagerData networkManagerDataStructure;
+
+#define MAX_SM_NUMBER 32u
+#define NETWORK_SM_BUFFER 5u
 unsigned int StateMachines = 0u;
 
 unsigned int init_NetworkManager(std::string message)
 {
-    //create structure containers for state machines
-    //bind notification flags to a list
+    initPort(NETWORK_SM_BUFFER, networkManagerDataStructure.networkManagerRxPort);
     std::cout << "Network Manager initialized successfully\n" << std::endl;
     return 0;
 }

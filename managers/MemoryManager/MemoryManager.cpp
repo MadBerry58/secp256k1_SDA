@@ -1,5 +1,13 @@
 #include "MemoryManager.h"
 
+MemoryManagerData memoryManagerDataStructure;
+#define MEMORY_PORT_BUFFER_SIZE 5u
+unsigned int init_MemoryManager(std::string initData)
+{
+    initPort(MEMORY_PORT_BUFFER_SIZE, memoryManagerDataStructure.memoryManagerRxPort);
+    return 0;
+}
+
 void pointProfile_Init(targetProfile* profile)
 {
     profile->checkOutPoint.reset();

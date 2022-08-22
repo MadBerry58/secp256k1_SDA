@@ -31,7 +31,7 @@
  */
 unsigned int checkAlgorithmParams(IteratorSMStruct iteratorData)
 {
-    switch (iteratorData.algorithmType)
+    switch (iteratorData.algorithm)
     {
         case ITERATION_ALGORITHM_INVALID:
             DEBUG_MSG("Algorithm undefined\n");
@@ -63,6 +63,12 @@ unsigned int checkAlgorithmParams(IteratorSMStruct iteratorData)
     return 0;
 }
 
+unsigned int init_continuousSteps()
+{
+    DEBUG_MSG("Accessed the continuousSteps initializer\n");
+    return 0;
+}
+
 /**
  * @brief The function checks points by adding a fixed value each step
  * 
@@ -73,6 +79,12 @@ unsigned int checkAlgorithmParams(IteratorSMStruct iteratorData)
 unsigned int continuousSteps()
 {
     DEBUG_MSG("Accessed the continuousSteps algorithm\n");
+    return 0;
+}
+
+
+unsigned int init_slicedSteps()
+{
     return 0;
 }
 
@@ -89,6 +101,11 @@ unsigned int slicedSteps()
     return 0;
 }
 
+unsigned int init_continuousMultiply()
+{
+    DEBUG_MSG("Accessed the continuousMultiply initializer\n");
+    return 0;
+}
 /**
  * @brief This algorithm checks points by continuously adding the target to itself
  * 
@@ -100,6 +117,11 @@ unsigned int continuousMultiply()
     return 0;
 }
 
+unsigned int init_continuousDoubling()
+{
+    DEBUG_MSG("Accessed the continuousDoubling initializer\n");
+    return 0;
+}
 /**
  * @brief This algorithm checks points by continuously doubling the target
  * 
@@ -183,6 +205,7 @@ unsigned int init_bTreeSubdivision(void **args, unsigned int arg_no)
     {
         gappedSegments[depth - 1].addPoint(gappedSegments[depth], one);
     }
+    return 0;
 }
 
 /**

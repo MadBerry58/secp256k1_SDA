@@ -1,48 +1,77 @@
 #include "StateMachines.h"
 
-unsigned int startClientSM(std::string message)
+std::thread *startClientSM(clientSMStruct *messageStruct)
 {
-    clientSMStruct messageStruct;
-    messageStruct.dummyData = message;
-    std::thread clientSMThread(init_ClientSM, &messageStruct);
-    clientSMThread.join();
+    init_ClientSM(messageStruct);
+    std::thread clientSMThread(ClientSM, messageStruct);
+    clientSMThread.detach(); /* prevent the destructor from joining the thread */
+    messageStruct->stateMachineHandle = &clientSMThread;
+    return messageStruct->stateMachineHandle;
+}
+unsigned int stopClientSM(clientSMStruct *messageStruct)
+{
+    messageStruct->stateMachineHandle->join();
     std::cout << "\n\nClientSM thread stopped\n" << std::endl;
     return 0;
 }
 
-unsigned int startClientHandlerSM(std::string message)
+std::thread *startClientHandlerSM(clientHandlerSMStruct *messageStruct)
 {
-    clientHandlerSMStruct messageStruct;
-    messageStruct.dummyData = message;
-    std::thread clientHandlerSMThread(ClientHandlerSM, &messageStruct);
-    clientHandlerSMThread.join();
+    init_ClientHandlerSM(messageStruct);
+    std::thread clientHandlerSMThread(ClientHandlerSM, messageStruct);
+    clientHandlerSMThread.detach(); /* prevent the destructor from joining the thread */
+    messageStruct->stateMachineHandle = &clientHandlerSMThread;
+    return messageStruct->stateMachineHandle;
+}
+unsigned int stopClientHandlerSM(clientHandlerSMStruct *messageStruct)
+{
+    messageStruct->stateMachineHandle->join();
     std::cout << "\n\nClientHandlerSM thread stopped\n" << std::endl;
     return 0;
 }
 
-unsigned int startSatelliteSM(std::string message)
+std::thread *startSatelliteSM(satelliteSMStruct *messageStruct)
 {
-    satelliteSMStruct messageStruct;
-    messageStruct.dummyData = message;
-    std::thread satelliteSMThread(init_SatelliteSM, &messageStruct);
-    satelliteSMThread.join();
+    init_SatelliteSM(messageStruct);
+    std::thread satelliteSMThread(SatelliteSM, messageStruct);
+    satelliteSMThread.detach(); /* prevent the destructor from joining the thread */
+    messageStruct->stateMachineHandle = &satelliteSMThread;
+    return messageStruct->stateMachineHandle;
+}
+unsigned int stopSatelliteSM(satelliteSMStruct *messageStruct)
+{
+    messageStruct->stateMachineHandle->join();
     std::cout << "\n\nSatelliteSM thread stopped\n" << std::endl;
     return 0;
 }
 
-unsigned int startSatelliteHandlerSM(std::string message)
+std::thread *startSatelliteHandlerSM(satelliteHandlerSMStruct *messageStruct)
 {
-    satelliteHandlerSMStruct messageStruct;
-    messageStruct.dummyData = message;
-    std::thread satelliteHandlerSMThread(init_SatelliteHandlerSM, &messageStruct);
-    satelliteHandlerSMThread.join();
+    init_SatelliteHandlerSM(messageStruct);
+    std::thread satelliteHandlerSMThread(SatelliteHandlerSM, messageStruct);
+    satelliteHandlerSMThread.detach(); /* prevent the destructor from joining the thread */
+    messageStruct->stateMachineHandle = &satelliteHandlerSMThread;
+    return messageStruct->stateMachineHandle;
+}
+unsigned int stopSatelliteHandlerSM(satelliteHandlerSMStruct *messageStruct)
+{
+    messageStruct->stateMachineHandle->join();
     std::cout << "\n\nSatelliteHandlerSM thread stopped\n" << std::endl;
     return 0;
 }
 
-std::thread *startServerFrontendSM(ServerFrontendSMStruct messageStruct)
+std::thread *startServerFrontendSM(ServerFrontendSMStruct *messageStruct)
 {
-    std::thread serverFrontendSMThread(ServerFrontendSM, &messageStruct);
-    messageStruct.ownerThreadAdress = &serverFrontendSMThread;
-    return &serverFrontendSMThread;
+    init_ServerFrontendSM(messageStruct);
+    std::thread serverFrontendSMThread(ServerFrontendSM, messageStruct);
+    serverFrontendSMThread.detach(); /* prevent the destructor from joining the thread */
+    messageStruct->stateMachineHandle = &serverFrontendSMThread;
+    return messageStruct->stateMachineHandle;
+}
+unsigned int stopServerFrontendSM(ServerFrontendSMStruct *messageStruct)
+{
+    /* Send stop message */
+    messageStruct->stateMachineHandle->join();
+    std::cout << "\n\nSatelliteHandlerSM thread stopped\n" << std::endl;
+    return 0;
 }

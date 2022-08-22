@@ -28,7 +28,7 @@ unsigned int ThreadTestUI(char &user_input, std::string &user_long_input)
             case '@':
                 std::cout << "Enter message to be returned:\n";
                 std::cin >> user_long_input;
-                startClientSM(user_long_input);
+                // startClientSM(user_long_input);
                 std::cout << "ClientSM test finished\nPlease choose another option\n";
                 break;
             

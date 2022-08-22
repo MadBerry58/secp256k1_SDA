@@ -2,8 +2,13 @@
 #define SECP251K1_SANDBOX_ITERATIONMANAGER_STATEMACHINES_H
 
 #include "../IterationManager.h"
+#include "IteratorSM/IteratorSM.h"
+#include "CoordinatorSM/CoordinatorSM.h"
 
-unsigned int startIteratorSM(/**CoordinatorID, IterationAlgorithm, **/);
-unsigned int startCoordinatorSM(/**Iterator number**/);
+std::thread *startIteratorSM(IteratorSMStruct *messageStruct);
+unsigned int stopIteratorSM(IteratorSMStruct *messageStruct);
+
+std::thread *startCoordinatorSM(CoordinatorSMStruct *messageStruct);
+unsigned int stopCoordinatorSM(CoordinatorSMStruct *messageStruct);
 
 #endif

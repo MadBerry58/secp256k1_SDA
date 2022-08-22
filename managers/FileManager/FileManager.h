@@ -1,6 +1,7 @@
 #ifndef SECP251K1_SANDBOX_FILEMANAGER_H
 #define SECP251K1_SANDBOX_FILEMANAGER_H
 
+#include "../managers.h"
 #include "../../TypeDef.h"
 #include "../../Arithmetic/ModularArithmetic/Mod.h"
 

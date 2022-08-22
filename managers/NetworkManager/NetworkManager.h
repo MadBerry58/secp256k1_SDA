@@ -2,6 +2,7 @@
 #define SECP251K1_SANDBOX_NETWORKMANAGER_H
 
 #include "../../TypeDef.h"
+#include "../managers.h"
 #include "ProtocolData/ProtocolData.h"
 #include "StateMachines/StateMachines.h"
 

@@ -5,6 +5,8 @@
     Further work: Join generator functions into a single instance by implementing function pointers
                   Consider merging integrity checking into the reader functions
 */
+#define FILE_PORT_BUFFER_SIZE 5u
+FileManagerData fileManagerDataStructure;
 
 extern mpz_t orderHalf;
 mpz_t temp;
@@ -17,9 +19,11 @@ Point remainderPoint;
 std::ofstream tempOutput;
 std::ifstream tempInput;
 
-unsigned int fileManager_Init()
+unsigned int init_FileManager(std::string initData)
 {
-   unsigned long errorNo = 0;
+    initPort(FILE_PORT_BUFFER_SIZE, fileManagerDataStructure.fileManagerRxPort);
+
+    unsigned long errorNo = 0;
     tempPoint.reset();
     remainderPoint.reset();
     containerPoint.reset();

@@ -3,6 +3,7 @@
 
 #include "../../../../TypeDef.h"
 
+unsigned int init_ServerFrontendSM(ServerFrontendSMStruct *messageStruct);
 unsigned int ServerFrontendSM(ServerFrontendSMStruct *messageStruct);
 
 #endif

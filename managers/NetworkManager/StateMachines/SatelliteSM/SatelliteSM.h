@@ -3,10 +3,7 @@
 
 #include "../../../../TypeDef.h"
 
-void init_SatelliteSM(satelliteSMStruct *messageStruct);
-
-//SatelliteSM input messages
-//SatelliteSM output messages
-//SatelliteSM states
+unsigned int init_SatelliteSM(satelliteSMStruct *messageStruct);
+unsigned int SatelliteSM(satelliteSMStruct *messageStruct);
 
 #endif

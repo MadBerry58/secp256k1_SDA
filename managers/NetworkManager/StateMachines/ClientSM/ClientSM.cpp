@@ -1,15 +1,17 @@
 #include "ClientSM.h"
 
-void init_ClientSM(clientSMStruct *message)
+unsigned int init_ClientSM(clientSMStruct *message)
 {
     std::cout << "ClientSM started with message: " << message->dummyData << std::endl;
+    return 0;
 }
 
-void start_ClientSM()
+unsigned int ClientSM(clientSMStruct *message)
 {
     //send starting acknowledgement
     //send started acknowledgement
     //send waiting for command acknowledgement
+    return 0;
 }
 
 // unsigned int clientFrontendSM_TCP(char *serverAdressString, int serverPort, bool &hostNotification, int &hostCommand, bool &SMnotification,

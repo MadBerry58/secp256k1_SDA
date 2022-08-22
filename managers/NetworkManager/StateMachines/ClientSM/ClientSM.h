@@ -3,6 +3,7 @@
 
 #include "../../../../TypeDef.h"
 
-void init_ClientSM(clientSMStruct *message);
+unsigned int init_ClientSM(clientSMStruct *message);
+unsigned int ClientSM(clientSMStruct *message);
 
 #endif
