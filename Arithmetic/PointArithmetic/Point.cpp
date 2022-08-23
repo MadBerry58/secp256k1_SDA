@@ -31,7 +31,7 @@ Point localTempPoint2;
 
 Point GeneratorPoints[255];
 
-unsigned int pointInit()
+unsigned int init_Point()
 {
     DEBUG_MSG("%s\n", localTempPoint1.getK());
 

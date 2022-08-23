@@ -11,6 +11,7 @@
 static int verbose_flag = false;
 static int userInterface_flag = false;
 static int operationType_flag = FLAG_OPERATION_NONE;
+unsigned long errorNo;
 
 std::ifstream checkpointFile;
 std::ifstream knownPointsFile;
@@ -119,7 +120,8 @@ int main(int argc, char **argv)
     switch(operationType_flag)
     {
         case FLAG_OPERATION_NONE:
-            gmp_printf("Please choose the desired operating mode: \n./secp256k1_SDA --userInterface | resumeIteration | generateKnownPoints | tuneSystemLoad\n");
+            // gmp_printf("Please choose the desired operating mode: \n./secp256k1_SDA --userInterface | resumeIteration | generateKnownPoints | tuneSystemLoad\n");
+            
             break;
 
         case FLAG_OPERATION_CLIENT:

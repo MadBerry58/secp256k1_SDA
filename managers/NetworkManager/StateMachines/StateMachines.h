@@ -2,7 +2,6 @@
 #define SECP251K1_SANDBOX_NETWORKMANAGER_SM_H
 
 #include "../../../TypeDef.h"
-#include "../NetworkManager.h"
 
 #include "ClientSM/ClientSM.h"
 #include "ClientHandlerSM/ClientHandlerSM.h"
@@ -25,4 +24,4 @@ unsigned int stopSatelliteHandlerSM(satelliteHandlerSMStruct &messageStruct);
 std::thread *startServerFrontendSM(ServerFrontendSMStruct &messageStruct);
 unsigned int stopServerFrontendSM(ServerFrontendSMStruct &messageStruct);
 
-#endif
+#endif SECP251K1_SANDBOX_NETWORKMANAGER_SM_H

@@ -1,4 +1,5 @@
 #include "managers.h"
+#include "../Arithmetic.h"
 
 /* Manager initialization:
  * Each manager holds specific functionality, data structures and state machine control
@@ -10,12 +11,34 @@
  */
 unsigned int init_managers(std::string initData)
 {
-    init_NetworkManager(initData);
-    long unsigned int errorNo = -1;
-    if ((errorNo = fileManager_Init()) != INTEGRITY_E_FILE_INIT_OK)
+    unsigned long errorNo = 0u;
+    if ((errorNo = init_Mod()) != MOD_E_OK)
     {
-        printf("fileManagerInit failed with code %lu\n", errorNo);
+        printf("Modular Arithmetic init failed with code %lu\n", errorNo);
     }
+
+    if ((errorNo = init_Point()) != MOD_E_OK)
+    {
+        printf("Modular Arithmetic init failed with code %lu\n", errorNo);
+    }
+
+    long unsigned int errorNo = -1;
+
+    if ((errorNo = init_FileManager(initData)) != INTEGRITY_E_FILE_INIT_OK)
+    {
+        printf("File Manager init failed with code %lu\n", errorNo);
+    }
+
+    if ((errorNo = init_NetworkManager(initData)) != NETWORK_MANAGER_E_OK)
+    {
+        printf("Network Manager init failed with code %lu\n", errorNo);
+    }
+
+    if ((errorNo = init_MemoryManager(initData)) != NETWORK_MANAGER_E_OK)
+    {
+        printf("Network Manager init failed with code %lu\n", errorNo);
+    }
+
 }
 
 

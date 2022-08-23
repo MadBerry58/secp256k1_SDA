@@ -1,4 +1,5 @@
 #include "IterationManager.h"
+#include "../Ports.cpp"
 
 IterationManagerData iterationManagerDataStructure;
 #define ITERATION_PORT_BUFFER_SIZE 5u

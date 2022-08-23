@@ -1,6 +1,7 @@
 #ifndef SECP251K1_SANDBOX_MEMORYMANAGER_H
 #define SECP251K1_SANDBOX_MEMORYMANAGER_H
-#include "../managers.h"
+
+#include "../../TypeDef.h"
 
 struct targetProfile
 {

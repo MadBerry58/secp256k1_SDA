@@ -174,6 +174,12 @@
 #define MOD_E_MOD_SUBTRACTION_INVALID                   1028u
 #define MOD_E_MOD_SQUAREROOT_INVALID                    1029u
 
+#define NETWORK_MANAGER_E_OK                                        1030u
+#define NETWORK_MANAGER_E_MPZ_ASSIGNMENT_INVALID                    1031u
+#define NETWORK_MANAGER_E_MPZ_ADDITION_INVALID                      1032u
+#define NETWORK_MANAGER_E_MOD_ADDITION_INVALID                      1033u
+#define NETWORK_MANAGER_E_MOD_SUBTRACTION_INVALID                   1034u
+#define NETWORK_MANAGER_E_MOD_SQUAREROOT_INVALID                    1035u
 /// Modular Operator Errors     0b 00000110 00000000
 
 #define POINT_E_OK                                      1536u

@@ -1,4 +1,6 @@
 #include "FileManager.h"
+#include "../../Arithmetic/ModularArithmetic/Mod.h"
+#include "../Ports.cpp"
 /*
     fileManager.cpp
     Provides the functionality for saving, loading and checking files used by the program

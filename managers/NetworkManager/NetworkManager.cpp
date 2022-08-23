@@ -1,4 +1,5 @@
 #include "NetworkManager.h"
+#include "../Ports.cpp"
 
 NetworkManagerData networkManagerDataStructure;
 

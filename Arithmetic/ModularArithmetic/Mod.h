@@ -3,7 +3,7 @@
 
 #include "../../TypeDef.h"
 
-unsigned int    modInit();
+unsigned int    init_Mod();
 void            printConstants();
 
 ///Arithmetic functions

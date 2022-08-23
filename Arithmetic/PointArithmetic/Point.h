@@ -4,7 +4,7 @@
 #include "../../TypeDef.h"
 
 int generatorConstantsInit();
-unsigned int pointInit();
+unsigned int init_Point();
 
 
 #endif //SECP251K1_SANDBOX_POINT_H

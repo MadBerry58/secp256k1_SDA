@@ -1,9 +1,7 @@
 #ifndef SECP251K1_SANDBOX_FILEMANAGER_H
 #define SECP251K1_SANDBOX_FILEMANAGER_H
 
-#include "../managers.h"
 #include "../../TypeDef.h"
-#include "../../Arithmetic/ModularArithmetic/Mod.h"
 
 /// File tags
 #define UNCOMPRESSED_POINTS_FILE_TAG                    "UNCOMPRESSED_POINTS_FILE"
@@ -22,7 +20,7 @@
 #define GENERATED_POINTS_EOF_TAG                        "GENERATED_POINTS_EOF"
 #define CHECKPOINT_EOF_TAG                              "CHECKPOINT_EOF"
 
-unsigned int    fileManager_Init                        ();
+unsigned int    init_FileManager                        (std::string initData);
 
 int             generationSanityCheck                   (Point &startingPoint, unsigned long numberOfPoints, unsigned long numberOfSlices, \
                                                            unsigned long pointsPerSlice, mpz_t &incrementSize);

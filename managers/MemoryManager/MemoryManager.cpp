@@ -1,4 +1,5 @@
 #include "MemoryManager.h"
+#include "../Ports.cpp"
 
 MemoryManagerData memoryManagerDataStructure;
 #define MEMORY_PORT_BUFFER_SIZE 5u

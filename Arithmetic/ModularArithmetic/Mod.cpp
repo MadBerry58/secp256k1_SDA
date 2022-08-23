@@ -25,7 +25,7 @@ mpz_t randomSeed;
 
 ///TODO: check if using t as an intermediary container offers speed benefits
 
-unsigned int modInit() 
+unsigned int init_Mod() 
 {
     DEBUG_MSG("Initializing Modular library \n");
 
