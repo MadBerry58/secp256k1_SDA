@@ -9,5 +9,6 @@ set(src_files
     Algorithms/Algorithms.h    
 
     Arithmetic.h
+    Arithmetic.cpp
 )
 add_library(srcLib ${src_files})

@@ -24,4 +24,4 @@ unsigned int stopSatelliteHandlerSM(satelliteHandlerSMStruct &messageStruct);
 std::thread *startServerFrontendSM(ServerFrontendSMStruct &messageStruct);
 unsigned int stopServerFrontendSM(ServerFrontendSMStruct &messageStruct);
 
-#endif SECP251K1_SANDBOX_NETWORKMANAGER_SM_H
+#endif //SECP251K1_SANDBOX_NETWORKMANAGER_SM_H

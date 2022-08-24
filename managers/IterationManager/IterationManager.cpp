@@ -1,17 +1,13 @@
 #include "IterationManager.h"
-#include "../Ports.cpp"
+#include "../Ports.h"
 
-IterationManagerData iterationManagerDataStructure;
+CoordinatorSMStruct **coordinatorData;
+bool isInitialized = false;
+
 #define ITERATION_PORT_BUFFER_SIZE 5u
-unsigned int init_MemoryManager(std::string initData)
+unsigned int init_IterationManager(IterationManagerData data)
 {
-    initPort(ITERATION_PORT_BUFFER_SIZE, iterationManagerDataStructure.iterationManagerRxPort);
-    return 0;
-}
-
-int iterationManager_init(IterationManagerData data)
-{
-    CoordinatorSMStruct coordinatorData;
+    initPort(&(data.iterationManagerRxPort), ITERATION_PORT_BUFFER_SIZE);
     //bind memoryManager
     //bind fileManager
     for(int i = 0; i < data.iteratorNumber; i++)
@@ -19,7 +15,8 @@ int iterationManager_init(IterationManagerData data)
         //create an iteratorSM
     }
     //bind iteratorSM to coordinatorSM
-    return 0;
+    isInitialized = true;
+    return ITERATION_MANAGER_E_OK;
 }
 
 unsigned int iterationManager_start()
@@ -27,17 +24,17 @@ unsigned int iterationManager_start()
     //bind notification ports
     //send start message to coordinatorSM
     //confirm iteration start
-    return 0;
+    return ITERATION_MANAGER_E_OK;
 }
 
 unsigned int iterationManager_getInfo()
 {
     //send message to coordinator
-    return 0;
+    return ITERATION_MANAGER_E_OK;
 }
 
-int testWorkoad()
+unsigned int testWorkoad()
 {
     //send message to coordinator
-    return 0;
+    return ITERATION_MANAGER_E_OK;
 }

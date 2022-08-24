@@ -1,12 +1,11 @@
 #include "MemoryManager.h"
-#include "../Ports.cpp"
+#include "../Ports.h"
 
-MemoryManagerData memoryManagerDataStructure;
 #define MEMORY_PORT_BUFFER_SIZE 5u
-unsigned int init_MemoryManager(std::string initData)
+unsigned int init_MemoryManager(MemoryManagerData memoryManagerStruct)
 {
-    initPort(MEMORY_PORT_BUFFER_SIZE, memoryManagerDataStructure.memoryManagerRxPort);
-    return 0;
+    initPort(&memoryManagerStruct.memoryManagerRxPort, MEMORY_PORT_BUFFER_SIZE);
+    return MEMORY_MANAGER_E_OK;
 }
 
 void pointProfile_Init(targetProfile* profile)
@@ -32,12 +31,12 @@ void targetProfile_Init(pointsProfile* profile)
     // std::set<LSB_HASH_SIZE> knownSet;
 }
 
-int read_file_checkpoint(std::ifstream &inputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
+unsigned int read_file_checkpoint(std::ifstream &inputFile, Point &targetPoint, Point &checkOutPoint, unsigned int iterationNumber, unsigned int numberOfSlices, unsigned int pointsPerSlice, mpz_t &sliceSize, mpz_t &incrementSize)
 {
     return 0;
 }
 
-int loadPoints(std::ifstream cardinalLSB_read, bool *listLoaded)
+unsigned int loadPoints(std::ifstream cardinalLSB_read, bool *listLoaded)
 {
     std::string line;
     std::set<unsigned long> LSB_cardinal;
@@ -58,5 +57,5 @@ int loadPoints(std::ifstream cardinalLSB_read, bool *listLoaded)
     std::cout << "Cardinal LSB list loaded\n"
               << "Elements in set: " << LSB_cardinal.size() << "\n";
     *listLoaded = true;
-    return 0;
+    return MEMORY_MANAGER_E_OK;
 }

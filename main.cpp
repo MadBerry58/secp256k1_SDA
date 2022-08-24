@@ -1,4 +1,3 @@
-#include "TypeDef.h"
 #include "Arithmetic/Arithmetic.h"
 #include "managers/managers.h"
 
@@ -16,7 +15,7 @@ unsigned long errorNo;
 std::ifstream checkpointFile;
 std::ifstream knownPointsFile;
 
-UISMStruct UIdata;
+InitDataStruct initData;
 
 std::ifstream inputFile;
 
@@ -85,7 +84,7 @@ int main(int argc, char **argv)
             case 'k':
             if(optarg)
                 {
-                    UIdata.knownPointsFileName = optarg;
+                    initData.knownPointsFileName = optarg;
                 }
                 break;
             
@@ -94,21 +93,21 @@ int main(int argc, char **argv)
             case 'c':
                 if(optarg)
                 {
-                    UIdata.checkpointFileName = optarg;
+                    initData.checkpointFileName = optarg;
                 }
                 break;
 
             case 's':
                 if(optarg)
                 {
-                    UIdata.serverAdress = optarg;
+                    initData.serverAdress = optarg;
                 }
                 break;
             
             case 'p':
                 if(optarg)
                 {
-                    UIdata.serverPort = optarg;
+                    initData.serverPort = optarg;
                 }
 
             case '?': /* getopt returneaza '?' cand optiunea nu este cunoscuta */
@@ -120,23 +119,25 @@ int main(int argc, char **argv)
     switch(operationType_flag)
     {
         case FLAG_OPERATION_NONE:
-            // gmp_printf("Please choose the desired operating mode: \n./secp256k1_SDA --userInterface | resumeIteration | generateKnownPoints | tuneSystemLoad\n");
+            //gmp_printf("Please choose the desired operating mode: \n./secp256k1_SDA --userInterface | resumeIteration | generateKnownPoints | tuneSystemLoad\n");
+            gmp_printf("Initial Testing Checkpoint 1: main.c\n");
             
+            init_Managers(initData);
             break;
 
         case FLAG_OPERATION_CLIENT:
             /* Check for local checkpoint file */
-            if(UIdata.checkpointFileName.empty())
+            if(initData.checkpointFileName.empty())
             {
                 //notify the user if a new checkpoint file is desired, or if the program should look for a checkpoint file locally
                 std::cout << "A checkpoint file is required for ClientMode operation.\n"
                           << "Should I create a new checkpoint file (c) or search locally for one? (s)\n";
-                std::cin  >>  UIdata.user_input;
-                if('c' == UIdata.user_input)
+                std::cin  >>  initData.user_input;
+                if('c' == initData.user_input)
                 {
                     //Mark the file name for later creation by the fileManager
                 }
-                else if('s' == UIdata.user_input)
+                else if('s' == initData.user_input)
                 {
                     //Search local folder for *.checkpoint file and assign it to checkpointFileName
                 }
@@ -156,7 +157,7 @@ int main(int argc, char **argv)
             }
 
             /* Check for server connection */
-            if(UIdata.serverAdress.empty())
+            if(initData.serverAdress.empty())
             {
                 //output fatal error: a hostname must be provided
             }
@@ -165,7 +166,7 @@ int main(int argc, char **argv)
                 //check if the provided hostname is valid
                     //if not, output fatal error: host name invalid
                     //if yes:
-                if(UIdata.serverPort.empty())
+                if(initData.serverPort.empty())
                 {
                     //output fatal error: a port must be provided
                 }
@@ -182,7 +183,7 @@ int main(int argc, char **argv)
             break;
         case FLAG_OPERATION_SERVER:
             /* Check for known points file */
-            if(UIdata.knownPointsFileName.empty())
+            if(initData.knownPointsFileName.empty())
             {
                 //notify the user if a known points file is desired, or if the program should look for a file locally
             }
@@ -198,7 +199,7 @@ int main(int argc, char **argv)
 
         case FLAG_OPERATION_SATELLITE:
             /* Check for known points file */
-            if(UIdata.knownPointsFileName.empty())
+            if(initData.knownPointsFileName.empty())
             {
                 //notify the user if a known points file is desired, or if the program should look for a file locally
             }
@@ -212,7 +213,7 @@ int main(int argc, char **argv)
             }
 
             /* Check for server connection */
-            if(UIdata.serverAdress.empty())
+            if(initData.serverAdress.empty())
             {
                 //output fatal error: a hostname must be provided
             }
@@ -221,7 +222,7 @@ int main(int argc, char **argv)
                 //check if the provided hostname is valid
                     //if not, output fatal error: host name invalid
                     //if yes:
-                if(UIdata.serverPort.empty())
+                if(initData.serverPort.empty())
                 {
                     //output fatal error: a port must be provided
                 }

@@ -7,12 +7,6 @@
 #include "NetworkManager/NetworkManager.h"
 #include "UIManager/UIManager.h"
 
-Port *uiManagerPort;
-Port *iterationManagerPort;
-Port *networkManagerPort;
-Port *memoryManagerPort;
-Port *fileManagerPort;
-
-unsigned int init_managers(std::string initData);
+unsigned int init_Managers(InitDataStruct initData);
 
 #endif

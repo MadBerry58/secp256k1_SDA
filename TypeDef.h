@@ -23,6 +23,7 @@
 #include <thread>
 #include <getopt.h>
 #include <math.h>
+#include <atomic>
 // #include <pthread.h>
 // #include "threads.h"
 
@@ -149,13 +150,18 @@ struct BigNumber
        inline mpz_t& getValuePointer();
 };
 
+#define PORT_EMPTY        0u
+#define PORT_MESSAGE_READ 1u
+#define PORT_MESSAGE_SENT 2u
+#define PORT_BUSY         3u
 typedef struct
 {
     pthread_mutex_t      portLock            = PTHREAD_MUTEX_INITIALIZER;
     unsigned int         bufferWriteIndex    = 0u;
     unsigned int         bufferReadIndex     = 0u;
     unsigned int         bufferSize          = 0u;
-    bool*                messagePresentFlag  = nullptr;
+    // pthread_mutex_t*     portLock            = nullptr;
+    std::atomic_bool*    messagePresentFlag;
     unsigned int*        messageContainer    = nullptr;
     unsigned long long*  messageBuffer       = nullptr;
     
@@ -201,6 +207,56 @@ struct ProgressPackage
 
 #define ITERATOR_SM_RETRY_COUNT 3u
 #define ITERATOR_SM_RETRY_DELAY 0.4
+
+typedef struct //Main file initial data
+{
+    char initString[512u] = "testing string initialized\n";
+    std::string checkpointFileName;
+    std::string knownPointsFileName;
+    std::string serverAdress;
+    std::string serverPort;
+    char user_input;
+} InitDataStruct;
+
+typedef struct //IteratorManager initializer data
+{
+    Port iterationManagerRxPort;
+    Port *parentPort;
+    unsigned int iteratorNumber = 0;
+
+}IterationManagerData;
+
+typedef struct 
+{
+    Port networkManagerRxPort;
+    Port *parentPort;
+}NetworkManagerData;
+
+typedef enum
+{
+    UI_UNINITIALIZED,
+    UI_RUNNING,
+    UI_STOPPED,
+    UI_FAULT
+} UserInterfaceState;
+typedef struct {
+    std::thread *stateMachineHandle;
+    Port uiManagerRxPort;
+    Port *parentPort;
+    UserInterfaceState SMstate;
+    char user_input;
+}UISMStruct;
+
+typedef struct {
+    Port memoryManagerRxPort;
+    Port *parentPort;
+}MemoryManagerData;
+
+typedef struct {
+    Port fileManagerRxPort;
+    Port *parentPort;
+}FileManagerData;
+
 typedef enum //ITERATOR_SM input commands
 {
     ITERATOR_SM_RX_NONE,
@@ -256,7 +312,7 @@ typedef enum
     COORDINATOR_SM_DISTRIBUTION_VERTICAL_SYNCED,
     COORDINATOR_SM_DISTRIBUTION_HORIZONTAL_SYNCED,
     COORDINATOR_SM_DISTRIBUTION_SCATTERED
-} CoordinatorSM_workDist;
+}CoordinatorSM_workDist;
 typedef struct //CoordinatorSM structure
 {
     Port                  *memoryManagerPort  = nullptr;
@@ -269,30 +325,6 @@ typedef struct //CoordinatorSM structure
     std::thread           *stateMachineHandle;
 
 }CoordinatorSMStruct;
-
-typedef struct //IteratorManager initializer data
-{
-    Port iterationManagerRxPort;
-    unsigned int iteratorNumber = 0;
-
-}IterationManagerData;
-
-typedef struct 
-{
-    Port networkManagerRxPort;
-}NetworkManagerData;
-
-typedef struct {
-    Port uiManagerRxPort;
-}UIManagerData;
-
-typedef struct {
-    Port memoryManagerRxPort;
-}MemoryManagerData;
-
-typedef struct {
-    Port fileManagerRxPort;
-}FileManagerData;
 
 typedef enum //ClientHandlerSM states
 {
@@ -385,23 +417,11 @@ typedef struct //ServerFrontendSM initialization data
     std::thread *stateMachineHandle;
 }ServerFrontendSMStruct;
 
-typedef enum
-{
-    UI_UNINITIALIZED,
-    UI_RUNNING,
-    UI_STOPPED,
-    UI_FAULT
-} UserInterfaceState;
 
-typedef struct //ServerFrontendSM initialization data
-{
-    UserInterfaceState SMstate;
-    char user_input;
-    std::string checkpointFileName;
-    std::string knownPointsFileName;
-    std::string serverAdress;
-    std::string serverPort;
-}UISMStruct;
+
+
+#define ECHO            65534u
+#define ECHO_RESPONSE   65535u
 
 /// Function-like macros
 #ifdef DEBUG

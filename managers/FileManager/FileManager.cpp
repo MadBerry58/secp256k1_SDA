@@ -1,6 +1,6 @@
 #include "FileManager.h"
 #include "../../Arithmetic/ModularArithmetic/Mod.h"
-#include "../Ports.cpp"
+#include "../Ports.h"
 /*
     fileManager.cpp
     Provides the functionality for saving, loading and checking files used by the program
@@ -21,9 +21,9 @@ Point remainderPoint;
 std::ofstream tempOutput;
 std::ifstream tempInput;
 
-unsigned int init_FileManager(std::string initData)
+unsigned int init_FileManager(FileManagerData fileManagerStruct)
 {
-    initPort(FILE_PORT_BUFFER_SIZE, fileManagerDataStructure.fileManagerRxPort);
+    initPort(&(fileManagerDataStructure.fileManagerRxPort), FILE_PORT_BUFFER_SIZE);
 
     unsigned long errorNo = 0;
     tempPoint.reset();

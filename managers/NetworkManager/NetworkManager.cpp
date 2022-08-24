@@ -1,17 +1,15 @@
 #include "NetworkManager.h"
-#include "../Ports.cpp"
-
-NetworkManagerData networkManagerDataStructure;
+#include "../Ports.h"
 
 #define MAX_SM_NUMBER 32u
 #define NETWORK_SM_BUFFER 5u
 unsigned int StateMachines = 0u;
 
-unsigned int init_NetworkManager(std::string message)
+unsigned int init_NetworkManager(NetworkManagerData networkManagerStruct)
 {
-    initPort(NETWORK_SM_BUFFER, networkManagerDataStructure.networkManagerRxPort);
-    std::cout << "Network Manager initialized successfully\n" << std::endl;
-    return 0;
+    initPort(&networkManagerStruct.networkManagerRxPort, NETWORK_SM_BUFFER);
+    // std::cout << "Network Manager initialized successfully\n" << std::endl;
+    return NETWORK_MANAGER_E_OK;
 }
 
 /**
@@ -29,7 +27,7 @@ unsigned int main_NetworkManager()
         ////OBS: client handlers should have direct access to the known points set, to reduce the need for the main function involvement
         //if clientHandlers need manager involvement, handle case
     //check satelliteHandlers
-    return 0;
+    return NETWORK_MANAGER_E_OK;
 }
 
 // struct sockaddr_in cli_addr, serv_addr;

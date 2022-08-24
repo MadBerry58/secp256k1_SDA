@@ -1,7 +1,3 @@
-//
-// Created by blackberry on 10.01.2021.
-//
-
 #include "Mod.h"
 
 mpz_t moduloHalb;

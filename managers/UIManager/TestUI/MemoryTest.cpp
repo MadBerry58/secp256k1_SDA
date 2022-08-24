@@ -1,5 +1,3 @@
-#ifndef SECP251K1_SANDBOX_MEMORYTEST_C
-#define SECP251K1_SANDBOX_MEMORYTEST_C
 #include "TestUI.h"
 
 unsigned int MemoryTestUI(char &user_input, std::string &user_long_input)
@@ -26,4 +24,3 @@ unsigned int MemoryTestUI(char &user_input, std::string &user_long_input)
     }
     return 0;
 }
-#endif

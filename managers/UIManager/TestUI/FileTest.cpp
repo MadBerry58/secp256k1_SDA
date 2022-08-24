@@ -1,6 +1,3 @@
-#ifndef SECP251K1_SANDBOX_FILETEST_C
-#define SECP251K1_SANDBOX_FILETEST_C
-
 #include "TestUI.h"
 
 unsigned int FileTestUI(char &user_input, std::string &user_long_input)
@@ -27,4 +24,3 @@ unsigned int FileTestUI(char &user_input, std::string &user_long_input)
     }
     return 0;
 }
-#endif

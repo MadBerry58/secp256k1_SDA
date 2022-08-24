@@ -61,15 +61,18 @@
 #define GENERATION_E_POINT_NUMBER_NOT_MATCHING          6u
 
 #define COMM_E_OK                                       16u
-#define COMM_E_NOTIFICATION_PRESENT                     17u
+#define COMM_E_NOK                                      17u
+#define COMM_E_BUSY                                     18u
+#define COMM_E_NO_MESSAGE                               19u
+#define COMM_E_NOTIFICATION_PRESENT                     20u
 
 
 /// Checkpoint errors           0b 00000000 00100000
 #define CHECKPOINT_E_OK                                 32u
 
 /// Memory management errors    0b 00000000 01000000
-#define MEMORY_E_OK                                     64u
-#define MEMORY_E_VARIABLES_NOT_INITIALIZED              64u
+#define MEMORY_MANAGER_E_OK                                     64u
+#define MEMORY_MANAGER_E_VARIABLES_NOT_INITIALIZED              64u
 
 /// File stream errors          0b 00000000 10000000
 #define FILE_E_OK                                       128u
@@ -162,6 +165,8 @@
 #define ITERATOR_SM_E_CONNECTION_FAILED           756u
 #define ITERATOR_SM_E_CONNECTION_TIMEOUT          757u
 #define ITERATOR_SM_E_CONNECTION_INVALID_RESPONSE 758u
+
+#define ITERATION_MANAGER_E_OK                    759u
 
 
 

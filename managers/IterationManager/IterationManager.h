@@ -3,10 +3,10 @@
 
 #include "StateMachines/StateMachines.h"
 
-int iterationManagers_init();
+unsigned int init_IterationManager(IterationManagerData data);
 
-int testThread();
+unsigned int testThread();
 
-int testWorkoad();
+unsigned int testWorkoad();
 
 #endif // SECP251K1_SANDBOX_THREADMANAGER_H

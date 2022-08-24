@@ -1,17 +1,44 @@
 #include "UIManager.h"
-
-UIManagerData uiManagerDataStructure;
+#include "Ports.h"
 
 ////TODO: Move UI functionality into a sepparate thread to allow for a main program loop running in the background
 
-int UserInterfaceSM_Init(UISMStruct UIdata)
+unsigned int UserInterfaceSM_Init(UISMStruct *UIdata)
 {
-    std::cout << "Initialize user interface\n"
-              << UNIMPLEMENTED_FUNCTIONALITY_TAG << "\n";
+    initPort(&UIdata->uiManagerRxPort, 5u);
+    std::cout << "User interface initialized\n";
     return 0;
 }
 
-int UserInterfaceSM_Start(UISMStruct UIdata)
+////TODO: the comm ports are getting stuck
+//add IDs to the individual threads to find out who is blocking the port
+//find a better sync mechanism for the ports
+
+unsigned int UserInterfaceSM_Listen(UISMStruct *UIdata)
+{
+    sleep(0.4);
+    printf("SM started\n");
+    unsigned int errorNo = 0u;
+    unsigned int receivedMessage = 0u;
+    unsigned long long receivedMessageContainer = 0u;
+    printf("SM entering read loop\n");
+    while(PORT_MESSAGE_READ != readMessage(&(UIdata->uiManagerRxPort), &receivedMessage, &receivedMessageContainer))
+    {
+        sleep(0.3);
+    }
+    printf("SM received message %llu\n", receivedMessageContainer);
+    if(ECHO == receivedMessage)
+    {
+        while(PORT_MESSAGE_SENT != sendMessage(UIdata->parentPort, ECHO_RESPONSE, receivedMessageContainer))
+        {
+            sleep(0.3);
+        }
+    }
+    pthread_exit(0u);
+    return errorNo;
+}
+
+unsigned int UserInterfaceSM_Start(UISMStruct &UIdata)
 {
     while (UIdata.SMstate != UI_STOPPED)
     {

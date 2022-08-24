@@ -1,9 +1,14 @@
 set(manager_files
 
-    Ports.cpp
+
+Ports.cpp
+Ports.h
+managers.h
+managers.cpp
 
     FileManager/FileManager.h
     FileManager/FileManager.cpp
+
 
     IterationManager/IterationManager.h
     IterationManager/IterationManager.cpp

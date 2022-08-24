@@ -1,5 +1,3 @@
-#ifndef SECP251K1_SANDBOX_NETWORKTEST_C
-#define SECP251K1_SANDBOX_NETWORKTEST_C
 #include "TestUI.h"
 
 unsigned int NetworkTestUI(char &user_input, std::string &user_long_input)
@@ -29,4 +27,3 @@ unsigned int NetworkTestUI(char &user_input, std::string &user_long_input)
     }
     return 0;
 }
-#endif

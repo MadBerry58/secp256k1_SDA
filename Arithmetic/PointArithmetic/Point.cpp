@@ -1,16 +1,12 @@
+#include "Point.h"
+#include "../ModularArithmetic/Mod.h"
+
 /*
     Point.cpp
     Contains point arithmetic functionality using modulo operations over the prime integer field
     Wrapper functions are provided for ease of use
     Overloaded operators are provided as wrappers for ease of use. Do ~NOT~ use for critical functionality
 */
-#ifndef SECP256K1_SANDBOX_POINT_CPP
-#define SECP256K1_SANDBOX_POINT_CPP
-#include "Point.h"
-
-#include "../ModularArithmetic/Mod.h"
-
-// #define POINTDEBUG
 
 unsigned long long returnValue = 0u;
 
@@ -1647,5 +1643,3 @@ int generatorConstantsInit()
 
     return 0;
 }
-
-#endif /// SECP256K1_SANDBOX_POINT_CPP

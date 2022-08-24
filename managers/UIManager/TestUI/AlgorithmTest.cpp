@@ -1,6 +1,3 @@
-#ifndef SECP251K1_SANDBOX_ALGORITHMICTEST_C
-#define SECP251K1_SANDBOX_ALGORITHMICTEST_C
-
 #include "TestUI.h"
 
 unsigned int AlgorithmTestUI(char &user_input, std::string &user_long_input)
@@ -27,5 +24,3 @@ unsigned int AlgorithmTestUI(char &user_input, std::string &user_long_input)
     }
     return 0;
 }
-
-#endif
