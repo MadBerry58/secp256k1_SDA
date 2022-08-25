@@ -41,7 +41,7 @@ jobs:
             cd build
             make
       - run:
-          name: "List the created files"
+          name: "List the build created files"
           command: ls
       - run:
           name: "Save executable"
@@ -51,6 +51,9 @@ jobs:
       - run:
           name: "Run program"
           command: ./build/secp256k1_SDA
+      - run:
+          name: "List the program created files"
+          command: ls
       - store_artifacts:
           path: ./linux_package
           
