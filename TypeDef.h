@@ -20,12 +20,12 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <thread>
+// #include <thread>
 #include <getopt.h>
 #include <math.h>
 #include <atomic>
 #include <atomic>
-// #include <pthread.h>
+#include <pthread.h>
 // #include "threads.h"
 #include <unistd.h>
 typedef std::ofstream OutputFile;
