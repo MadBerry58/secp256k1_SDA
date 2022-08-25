@@ -20,7 +20,7 @@
 #include <arpa/inet.h>
 #include <stdio.h>
 #include <stdlib.h>
-// #include <thread>
+#include <thread>
 #include <getopt.h>
 #include <math.h>
 #include <atomic>
