@@ -23,5 +23,6 @@ add_executable(${PROJECT_NAME} ${SOURCE_FILES})
 target_link_libraries(${PROJECT_NAME} #library linking order goes from high level to low level
 managerLib
 srcLib
+pthread
 gmp
 )
