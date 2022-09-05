@@ -5,10 +5,35 @@
 #define NETWORK_SM_BUFFER 5u
 unsigned int StateMachines = 0u;
 
-unsigned int init_NetworkManager(NetworkManagerData networkManagerStruct)
+unsigned int init_NetworkManager(NetworkManagerData *networkManagerStruct)
 {
-    initPort(&networkManagerStruct.networkManagerRxPort, NETWORK_SM_BUFFER);
-    // std::cout << "Network Manager initialized successfully\n" << std::endl;
+    initPort(&networkManagerStruct->networkManagerRxPort, NETWORK_SM_BUFFER);
+    switch(networkManagerStruct->functionMode)
+    {
+        case NM_MODE_NONE:
+            printf("No network operation mode selected\n");
+            break;
+        
+        case NM_MODE_SERVER:
+            printf("Server mode selected\n");
+            break;
+        
+        case NM_MODE_CLIENT:
+            printf("Client selected\n");
+            break;
+        case NM_MODE_SATELLITE:
+            printf("Satellite mode selected\n");
+            break;
+        
+        case NM_MODE_TEST:
+            printf("Test mode selected\n");
+            break;
+
+        default:
+            printf("Server mode selection error\n");
+            break;
+    }
+    std::cout << "Network Manager initialized successfully\n" << std::endl;
     return NETWORK_MANAGER_E_OK;
 }
 
@@ -18,7 +43,7 @@ unsigned int init_NetworkManager(NetworkManagerData networkManagerStruct)
  * @return unsigned int 
  */
 
-unsigned int main_NetworkManager()
+unsigned int main_NetworkManager(NetworkManagerData *networkManagerStruct)
 {
     ////ServerMode:
     //check frontend

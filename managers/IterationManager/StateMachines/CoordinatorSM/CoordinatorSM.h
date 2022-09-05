@@ -3,7 +3,7 @@
 
 #include "../../../../TypeDef.h"
 
-unsigned int init_CoordinatorSM(CoordinatorSMStruct *data);
-unsigned int CoordinatorSM(CoordinatorSMStruct *data);
+unsigned int init_CoordinatorSM(CoordinatorSM_struct *data);
+unsigned int CoordinatorSM(CoordinatorSM_struct *data);
 
 #endif

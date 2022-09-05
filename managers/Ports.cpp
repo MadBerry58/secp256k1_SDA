@@ -1,4 +1,5 @@
 #include "Ports.h"
+#include "MemoryManager/MemoryManager.h"
 
 unsigned int initPort(Port *targetPortStruct, unsigned int bufferSize)
 {
@@ -9,19 +10,79 @@ unsigned int initPort(Port *targetPortStruct, unsigned int bufferSize)
     targetPortStruct->messageContainer   = (unsigned int*)       malloc(sizeof(unsigned int)       * bufferSize);
     targetPortStruct->messagePresentFlag = (std::atomic_bool*)   malloc(sizeof(std::atomic_bool)   * bufferSize);
    *targetPortStruct->messagePresentFlag = {false};
-    // if(0u != pthread_mutex_init(&(targetPortStruct->portLock), NULL))
-    // {
-    //     printf("Mutex initialization failed\n");
-    // }
-    // pthread_mutex_unlock(&(targetPortStruct->portLock));
-    // targetPortStruct.portLock           = (pthread_mutex_t*)    malloc(sizeof(pthread_mutex_t)    * bufferSize);
     return COMM_E_OK;
 }
 
-unsigned int sendMessage(Port *TxPort, unsigned int message, unsigned long long messageData)
+/**
+ * @brief Initialize target mpz buffer port
+ * 
+ * @pre Port data structure must be initialized by the caller with the buffer number data
+ * @param targetPortStruct The adress of the structure holding the port data
+ * @return unsigned int Error response
+ */
+unsigned int initPort_mpz(MpzBufferPort *targetPortStruct)
+{
+    unsigned int retVal = 0u;
+    if(targetPortStruct->buffer_size < 2u)
+    {
+        retVal = PORT_E_BUFFERSIZE_INVALID;
+    }
+    else
+    {
+        /* call memory manager to initialize the buffers */
+        targetPortStruct->buffers = init_mpzBuffers(targetPortStruct->buffer_size, targetPortStruct->buffer_number);
+        /* initialize locks (per buffer) */
+        targetPortStruct->locks = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * targetPortStruct->buffer_number);
+                targetPortStruct->bufferFull = (bool*)malloc(sizeof(bool) * targetPortStruct->buffer_number);
+        for(int i = 0; i < targetPortStruct->buffer_number; ++i)
+        {
+            /* Initialize lock */
+            targetPortStruct->locks[i] = PTHREAD_MUTEX_INITIALIZER;
+            /* Mark port as initialized */
+            targetPortStruct->initialized = true;
+        }
+        retVal = PORT_E_OK;
+    }
+    return retVal;
+}
+
+/**
+ * @brief Initialize target Point buffer port
+ * 
+ * @pre Port data structure must be initialized by the caller with the buffer number data
+ * @param targetPortStruct The adress of the structure holding the port data
+ * @return unsigned int Error response
+ */
+unsigned int initPort_point(PointBufferPort *targetPortStruct)
+{
+    unsigned int retVal = 0u;
+    if(targetPortStruct->buffer_size < 2u)
+    {
+        retVal = PORT_E_BUFFERSIZE_INVALID;
+    }
+    else
+    {
+        /* call memory manager to initialize the buffers */
+        targetPortStruct->buffers = init_PointBuffers(targetPortStruct->buffer_size, targetPortStruct->buffer_number);
+        /* initialize locks (per buffer) */
+        targetPortStruct->locks = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * targetPortStruct->buffer_number);
+        targetPortStruct->bufferFull = (bool*)malloc(sizeof(bool) * targetPortStruct->buffer_number);
+        for(int i = 0; i < targetPortStruct->buffer_number; ++i)
+        {
+            /* Initialize lock */
+            targetPortStruct->locks[i] = PTHREAD_MUTEX_INITIALIZER;
+            /* Mark port as initialized */
+            targetPortStruct->initialized = true;
+        }
+        retVal = PORT_E_OK;
+    }
+    return retVal;
+}
+
+unsigned int sendMessage(Port *TxPort, unsigned long long message, unsigned long long messageData)
 {
     int ret, i = 0ul;
-    ret = PORT_EMPTY;
+    ret = PORT_E_EMPTY;
     for(i; i < TxPort->bufferSize; ++i)
     {
         if(TxPort->messagePresentFlag[TxPort->bufferWriteIndex] == false)
@@ -29,41 +90,13 @@ unsigned int sendMessage(Port *TxPort, unsigned int message, unsigned long long 
             TxPort->messageContainer[TxPort->bufferWriteIndex]   = message;
             TxPort->messageBuffer[TxPort->bufferWriteIndex]      = messageData;
             TxPort->messagePresentFlag[TxPort->bufferWriteIndex] = true;
-            ret = PORT_MESSAGE_SENT;
+            ret = PORT_E_OK;
             break;
         }
         TxPort->bufferWriteIndex = ((TxPort->bufferWriteIndex + 1u) % TxPort->bufferSize);
     }
     return ret;
 }
-
-// unsigned int sendMessage(Port *TxPort, unsigned int message, unsigned long long messageData)
-// {
-//     int ret;
-//     if(EBUSY == pthread_mutex_trylock(&(TxPort->portLock)))
-//     {
-//         ret = PORT_BUSY;
-//     }
-//     else
-//     {
-//         ret = PORT_EMPTY;
-//         pthread_mutex_lock(&(TxPort->portLock));
-//         for(int i = 0ul; i < TxPort->bufferSize; ++i)
-//         {
-//             if(TxPort->messagePresentFlag[TxPort->bufferWriteIndex])
-//             {
-//                 TxPort->messageContainer[TxPort->bufferWriteIndex]   = message;
-//                 TxPort->messageBuffer[TxPort->bufferWriteIndex]      = messageData;
-//                 TxPort->messagePresentFlag[TxPort->bufferWriteIndex] = false;
-//                 ret = PORT_MESSAGE_SENT;
-//                 break;
-//             }
-//             TxPort->bufferWriteIndex = ((TxPort->bufferWriteIndex + 1u) % TxPort->bufferSize);
-//         }
-//         pthread_mutex_unlock(&(TxPort->portLock));
-//     }
-//     return ret;
-// }
 
 /**
  * @brief Reads a message from the port's buffer
@@ -75,48 +108,30 @@ unsigned int sendMessage(Port *TxPort, unsigned int message, unsigned long long 
  * @return int (1..bufferSize) - The data was read successfully from the buffer at the specified index
  * @return int (bufferSize)    - No readable data is present inside the buffer
  */
-// unsigned int readMessage(Port *RxPort, unsigned int *messageContainer, unsigned long long *messageDataContainer)
-// {
-//     int ret;
-//     if(EBUSY == pthread_mutex_trylock(&(RxPort->portLock)))
-//     {
-//         ret = PORT_BUSY;
-//     }
-//     else
-//     {
-//         pthread_mutex_lock(&(RxPort->portLock));
-//         for(int i = 0ul; i < RxPort->bufferSize; ++i)
-//         {
-//             if(RxPort->messagePresentFlag[RxPort->bufferReadIndex] == true)
-//             {
-//                 *messageContainer = RxPort->messageContainer[RxPort->bufferReadIndex];
-//                 *messageDataContainer = RxPort->messageBuffer[RxPort->bufferReadIndex];
-//                 RxPort->messagePresentFlag[RxPort->bufferReadIndex] = true;
-//                 break;
-//             }
-//         }
-//         ret = (RxPort->messagePresentFlag[RxPort->bufferWriteIndex] * PORT_EMPTY) +
-//               (RxPort->messagePresentFlag[RxPort->bufferWriteIndex] * PORT_MESSAGE_READ);
-//         pthread_mutex_unlock(&(RxPort->portLock));
-//     }
-//     return ret;
-// }
 
-unsigned int readMessage(Port *RxPort, unsigned int *messageContainer, unsigned long long *messageDataContainer)
+unsigned int readMessage(Port *RxPort, unsigned long long *messageContainer, unsigned long long *messageDataContainer, unsigned int match)
 {
-    int ret, i = 0ul;
-    ret = PORT_EMPTY;
-    for(i; i < RxPort->bufferSize; ++i)
+    int ret = PORT_E_EMPTY;
+    int internalIndexBuffer = RxPort->bufferReadIndex;
+    for(int i = 0u; i < RxPort->bufferSize; ++i)
     {
-        if(RxPort->messagePresentFlag[RxPort->bufferReadIndex] == true)
+        if(
+            (RxPort->messagePresentFlag[internalIndexBuffer] == true) &&
+            (
+                (0u == match) ||
+                (RxPort->messageContainer[internalIndexBuffer] == match)
+            )
+          )
         {
-            *messageContainer       = RxPort->messageContainer[RxPort->bufferReadIndex];
-            *messageDataContainer   = RxPort->messageBuffer   [RxPort->bufferReadIndex]   ;
-            RxPort->messagePresentFlag[RxPort->bufferReadIndex] = false;
-            ret = PORT_MESSAGE_READ;
+            *messageContainer       = RxPort->messageContainer[internalIndexBuffer];
+            *messageDataContainer   = RxPort->messageBuffer   [internalIndexBuffer];
+            RxPort->messagePresentFlag[internalIndexBuffer] = false;
+            ret = PORT_E_FOUND;
             break;
         }
-        RxPort->bufferReadIndex = ((RxPort->bufferReadIndex + 1u) % RxPort->bufferSize);
+        //allow the index to rotate around the buffer 
+        internalIndexBuffer = ((internalIndexBuffer + 1u) % RxPort->bufferSize);
     }
+
     return ret;
 }

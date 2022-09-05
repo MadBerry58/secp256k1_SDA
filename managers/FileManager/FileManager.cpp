@@ -21,7 +21,7 @@ Point remainderPoint;
 std::ofstream tempOutput;
 std::ifstream tempInput;
 
-unsigned int init_FileManager(FileManagerData fileManagerStruct)
+unsigned int init_FileManager(FileManagerData *fileManagerStruct)
 {
     initPort(&(fileManagerDataStructure.fileManagerRxPort), FILE_PORT_BUFFER_SIZE);
 
@@ -120,12 +120,8 @@ unsigned int init_FileManager(FileManagerData fileManagerStruct)
         DEBUG_MSG("Checkpoint file generation failed with error code %d", errorNo);
     }
     tempOutput.close();
-    DEBUG_MSG("Checkpoint file generated successfully\n");
     
-
-
-
-
+    DEBUG_MSG("Checkpoint file generated successfully\n");
     tempInput.open("CheckpointTest.sda");
     if (!tempInput.is_open())
     {

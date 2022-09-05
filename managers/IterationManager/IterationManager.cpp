@@ -1,21 +1,19 @@
 #include "IterationManager.h"
 #include "../Ports.h"
 
-CoordinatorSMStruct **coordinatorData;
-bool isInitialized = false;
-
-#define ITERATION_PORT_BUFFER_SIZE 5u
+CoordinatorSM_struct coordinatorData[MAX_COORDINATOR_NO];
+IteratorSM_struct    iteratorData[MAX_ITERATOR_NO];
 unsigned int init_IterationManager(IterationManagerData data)
 {
     initPort(&(data.iterationManagerRxPort), ITERATION_PORT_BUFFER_SIZE);
     //bind memoryManager
     //bind fileManager
-    for(int i = 0; i < data.iteratorNumber; i++)
-    {
-        //create an iteratorSM
-    }
+    // for(int i = 0; i < data.iteratorNumber; i++)
+    // {
+    //     //create an iteratorSM
+    // }
     //bind iteratorSM to coordinatorSM
-    isInitialized = true;
+    data.managerInitialized = true;
     return ITERATION_MANAGER_E_OK;
 }
 

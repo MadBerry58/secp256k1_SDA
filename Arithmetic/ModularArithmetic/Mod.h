@@ -7,12 +7,16 @@ void            printConstants();
 
 ///Arithmetic functions
 void neg(mpz_t &result, mpz_t &number);
+void negKey(mpz_t &result, mpz_t &number);
 void add(mpz_t &result, mpz_t &A, mpz_t &B);
-void sub(mpz_t &result, mpz_t &A, mpz_t &B);
-void mul(mpz_t &result, mpz_t &number, mpz_t &multiple);
-void div(mpz_t &result, mpz_t &number, mpz_t &divisor);
-void pow(mpz_t &result, mpz_t &number, mpz_t &power);
 void addKeys(mpz_t &result, mpz_t &key1, mpz_t &key2);
+void sub(mpz_t &result, mpz_t &A, mpz_t &B);
+void subKeys(mpz_t &result, mpz_t &A, mpz_t &B);
+void mul(mpz_t &result, mpz_t &number, mpz_t &multiple);
+void mulKey(mpz_t &result, mpz_t &number, mpz_t &multiple);
+void div(mpz_t &result, mpz_t &number, mpz_t &divisor);
+void divKey(mpz_t &result, mpz_t &number, mpz_t &divisor);
+void pow(mpz_t &result, mpz_t &number, mpz_t &power);
 void modSqrt(mpz_t &result, mpz_t &number);
 void generateRandomKey(mpz_t &result);
 

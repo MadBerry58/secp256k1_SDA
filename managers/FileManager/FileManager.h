@@ -20,7 +20,7 @@
 #define GENERATED_POINTS_EOF_TAG                        "GENERATED_POINTS_EOF"
 #define CHECKPOINT_EOF_TAG                              "CHECKPOINT_EOF"
 
-unsigned int    init_FileManager                        (FileManagerData fileManagerStruct);
+unsigned int    init_FileManager                        (FileManagerData *fileManagerStruct);
 
 int             generationSanityCheck                   (Point &startingPoint, unsigned long numberOfPoints, unsigned long numberOfSlices, \
                                                            unsigned long pointsPerSlice, mpz_t &incrementSize);

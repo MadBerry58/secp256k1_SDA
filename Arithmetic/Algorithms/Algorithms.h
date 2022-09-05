@@ -3,7 +3,7 @@
 
 #include "../../TypeDef.h"
 
-unsigned int checkAlgorithmParams(IteratorSMStruct iteratorData);
+unsigned int checkAlgorithmParams(IteratorSM_struct iteratorData);
 
 unsigned int hashGeneratorIterator(OutputFile &outputFile, Point &startingPoint, Point &incrementPoint, Point &remainderPoint, unsigned int numberOfSlices, unsigned int pointsPerSlice);
 

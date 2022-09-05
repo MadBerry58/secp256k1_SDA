@@ -14,6 +14,7 @@ mpz_t four;
 mpz_t five;
 mpz_t six;
 mpz_t seven;
+mpz_t eight;
 mpz_t t1;
 mpz_t t2;
 gmp_randstate_t randomState;
@@ -39,6 +40,7 @@ unsigned int init_Mod()
     mpz_init_set_d(five, 5);
     mpz_init_set_d(six, 6);
     mpz_init_set_d(seven, 7);
+    mpz_init_set_d(eight, 8);
     mpz_init_set_d(t1, 0);
     mpz_init_set_d(t2, 0);
 
@@ -284,10 +286,34 @@ void neg(mpz_t &result, mpz_t &number){
     mpz_sub(result, prime, number);
 }
 
+void negKey(mpz_t &result, mpz_t &number){
+    mpz_sub(t1, order, number);
+    mpz_mod(result, t1, order);
+}
+
 void add(mpz_t &result, mpz_t &A, mpz_t &B)
 {
     mpz_add(t1, A, B);
-    mpz_mmod(result, t1, prime);
+    mpz_mod(result, t1, prime);
+}
+
+void addKeys(mpz_t &result, mpz_t &A, mpz_t &B)
+{
+    if(mpz_cmp_ui(A, 0) == 0)
+    {
+        mpz_set(result, B);
+        return;
+    }
+    else if(mpz_cmp_ui(B, 0) == 0)
+    {
+        mpz_set(result, A);
+        return;
+    }
+    else
+    {
+    mpz_add(result, A, B);
+    mpz_mod(result, result, order);
+    }
 }
 
 void sub(mpz_t &result, mpz_t &A, mpz_t &B)
@@ -296,28 +322,83 @@ void sub(mpz_t &result, mpz_t &A, mpz_t &B)
     add(result, A, t1);
 }
 
+void subKeys(mpz_t &result, mpz_t &A, mpz_t &B)
+{
+    if(mpz_cmp_ui(A, 0) == 0)
+    {
+        mpz_set(result, B);
+        return;
+    }
+    else if(mpz_cmp_ui(B, 0) == 0)
+    {
+        mpz_set(result, A);
+        return;
+    }
+    else
+    {
+        negKey(t1, B);
+        addKeys(result, A, t1);
+    }
+}
+
+void mulKey(mpz_t &result, mpz_t &number, mpz_t &multiple)
+{
+    if(mpz_cmp_ui(multiple, 0) == 0)
+    {
+        mpz_set_ui(result, 0);
+        return;
+    }
+    else if(mpz_cmp_ui(multiple, 1) == 0)
+    {
+        mpz_set(result, number);
+        return;
+    }
+    else
+    {
+        mpz_mul(t1, number, multiple);
+        mpz_mod(result, t1, order);
+        return;
+    }
+}
+
 void mul(mpz_t &result, mpz_t &number, mpz_t &multiple)
 {
     mpz_mul(t1, number, multiple);
-    mpz_mmod(result, t1, prime);
+    mpz_mod(result, t1, prime);
+}
+
+void divKey(mpz_t &result, mpz_t &number, mpz_t &divisor)
+{
+    if(mpz_cmp_ui(divisor, 0) == 0)
+    {
+        gmp_printf("Division by zero!\n");
+        return;
+    }
+    else if(mpz_cmp_ui(divisor, 1) == 0)
+    {
+        mpz_set(result, number);
+        return;
+    }
+    else
+    {
+        mpz_invert(t1, divisor, order);
+        mpz_mul(t2, number, t1);
+        mpz_mod(result, t2, order);
+    }
 }
 
 void div(mpz_t &result, mpz_t &number, mpz_t &divisor)
 {
     mpz_invert(t1, divisor, prime);
     mpz_mul(t2, number, t1);
-    mpz_mmod(result, t2, prime);
+    mpz_mod(result, t2, prime);
 }
 
 void pow(mpz_t &result, mpz_t &number, mpz_t &power){
     mpz_powm(result, number, power, prime);
 }
 
-void addKeys(mpz_t &result, mpz_t &key1, mpz_t &key2)
-{
-    mpz_add(t1, key1, key2);
-    mpz_mmod(result, t1, order);
-}
+
 
 void modSqrt(mpz_t &result, mpz_t &number)
 {

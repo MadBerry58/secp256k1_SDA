@@ -163,6 +163,7 @@ Point::Point()
     mpz_init_set_ui(t2, 0);
     mpz_init_set_ui(m, 1);
     mpz_init_set_ui(n, 1);
+    // mpz_inits(t1, t2, m, n); - the m and n variables are required to be 1 for the calculations to work
 }
 
 Point::Point(Point &source)
@@ -211,13 +212,13 @@ Point::Point(const char *xString, const char *yString, const char *kString) {
 
 Point::~Point()
 {
-    mpz_clear(x);
-    mpz_clear(y);
-    mpz_clear(t1);
-    mpz_clear(t2);
-    mpz_clear(m);
-    mpz_clear(n);
-    mpz_clear(k);
+    mpz_clear(this->x);
+    mpz_clear(this->y);
+    mpz_clear(this->k);
+    mpz_clear(this->t1);
+    mpz_clear(this->t2);
+    mpz_clear(this->m);
+    mpz_clear(this->n);
 }
 
 
@@ -331,30 +332,29 @@ Point& Point::operator*=(mpz_t &factor)
 
 Point& Point::operator/= (mpz_t &factor)
 {
-    returnValue = mpz_cmp_ui(factor, 1u);
-    if  (returnValue < 0)
-        this->reset();
-    else if
-        (returnValue > 0)
-    {
-        if(mpz_cmp_ui(factor, 2u) > 0)
-        {
-            this->multiplyByFactor(*this, factor);
-        }
-        else
-        {
-            this->multiplyBy2(*this);
-        }
-    }
+    mpz_t invertedFactor;
+    mpz_init(invertedFactor);
+    mpz_invert (invertedFactor, factor, order);
+    *this *= invertedFactor;
+    return *this;
+}
+
+Point& Point::operator/= (unsigned long long intFactor)
+{
+    mpz_t invertedFactor;
+    mpz_t trueFactor;
+    mpz_init(invertedFactor);
+    mpz_init_set_ui(trueFactor, intFactor);
+    mpz_invert (invertedFactor, trueFactor, order);
+    *this *= invertedFactor;
     return *this;
 }
 
 bool Point::operator==(Point &source)
 {
     return (
-              (mpz_cmp(this->k, source.k) == 0)
-            &&(mpz_cmp(this->x, source.x) == 0)
-            &&(mpz_cmp(this->y, source.y) == 0)
+            (mpz_cmp(this->x, source.x) == 0) &&
+            (mpz_cmp(this->y, source.y) == 0)
            );
 }
 
@@ -466,21 +466,31 @@ void Point::multiplyByFactor(Point &result, mpz_t &factor)
     }
 }
 
+void Point::divideByFactor(Point &result, mpz_t &factor)
+{
+    mpz_t invFactor;
+    mpz_init(invFactor);
+    mpz_invert(invFactor, factor, order);
+    this->multiplyByFactor(result, invFactor);
+}
+
 void Point::multiplyByFactor(Point &result, unsigned long long &factor)
 {
     unsigned int factorSize = log2(factor);
     Point temp(*this);
-
-    unsigned long long i = 1ll;
+    unsigned long long i = 0b1;
+    unsigned int j = 0u;
 
     while (factor ^ i) /// covers the case when factor's LSB is not 0
     {
         temp.multiplyBy2(temp);
         i <<= 1;
+        j++;
     }
     result = temp;
-    
-    for (;i != 0; i <<= 1) //by left-shitfing i outside the allowed register, a value of 0 is obtained
+    i <<= 1;
+    ++j;
+    for (;j < factorSize; ++j) //by left-shitfing i outside the allowed register, a value of 0 is obtained
     {
         temp.multiplyBy2(temp);
         if (factor & i)
@@ -536,9 +546,9 @@ void Point::reset()
 void Point::printPointInfo()
 {
 
-    gmp_printf("K: %Zx\n",    k);
+    // gmp_printf("K: %Zx\n",    k);
     gmp_printf("X: %Zx\n",    x);
-    gmp_printf("Y: %Zx\n",      y);
+    gmp_printf("Y: %Zx\n\n",    y);
     if(keyKnown)
     {
         gmp_printf("key unknown\n");

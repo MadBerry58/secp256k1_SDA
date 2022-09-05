@@ -7,7 +7,7 @@
  * 
  * @return unsigned int 
  */
-std::thread *startIteratorSM(IteratorSMStruct *messageStruct)
+std::thread *startIteratorSM(IteratorSM_struct *messageStruct)
 {
     init_IteratorSM(messageStruct);
     std::thread iteratorSMThread(IteratorSM, messageStruct);
@@ -15,14 +15,14 @@ std::thread *startIteratorSM(IteratorSMStruct *messageStruct)
     messageStruct->stateMachineHandle = &iteratorSMThread;
     return messageStruct->stateMachineHandle;
 }
-unsigned int stopIteratorSM(IteratorSMStruct *messageStruct)
+unsigned int stopIteratorSM(IteratorSM_struct *messageStruct)
 {
     messageStruct->stateMachineHandle->join();
     std::cout << "\n\nIteratorSM thread stopped\n" << std::endl;
     return 0;
 }
 
-std::thread *startCoordinatorSM(CoordinatorSMStruct *messageStruct)
+std::thread *startCoordinatorSM(CoordinatorSM_struct *messageStruct)
 {
     init_CoordinatorSM(messageStruct);
     std::thread coordinatorSMThread(CoordinatorSM, messageStruct);
@@ -30,7 +30,7 @@ std::thread *startCoordinatorSM(CoordinatorSMStruct *messageStruct)
     messageStruct->stateMachineHandle = &coordinatorSMThread;
     return messageStruct->stateMachineHandle;
 }
-unsigned int stopCoordinatorSM(CoordinatorSMStruct *messageStruct)
+unsigned int stopCoordinatorSM(CoordinatorSM_struct *messageStruct)
 {
     messageStruct->stateMachineHandle->join();
     std::cout << "\n\nCoordinatorSM thread stopped\n" << std::endl;

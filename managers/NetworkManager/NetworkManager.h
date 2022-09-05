@@ -4,6 +4,6 @@
 #include "ProtocolData/ProtocolData.h"
 #include "StateMachines/StateMachines.h"
 
-unsigned int init_NetworkManager(NetworkManagerData networkManagerStruct);
-unsigned int main_NetworkManager();
+unsigned int init_NetworkManager(NetworkManagerData *networkManagerStruct);
+unsigned int main_NetworkManager(NetworkManagerData *networkManagerStruct);
 #endif // SECP251K1_SANDBOX_NETWORKMANAGER_H

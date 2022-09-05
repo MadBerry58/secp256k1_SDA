@@ -3,7 +3,7 @@
 
 #include "../../../../TypeDef.h"
 
-unsigned int init_IteratorSM(IteratorSMStruct *data);
-unsigned int IteratorSM(IteratorSMStruct *data);
+unsigned int init_IteratorSM(IteratorSM_struct *data);
+unsigned int IteratorSM(IteratorSM_struct *data);
 
 #endif

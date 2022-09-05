@@ -1,7 +1,7 @@
 #include "CoordinatorSM.h"
 #include "../../../../Arithmetic/Arithmetic.h"
 
-unsigned int init_CoordinatorSM(CoordinatorSMStruct *data)
+unsigned int init_CoordinatorSM(CoordinatorSM_struct *data)
 {   
     void         **initArgs   = nullptr;
     unsigned int   initArgs_no = 0u;
@@ -60,7 +60,7 @@ unsigned int init_CoordinatorSM(CoordinatorSMStruct *data)
     return 0;
 }
 
-unsigned int CoordinatorSM(CoordinatorSMStruct *data)
+unsigned int CoordinatorSM(CoordinatorSM_struct *data)
 {
     return 0;
 }

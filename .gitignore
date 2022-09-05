@@ -13,3 +13,4 @@ col
 CheckpointTest.sda
 GeneratorEnum.h
 secp256k1-SDA.code-workspace
+experimental.cpp

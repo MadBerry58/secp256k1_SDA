@@ -4,10 +4,10 @@
 #include "IteratorSM/IteratorSM.h"
 #include "CoordinatorSM/CoordinatorSM.h"
 
-std::thread *startIteratorSM(IteratorSMStruct *messageStruct);
-unsigned int stopIteratorSM(IteratorSMStruct *messageStruct);
+std::thread *startIteratorSM(IteratorSM_struct *messageStruct);
+unsigned int stopIteratorSM(IteratorSM_struct *messageStruct);
 
-std::thread *startCoordinatorSM(CoordinatorSMStruct *messageStruct);
-unsigned int stopCoordinatorSM(CoordinatorSMStruct *messageStruct);
+std::thread *startCoordinatorSM(CoordinatorSM_struct *messageStruct);
+unsigned int stopCoordinatorSM(CoordinatorSM_struct *messageStruct);
 
 #endif

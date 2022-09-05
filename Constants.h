@@ -38,6 +38,8 @@
 #define PROGRESSDATA_DATACONTAINERSIZE                  MAX_MESSAGE_LINE - PROGRESSDATA_TOTALCHECKBYTES
 #define PORTLENGTH                                      10u       // port length shall be 10 characters long. any smaller character size will have to use padding
 #define HANDLERTOKENSIZE                                32u // handler confirmation token size
+#define DEFAULT_SERVER_PORT                             50001
+#define DEFAULT_SERVER_IP                               127001
 
 /// Elliptic Curve Parameters
 #define moduloHalb_String                               "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE17"
@@ -48,72 +50,73 @@
 #define primePlusOneDivFour_String                      "3FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFF0C"
 #define primePlusOneDivTwo_String                       "7FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF7FFFFE18"
 
+/// Cycle durations
+#define UI_SM_CYCLE                                      0.2
+
 //////////////////////////// ERROR CODES /////////////////////////
-///Bitmask friendly error codes, using 16 bit masks
 
-/// Point generation errors     0b 00000000 00000001
-#define GENERATION_E_OK                                 0u
-#define GENERATION_E_UNKNOWN_POINT_KEY                  1u
-#define GENERATION_E_TOO_MANY_SLICES                    2u
-#define GENERATION_E_TOO_MANY_POINTS_PER_SLICE          3u
-#define GENERATION_E_POINTS_OUTSIDE_RANGE               4u
-#define GENERATION_E_NO_SLICES                          5u
-#define GENERATION_E_POINT_NUMBER_NOT_MATCHING          6u
+#define GENERATION_E_OK                                  0u
+#define GENERATION_E_UNKNOWN_POINT_KEY                   1u
+#define GENERATION_E_TOO_MANY_SLICES                     2u
+#define GENERATION_E_TOO_MANY_POINTS_PER_SLICE           3u
+#define GENERATION_E_POINTS_OUTSIDE_RANGE                4u
+#define GENERATION_E_NO_SLICES                           5u
+#define GENERATION_E_POINT_NUMBER_NOT_MATCHING           6u
 
-#define COMM_E_OK                                       16u
-#define COMM_E_NOK                                      17u
-#define COMM_E_BUSY                                     18u
-#define COMM_E_NO_MESSAGE                               19u
-#define COMM_E_NOTIFICATION_PRESENT                     20u
+#define COMM_E_OK                                        16u
+#define COMM_E_NOK                                       17u
+#define COMM_E_BUSY                                      18u
+#define COMM_E_NO_MESSAGE                                19u
+#define COMM_E_NOTIFICATION_PRESENT                      20u
 
+#define PORT_E_OK                                        21u
+#define PORT_E_EMPTY                                     22u
+#define PORT_E_BUSY                                      23u
+#define PORT_E_BUFFERSIZE_INVALID                        24u
+#define PORT_E_FOUND                                     25u
+#define PORT_E_NOTFOUND                                  26u
+#define PORT_E_NOK                                       27u
 
-/// Checkpoint errors           0b 00000000 00100000
-#define CHECKPOINT_E_OK                                 32u
+#define CHECKPOINT_E_OK                                  32u
 
-/// Memory management errors    0b 00000000 01000000
-#define MEMORY_MANAGER_E_OK                                     64u
-#define MEMORY_MANAGER_E_VARIABLES_NOT_INITIALIZED              64u
+#define MEMORY_MANAGER_E_OK                              64u
+#define MEMORY_MANAGER_E_VARIABLES_NOT_INITIALIZED       64u
 
-/// File stream errors          0b 00000000 10000000
-#define FILE_E_OK                                       128u
-#define FILE_E_NOT_OPEN                                 129u
+#define FILE_E_OK                                        128u
+#define FILE_E_NOT_OPEN                                  129u
 
-/// File integrity errors       0b 00000001 00000000
-#define INTEGRITY_E_OK                                  256u
-#define INTEGRITY_E_FILETYPE_MISMATCH                   257u
-#define INTEGRITY_E_UNKNOWN_FILETYPE                    258u
-#define INTEGRITY_E_UNKNOWN_INITIAL_POINT               259u
-#define INTEGRITY_E_INVALID_INITIAL_POINT               260u
-#define INTEGRITY_E_UNKNOWN_TARGET_POINT                261u
-#define INTEGRITY_E_INVALID_TARGET_POINT                262u
-#define INTEGRITY_E_UNKNOWN_SLICE_NUMBER                263u
-#define INTEGRITY_E_INVALID_SLICE_NUMBER                264u
-#define INTEGRITY_E_UNKNOWN_SLICE_SIZE                  265u
-#define INTEGRITY_E_UNKNOWN_POINTS_PER_SLICE            266u
-#define INTEGRITY_E_INVALID_POINTS_PER_SLICE            267u
-#define INTEGRITY_E_UNKNOWN_TOTAL_POINT_NUMBER          268u
-#define INTEGRITY_E_INVALID_TOTAL_POINT_NUMBER          269u
-#define INTEGRITY_E_UNKNOWN_ITERATIONs_NUMBER           270u
-#define INTEGRITY_E_POINT_NUMBERS_NOT_MATCHING          271u
-#define INTEGRITY_E_UNKNOWN_INCREMENT_SIZE              272u
-#define INTEGRITY_E_SLICE_SIZE_TOO_BIG                  273u
-#define INTEGRITY_E_INCREMENT_SIZE_TOO_BIG              274u
-#define INTEGRITY_E_UNKNOWN_EOF_TOKEN                   275u
-#define INTEGRITY_E_INVALID_EOF_TOKEN                   276u
-#define INTEGRITY_E_INIT_COULDNOTOPENFILE               277u
-#define INTEGRITY_E_READ_CHECKPOINT                     278u
+#define INTEGRITY_E_OK                                   256u
+#define INTEGRITY_E_FILETYPE_MISMATCH                    257u
+#define INTEGRITY_E_UNKNOWN_FILETYPE                     258u
+#define INTEGRITY_E_UNKNOWN_INITIAL_POINT                259u
+#define INTEGRITY_E_INVALID_INITIAL_POINT                260u
+#define INTEGRITY_E_UNKNOWN_TARGET_POINT                 261u
+#define INTEGRITY_E_INVALID_TARGET_POINT                 262u
+#define INTEGRITY_E_UNKNOWN_SLICE_NUMBER                 263u
+#define INTEGRITY_E_INVALID_SLICE_NUMBER                 264u
+#define INTEGRITY_E_UNKNOWN_SLICE_SIZE                   265u
+#define INTEGRITY_E_UNKNOWN_POINTS_PER_SLICE             266u
+#define INTEGRITY_E_INVALID_POINTS_PER_SLICE             267u
+#define INTEGRITY_E_UNKNOWN_TOTAL_POINT_NUMBER           268u
+#define INTEGRITY_E_INVALID_TOTAL_POINT_NUMBER           269u
+#define INTEGRITY_E_UNKNOWN_ITERATIONs_NUMBER            270u
+#define INTEGRITY_E_POINT_NUMBERS_NOT_MATCHING           271u
+#define INTEGRITY_E_UNKNOWN_INCREMENT_SIZE               272u
+#define INTEGRITY_E_SLICE_SIZE_TOO_BIG                   273u
+#define INTEGRITY_E_INCREMENT_SIZE_TOO_BIG               274u
+#define INTEGRITY_E_UNKNOWN_EOF_TOKEN                    275u
+#define INTEGRITY_E_INVALID_EOF_TOKEN                    276u
+#define INTEGRITY_E_INIT_COULDNOTOPENFILE                277u
+#define INTEGRITY_E_READ_CHECKPOINT                      278u
 
-/// Filer manager errors        0b 00000001 10000000
-#define INTEGRITY_E_FILE_INIT_OK                        384u
-#define INTEGRITY_E_FILE_INIT_MISMATCHED_TARGET         385u
-#define INTEGRITY_E_FILE_INIT_MISMATCHED_CHECKOUT       386u
-#define INTEGRITY_E_FILE_INIT_MISMATCHED_ITERATION      387u
-#define INTEGRITY_E_FILE_INIT_MISMATCHED_SLICENO        388u
-#define INTEGRITY_E_FILE_INIT_MISMATCHED_POINTSPERSLICE 389u
-#define INTEGRITY_E_FILE_INIT_MISMATCHED_SLICESIZE      390u
-#define INTEGRITY_E_FILE_INIT_MISMATCHED_INCREMENTSIZE  391u
-
-
+#define INTEGRITY_E_FILE_INIT_OK                         384u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_TARGET          385u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_CHECKOUT        386u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_ITERATION       387u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_SLICENO         388u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_POINTSPERSLICE  389u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_SLICESIZE       390u
+#define INTEGRITY_E_FILE_INIT_MISMATCHED_INCREMENTSIZE   391u
 
 #define CLIENT_UNITIALIZED                               400u
 
@@ -130,7 +133,6 @@
 #define CONN_MGR_E_SOCKETFAULT                           509u
 #define CONN_MGR_E_INVALIDPORT                           510u
 #define CONN_MGR_E_INVALIDADRESS                         511u
-/// Client state machine connection errors           0b 00000010 00000000
 
 #define CLIENT_SM_E_OK                                   512u
 #define CLIENT_SM_E_INVALIDADRESS                        513u
@@ -156,21 +158,32 @@
 #define SERVER_FRONTEND_SM_E_UNINITIALIZED               755u
 #define SERVER_FRONTEND_SM_E_CONNECTION_FAILED           756u
 
-#define ITERATOR_SM_E_OK                          751u
-#define ITERATOR_SM_E_INVALID_SM_STATE            752u
-#define ITERATOR_SM_E_INVALID_RX                  753u
-#define ITERATOR_SM_E_INVALID_ALGORITHM_ID        754u
-#define ITERATOR_SM_E_ADRESSFAULT                 755u
-#define ITERATOR_SM_E_UNINITIALIZED               755u
-#define ITERATOR_SM_E_CONNECTION_FAILED           756u
-#define ITERATOR_SM_E_CONNECTION_TIMEOUT          757u
-#define ITERATOR_SM_E_CONNECTION_INVALID_RESPONSE 758u
+#define ITERATOR_SM_E_OK                                 751u
+#define ITERATOR_SM_E_INVALID_SM_STATE                   752u
+#define ITERATOR_SM_E_INVALID_RX                         753u
+#define ITERATOR_SM_E_INVALID_ALGORITHM_ID               754u
+#define ITERATOR_SM_E_ADRESSFAULT                        755u
+#define ITERATOR_SM_E_UNINITIALIZED                      755u
+#define ITERATOR_SM_E_CONNECTION_FAILED                  756u
+#define ITERATOR_SM_E_CONNECTION_TIMEOUT                 757u
+#define ITERATOR_SM_E_CONNECTION_INVALID_RESPONSE        758u
 
-#define ITERATION_MANAGER_E_OK                    759u
+#define COORDINATOR_SM_E_OK                              759u
+#define COORDINATOR_SM_E_
+#define COORDINATOR_SM_E_
+#define COORDINATOR_SM_E_
+#define COORDINATOR_SM_E_
+#define COORDINATOR_SM_E_
 
+#define ITERATION_MANAGER_E_OK                           760u
 
-
-/// Modular Operator Errors     0b 00000100 00000000
+#define UI_SM_E_OK                                       800u
+#define UI_SM_E_
+#define UI_SM_E_
+#define UI_SM_E_
+#define UI_SM_E_
+#define UI_SM_E_
+#define UI_SM_E_
 
 #define MOD_E_OK                                        1024u
 #define MOD_E_MPZ_ASSIGNMENT_INVALID                    1025u
@@ -179,13 +192,12 @@
 #define MOD_E_MOD_SUBTRACTION_INVALID                   1028u
 #define MOD_E_MOD_SQUAREROOT_INVALID                    1029u
 
-#define NETWORK_MANAGER_E_OK                                        1030u
-#define NETWORK_MANAGER_E_MPZ_ASSIGNMENT_INVALID                    1031u
-#define NETWORK_MANAGER_E_MPZ_ADDITION_INVALID                      1032u
-#define NETWORK_MANAGER_E_MOD_ADDITION_INVALID                      1033u
-#define NETWORK_MANAGER_E_MOD_SUBTRACTION_INVALID                   1034u
-#define NETWORK_MANAGER_E_MOD_SQUAREROOT_INVALID                    1035u
-/// Modular Operator Errors     0b 00000110 00000000
+#define NETWORK_MANAGER_E_OK                            1030u
+#define NETWORK_MANAGER_E_MPZ_ASSIGNMENT_INVALID        1031u
+#define NETWORK_MANAGER_E_MPZ_ADDITION_INVALID          1032u
+#define NETWORK_MANAGER_E_MOD_ADDITION_INVALID          1033u
+#define NETWORK_MANAGER_E_MOD_SUBTRACTION_INVALID       1034u
+#define NETWORK_MANAGER_E_MOD_SQUAREROOT_INVALID        1035u
 
 #define POINT_E_OK                                      1536u
 #define POINT_E_INITIALIZATION_K_INVALID                1537u
@@ -197,15 +209,6 @@
 #define POINT_E_SUBTRACTION_K_INVALID                   1542u
 #define POINT_E_SUBTRACTION_X_INVALID                   1543u
 #define POINT_E_SUBTRACTION_Y_INVALID                   1544u
-
-
-
-/// Further error types shall be written in the bit shifted pattern
-///                             0b 00001000 00000000
-///                             0b 00010000 00000000
-///                             0b 00100000 00000000
-///                             0b 01000000 00000000
-///                             0b 10000000 00000000
 
 /// Verbose point generation errors
 #define VERBOSE_GENERATION_E_OK                         "Point generation parameters are valid"

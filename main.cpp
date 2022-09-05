@@ -116,6 +116,16 @@ int main(int argc, char **argv)
             }
     }
 
+    /* Initialize arithmetic functionality */
+    if ((errorNo = init_Mod()) != MOD_E_OK)
+    {
+        printf("Modular Arithmetic init failed with code %lu\n", errorNo);
+    }
+    else if ((errorNo = init_Point()) != POINT_E_OK)
+    {
+        printf("Point Arithmetic init failed with code %lu\n", errorNo);
+    }
+
     switch(operationType_flag)
     {
         case FLAG_OPERATION_NONE:

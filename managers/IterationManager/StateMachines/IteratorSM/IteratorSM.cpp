@@ -1,12 +1,12 @@
 #include "IteratorSM.h"
 #include "../../../../Arithmetic/Arithmetic.h"
 
-unsigned int init_IteratorSM(IteratorSMStruct *data)
+unsigned int init_IteratorSM(IteratorSM_struct *data)
 {
     return 0;
 }
 
-unsigned int IteratorSM(IteratorSMStruct *data)
+unsigned int IteratorSM(IteratorSM_struct *data)
 {
     bool internalTrigger = false;
     while(data->SMstate != ITERATOR_SM_STATE_SHUTDOWN)

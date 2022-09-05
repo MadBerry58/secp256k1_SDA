@@ -6,12 +6,9 @@
 #include "ClientUI/ClientUI.h"
 #include "SatelliteUI/SatelliteUI.h"
 
-static char counterOutput[1024];
-static char user_input = 's';
-static std::string user_long_input = "s";
+#define UI_SM_IDLE_WAIT 0.1
 
-unsigned int UserInterfaceSM_Init(UISMStruct *UIdata);
-unsigned int UserInterfaceSM_Listen(UISMStruct *UIdata);
-unsigned int UserInterfaceSM_Start(UISMStruct *UIdata);
+unsigned int init_UserInterfaceSM(UI_SM_struct *UIdata);
+unsigned int start_UserInterfaceSM(UI_SM_struct *UIdata);
 
 #endif // SECP251K1_SANDBOX_UIRUNNABLE_H

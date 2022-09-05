@@ -2,7 +2,6 @@
 #define SECP251K1_SANDBOX_TYPEDEF_H
 
 #include "Constants.h"
-
 #include <gmp.h>
 #include <iterator>
 #include <map>
@@ -60,6 +59,7 @@ public:
     Point&          operator*=              (mpz_t &factor);
     Point&          operator*=              (unsigned long long factor);
     Point&          operator/=              (mpz_t &factor);
+    Point&          operator/=              (unsigned long long factor);
     bool            operator==              (Point &source);
     bool            operator!=              (Point &source);
 
@@ -69,6 +69,7 @@ public:
     void            subPoint                (Point &result, Point &B);
     void            multiplyBy2             (Point &result);
     void            multiplyByFactor        (Point &result, mpz_t &factor);
+    void            divideByFactor          (Point &result, mpz_t &factor);
     void            multiplyByFactor        (Point &result, unsigned long long &factor);
 
     ///Getters  
@@ -150,11 +151,7 @@ struct BigNumber
        inline mpz_t& getValuePointer();
 };
 
-#define PORT_EMPTY        0u
-#define PORT_MESSAGE_READ 1u
-#define PORT_MESSAGE_SENT 2u
-#define PORT_BUSY         3u
-typedef struct
+struct Port
 {
     pthread_mutex_t      portLock            = PTHREAD_MUTEX_INITIALIZER;
     unsigned int         bufferWriteIndex    = 0u;
@@ -165,7 +162,27 @@ typedef struct
     unsigned int*        messageContainer    = nullptr;
     unsigned long long*  messageBuffer       = nullptr;
     
-} Port;
+};
+struct MpzBufferPort //ports used for internally transfering keys and hashes
+{
+    bool initialized;
+    // unsigned long ownerID;
+    unsigned int buffer_size = 0u;
+    unsigned int buffer_number = 2u; /* The port requires at least two buffers to allow concurrent operation */
+    pthread_mutex_t *locks = nullptr; /* Locks are initialized inside the port software component */
+    bool *bufferFull = nullptr;
+    mpz_t*** buffers;
+};
+struct PointBufferPort
+{
+    bool initialized;
+    // unsigned long ownerID;
+    unsigned int buffer_size = 0;
+    unsigned int buffer_number = 2u; /* The port requires at least two buffers to allow concurrent operation */
+    pthread_mutex_t *locks = nullptr; /* Locks are initialized inside the port software component */
+    bool *bufferFull = nullptr;
+    Point*** buffers;
+};
 
 struct targetStringProfile
 {
@@ -208,56 +225,203 @@ struct ProgressPackage
 #define ITERATOR_SM_RETRY_COUNT 3u
 #define ITERATOR_SM_RETRY_DELAY 0.4
 
-typedef struct //Main file initial data
+enum ModuleBitMasks
+{
+    INITIALIZED_BIT_NETWORKMANAGER      = 0b0000001,
+    INITIALIZED_BIT_MEMORYMANAGER       = 0b0000010,
+    INITIALIZED_BIT_ITERATIONMANAGER    = 0b0000100,
+    INITIALIZED_BIT_FILEMANAGER         = 0b0001000,
+    INITIALIZED_BIT_FAULT               = 0b1000000,
+
+    INITIALIZED_BIT_READY               = 0b0001111
+};
+struct InitDataStruct //Main file initial data
 {
     char initString[512u] = "testing string initialized\n";
     std::string checkpointFileName;
     std::string knownPointsFileName;
     std::string serverAdress;
     std::string serverPort;
+    unsigned int coordinatorNo;
+    unsigned int workersPerCoordinator;
+    unsigned int maxClientNo;
+    unsigned initializedModules         = 0b0000;
     char user_input;
-} InitDataStruct;
+};
 
-typedef struct //IteratorManager initializer data
+enum NetworkManager_initType
 {
-    Port iterationManagerRxPort;
-    Port *parentPort;
-    unsigned int iteratorNumber = 0;
+    NM_MODE_NONE,
+    NM_MODE_SERVER,
+    NM_MODE_CLIENT,
+    NM_MODE_SATELLITE,
+    NM_MODE_TEST
+};
+enum NM_ModuleBitMasks
+{
+    INITIALIZED_BIT_NETWORKMANAGER_NONE            = 0b00000000,
+    INITIALIZED_BIT_NETWORKMANAGER_MAXCLIENTNO     = 0b00000001,
+    INITIALIZED_BIT_NETWORKMANAGER_SERVERIP        = 0b00000010,
+    INITIALIZED_BIT_NETWORKMANAGER_SERVERPORT      = 0b00000100,
+    INITIALIZED_BIT_NETWORKMANAGER_NOTASSIGNED0    = 0b00001000,
+    INITIALIZED_BIT_NETWORKMANAGER_NOTASSIGNED1    = 0b00010000,
+    INITIALIZED_BIT_NETWORKMANAGER_NOTASSIGNED2    = 0b00100000,
+    INITIALIZED_BIT_NETWORKMANAGER_NOTASSIGNED3    = 0b01000000,
+    INITIALIZED_BIT_NETWORKMANAGER_FAULT           = 0b10000000,
 
-}IterationManagerData;
-
-typedef struct 
+    INITIALIZED_BIT_NETWORKMANAGER_CLIENT_READY    = 0b00000110,
+    INITIALIZED_BIT_NETWORKMANAGER_SERVER_READY    = 0b00000111,
+    INITIALIZED_BIT_NETWORKMANAGER_SATELLITE_READY = 0b00000111
+};
+struct NetworkManagerData
 {
     Port networkManagerRxPort;
-    Port *parentPort;
-}NetworkManagerData;
+    Port *parentPort                     = nullptr;
+    NetworkManager_initType functionMode = NM_MODE_NONE;
+    unsigned int maxClients              = 0u;
+    unsigned int coordinators            = 0u;
+    unsigned int workersPerCoordinator   = 0u;
+    unsigned int initializedMembers      = INITIALIZED_BIT_NETWORKMANAGER_NONE;
+};
 
-typedef enum
+enum UI_SM_input
 {
-    UI_UNINITIALIZED,
-    UI_RUNNING,
-    UI_STOPPED,
-    UI_FAULT
-} UserInterfaceState;
-typedef struct {
+    UI_SM_RX_NONE,
+    UI_SM_RX_START,
+    UI_SM_RX_ABORT,
+    UI_SM_RX_SHUTDOWN,
+    UI_SM_RX_CONNECTION_REQUEST_CONFIRMED,
+    UI_SM_RX_BUFFER_REQUEST_CONFIRMED,
+    UI_SM_RX_CONTINUE,
+
+    UI_SM_RX_NETWORK_INIT_STATE   = 0b0001,
+    UI_SM_RX_FILE_INIT_STATE      = 0b0010,
+    UI_SM_RX_ITERATOR_INIT_STATE  = 0b0100,
+    UI_SM_RX_MEMORY_INIT_STATE    = 0b1000
+
+};
+enum UI_SM_output
+{
+    UI_SM_TX_NONE,
+    UI_SM_TX_START_CONFIRMED,
+    UI_SM_TX_SHUTDOWN_CONFIRMED,
+    UI_SM_TX_REQUEST_CONNECTION,
+    UI_SM_TX_REQUEST_BUFFER,
+    UI_SM_TX_CONTINUING,
+    UI_SM_TX_FAULT,
+  
+    UI_SM_TX_USERMODE_CLIENT,
+    UI_SM_TX_USERMODE_SERVER,
+    UI_SM_TX_USERMODE_SATELLITE,
+    UI_SM_TX_USERMODE_TESTING,
+    UI_SM_TX_USERMODE_EXIT,
+
+    UI_SM_TX_USERREQUEST_START,
+
+    UI_SM_TX_INIT_MEMMANAGER,                 
+    UI_SM_TX_INIT_MEMMANAGER_KNOWNPOINTS_OK,
+    UI_SM_TX_INIT_MEMMANAGER_KNOWNPOINTS_NEW,
+    UI_SM_TX_INIT_MEMMANAGER_POINTPOOL_OK,
+    UI_SM_TX_INIT_MEMMANAGER_POINTPOOL_NEW,
+
+    UI_SM_TX_INIT_FILEMANAGER,                
+    UI_SM_TX_INIT_FILEMANAGER_KNOWNPOINTS_OK, 
+    UI_SM_TX_INIT_FILEMANAGER_KNOWNPOINTS_NEW,
+    UI_SM_TX_INIT_FILEMANAGER_CHECKPOINT_OK,  
+    UI_SM_TX_INIT_FILEMANAGER_CHECKPOINT_NEW, 
+    UI_SM_TX_INIT_FILEMANAGER_CONNECTION_OK,  
+    UI_SM_TX_INIT_FILEMANAGER_CONNECTION_NEW, 
+    UI_SM_TX_INIT_FILEMANAGER_DATABASE_OK,    
+    UI_SM_TX_INIT_FILEMANAGER_DATABASE_NEW,   
+    UI_SM_TX_INIT_FILEMANAGER_FAULT,
+
+    UI_SM_TX_INIT_ITERATIONMANAGER,
+    UI_SM_TX_INIT_ITERATIONMANAGER_COORDNO,
+    UI_SM_TX_INIT_ITERATIONMANAGER_ITERATORNO,
+
+    UI_SM_TX_INIT_NETWORKMANAGER_CLIENTNO,
+    UI_SM_TX_INIT_NETWORKMANAGER_PORT,
+    UI_SM_TX_INIT_NETWORKMANAGER_IP
+    
+};
+enum UI_SM_state
+{
+    UI_SM_UNINITIALIZED,
+    UI_SM_INITIALIZED,
+    UI_SM_RUNNING,
+    UI_SM_STOPPED,
+    UI_SM_FAULT
+};
+struct UI_SM_struct
+{
     std::thread *stateMachineHandle;
     Port uiManagerRxPort;
     Port *parentPort;
-    UserInterfaceState SMstate;
+    UI_SM_state SMstate;
     char user_input;
-}UISMStruct;
+};
 
-typedef struct {
+enum MM_ModuleBitMasks
+{
+    INITIALIZED_BIT_MEMMANAGER_NONE            = 0b000000000,
+    INITIALIZED_BIT_MEMMANAGER_KNOWNPOINTS_OK  = 0b000000001,
+    INITIALIZED_BIT_MEMMANAGER_KNOWNPOINTS_NEW = 0b000000010,
+    INITIALIZED_BIT_MEMMANAGER_POINTPOOL_OK    = 0b000000100,
+    INITIALIZED_BIT_MEMMANAGER_POINTPOOL_NEW   = 0b000001000,
+    INITIALIZED_BIT_MEMMANAGER_UNASSIGNED0     = 0b000010000,
+    INITIALIZED_BIT_MEMMANAGER_UNASSIGNED1     = 0b000100000,
+    INITIALIZED_BIT_MEMMANAGER_UNASSIGNED2     = 0b001000000,
+    INITIALIZED_BIT_MEMMANAGER_UNASSIGNED3     = 0b010000000,
+    INITIALIZED_BIT_MEMMANAGER_FAULT           = 0b100000000,
+
+    INITIALIZED_BIT_MEMMANAGER_CLIENT_READY    = 0b000000000,
+    INITIALIZED_BIT_MEMMANAGER_SERVER_READY    = 0b000000001,
+    INITIALIZED_BIT_MEMMANAGER_SATELLITE_READY = 0b000000000,
+};
+struct MemoryManagerData{
     Port memoryManagerRxPort;
     Port *parentPort;
-}MemoryManagerData;
+    std::set<unsigned long long> *hashDatabase = nullptr;
+};
 
-typedef struct {
+enum FM_ModuleBitMasks
+{
+    INITIALIZED_BIT_FILEMANAGER_NONE            = 0b000000000,
+    INITIALIZED_BIT_FILEMANAGER_CHECKPOINT_OK   = 0b000000001,
+    INITIALIZED_BIT_FILEMANAGER_CHECKPOINT_NEW  = 0b000000010,
+    INITIALIZED_BIT_FILEMANAGER_KNOWNPOINTS_OK  = 0b000000100,
+    INITIALIZED_BIT_FILEMANAGER_KNOWNPOINTS_NEW = 0b000001000,
+    INITIALIZED_BIT_FILEMANAGER_CONNECTION_OK   = 0b000010000,
+    INITIALIZED_BIT_FILEMANAGER_CONNECTION_NEW  = 0b000100000,
+    INITIALIZED_BIT_FILEMANAGER_DATABASE_OK     = 0b001000000,
+    INITIALIZED_BIT_FILEMANAGER_DATABASE_NEW    = 0b010000000,
+    INITIALIZED_BIT_FILEMANAGER_FAULT           = 0b100000000,
+};
+struct FileManagerData {
+
     Port fileManagerRxPort;
     Port *parentPort;
-}FileManagerData;
+    
+    std::string knownPointsFileName = "\0";
+    std::ifstream *knownPointsFileInput;
+    std::ofstream *knownPointsFileOutput;
 
-typedef enum //ITERATOR_SM input commands
+    std::string connectionFileName = "\0";
+    std::ifstream *connectionFileInput;
+    std::ofstream *connectionFileOutput;
+
+    std::string checkpointFileName = "\0";
+    std::ifstream *checkpointFileInput;
+    std::ofstream *checkpointFileOutput;
+
+    std::string databaseFileName = "\0";
+    std::ifstream *databaseFileInput;
+    std::ofstream *databaseFileOutput;
+
+    unsigned int fileManagerModules = INITIALIZED_BIT_FILEMANAGER_NONE;
+};
+
+enum IteratorSM_input//IteratorSM input commands
 {
     ITERATOR_SM_RX_NONE,
     ITERATOR_SM_RX_START,
@@ -265,14 +429,14 @@ typedef enum //ITERATOR_SM input commands
     ITERATOR_SM_RX_CONFIRM_CONNECTION_REQUEST,
     ITERATOR_SM_RX_CONFIRM_BUFFER_REQUEST,
     ITERATOR_SM_RX_CONTINUE
-}IteratorSM_input;
-typedef enum //IteratorSM output commands
+};
+enum IteratorSM_output //IteratorSM output commands
 {
     ITERATOR_SM_TX_NONE,
     ITERATOR_SM_TX_REQUEST_CONNECTION,
     ITERATOR_SM_TX_REQUEST_POINT_BUFFER
-}IteratorSM_output;
-typedef enum //ITERATOR_SM states
+} ;
+enum IteratorSM_state //IteratorSM states
 {
     ITERATOR_SM_STATE_UNINITIALIZED,
     ITERATOR_SM_STATE_READY,
@@ -280,8 +444,8 @@ typedef enum //ITERATOR_SM states
     ITERATOR_SM_STATE_WAITING,
     ITERATOR_SM_STATE_FAULT,
     ITERATOR_SM_STATE_SHUTDOWN
-} IteratorSMState;
-typedef enum //IteratorSM iteration algorithm type
+} ;
+enum IteratorSM_algorithm //IteratorSM iteration algorithm type
 {
     ITERATOR_SM_ALGORITHM_UNDEFINED,
     ITERATOR_SM_ALGORITHM_CONTINUOUS_STEPS,
@@ -289,8 +453,21 @@ typedef enum //IteratorSM iteration algorithm type
     ITERATOR_SM_ALGORITHM_CONTINUOUS_MULTIPLY,
     ITERATOR_SM_ALGORITHM_CONTINUOUS_DOUBLING,
     ITERATOR_SM_ALGORITHM_BTREE_SUBDIVISION
-} IteratorSM_Algorithm;
-typedef struct //ITERATOR_SM structure
+} ;
+enum IT_ModuleBitMasks
+{
+    INITIALIZED_BIT_ITERATIONMANAGER_NONE          = 0b00000000,
+    INITIALIZED_BIT_ITERATIONMANAGER_COORDNO       = 0b00000010,
+    INITIALIZED_BIT_ITERATIONMANAGER_ITERATORNO    = 0b00000100,
+    INITIALIZED_BIT_ITERATIONMANAGER_NOTASSIGNED0  = 0b00001000,
+    INITIALIZED_BIT_ITERATIONMANAGER_NOTASSIGNED1  = 0b00010000,
+    INITIALIZED_BIT_ITERATIONMANAGER_NOTASSIGNED2  = 0b00100000,
+    INITIALIZED_BIT_ITERATIONMANAGER_NOTASSIGNED3  = 0b01000000,
+    INITIALIZED_BIT_ITERATIONMANAGER_FAULT         = 0b10000000,
+
+    INITIALIZED_BIT_ITERATIONMANAGER_READY         = 0b00000110
+};
+struct IteratorSM_struct //IteratorSM structure
 {
     bool RxNotificationFlag; //flag signaling the presence of an incomming message
     IteratorSM_input RxFlag; /* Incomming message container */
@@ -301,32 +478,57 @@ typedef struct //ITERATOR_SM structure
     Point **buffer;     //pointer to a Point buffer array. The pointer is used to allow buffer swapping by the coordinator, in order to reduce downtime
     unsigned long long errorNo; //variable holding the error code associated to the FAULT state
 
-    IteratorSMState SMstate = ITERATOR_SM_STATE_UNINITIALIZED;
-    IteratorSM_Algorithm algorithm = ITERATOR_SM_ALGORITHM_UNDEFINED;
+    IteratorSM_state SMstate = ITERATOR_SM_STATE_UNINITIALIZED;
+    IteratorSM_algorithm algorithm = ITERATOR_SM_ALGORITHM_UNDEFINED;
     std::thread *stateMachineHandle;
-} IteratorSMStruct;
+} ;
 
-typedef enum
+enum CoordinatorSM_workDist
 {
     COORDINATOR_SM_DISTRIBUTION_UNDEFINED,
     COORDINATOR_SM_DISTRIBUTION_VERTICAL_SYNCED,
     COORDINATOR_SM_DISTRIBUTION_HORIZONTAL_SYNCED,
     COORDINATOR_SM_DISTRIBUTION_SCATTERED
-}CoordinatorSM_workDist;
-typedef struct //CoordinatorSM structure
+};
+struct CoordinatorSM_struct //CoordinatorSM structure
 {
     Port                  *memoryManagerPort  = nullptr;
     Port                  *networkManagerPort = nullptr;
     Port                  *fileManagerPort    = nullptr;
     unsigned int           workerNumber       = 0u;
     unsigned int           workerBufferSize   = 0u;
-    IteratorSM_Algorithm   chosenAlgorithm    = ITERATOR_SM_ALGORITHM_UNDEFINED;
+    IteratorSM_algorithm   chosenAlgorithm    = ITERATOR_SM_ALGORITHM_UNDEFINED;
     CoordinatorSM_workDist distribution       = COORDINATOR_SM_DISTRIBUTION_UNDEFINED;
     std::thread           *stateMachineHandle;
 
-}CoordinatorSMStruct;
+};
 
-typedef enum //ClientHandlerSM states
+enum IM_ModuleBitMasks
+{
+    INITIALIZED_BIT_ITERATIONMANAGER_NONE            = 0b00000000,
+    INITIALIZED_BIT_ITERATIONMANAGER_KNOWNPOINTS_OK  = 0b00000001,
+    INITIALIZED_BIT_ITERATIONMANAGER_KNOWNPOINTS_NEW = 0b00000010,
+    INITIALIZED_BIT_ITERATIONMANAGER_POINTPOOL_OK    = 0b00000100,
+    INITIALIZED_BIT_ITERATIONMANAGER_POINTPOOL_NEW   = 0b00001000,
+    INITIALIZED_BIT_ITERATIONMANAGER_UNASSIGNED0     = 0b00010000,
+    INITIALIZED_BIT_ITERATIONMANAGER_UNASSIGNED1     = 0b00100000,
+    INITIALIZED_BIT_ITERATIONMANAGER_UNASSIGNED2     = 0b01000000,
+    INITIALIZED_BIT_ITERATIONMANAGER_FAULT           = 0b10000000,
+
+    INITIALIZED_BIT_ITERATIONMANAGER_CLIENT_READY    = 0b00000110,
+    INITIALIZED_BIT_ITERATIONMANAGER_SERVER_READY    = 0b00000111,
+    INITIALIZED_BIT_ITERATIONMANAGER_SATELLITE_READY = 0b00000111
+};
+struct  IterationManagerData //IteratorManager initializer data
+{
+    Port iterationManagerRxPort;
+    Port *parentPort;
+    unsigned int coordinatorNo = 0u;
+    unsigned int iteratorsPerCoordinator = 0u;
+    bool managerInitialized = false;
+} ;
+
+enum  ClientHandlerStates//ClientHandlerSM states
 {
     CLIENT_HANDLER_SM_UNINITIALIZED,
     CLIENT_HANDLER_SM_INITIALIZING,
@@ -338,7 +540,7 @@ typedef enum //ClientHandlerSM states
     CLIENT_HANDLER_SM_REGISTERING_PROGRESS,
     CLIENT_HANDLER_SM_DISCONNECTED,
     CLIENT_HANDLER_SM_SHUTDOWN_REQUESTED
-} ClientHandlerStates;
+};
 struct clientHandlerSMStruct
 {    
     std::string dummyData;
@@ -367,7 +569,7 @@ struct satelliteHandlerSMStruct
 };
 
 ////ServerFrontendSM protocol data
-typedef enum //ServerFrontendSM input messages
+enum ServerFrontendSM_input//ServerFrontendSM input messages
 {
     NO_INPUT,
     START,
@@ -375,13 +577,13 @@ typedef enum //ServerFrontendSM input messages
     RESTART,
     STOP,
     SHUTDOWN
-} ServerFrontendSM_input;
-typedef enum //ServerFrontendSM output messages
+};
+enum  ServerFrontendSM_output//ServerFrontendSM output messages
 {
     NO_OUTPUT,
     SOCKET_AVAILABLE
-} ServerFrontendSM_output;
-typedef enum //ServerFrontendSM states
+};
+enum ServerFrontendSM_state//ServerFrontendSM states
 {
     UNINITIALIZED,
     INITIALIZING,
@@ -391,9 +593,10 @@ typedef enum //ServerFrontendSM states
     FAULT,
     CLIENT_CONNECTION_REQUESTED,
     SHUTDOWN_REQUESTED
-} ServerFrontendSM_state;
+};
+
 #define BUFFERED_SOCKETS 5u //the ammount of buffered sockets the frontend can hold before refusing new ones
-typedef struct //ServerFrontendSM initialization data
+typedef struct ServerFrontendSMStruct//ServerFrontendSM initialization data
 {
     std::string dummyData;
     int server_tcp_port = -1;
@@ -415,10 +618,7 @@ typedef struct //ServerFrontendSM initialization data
     unsigned int error = 0u;
 
     std::thread *stateMachineHandle;
-}ServerFrontendSMStruct;
-
-
-
+};
 
 #define ECHO            65534u
 #define ECHO_RESPONSE   65535u

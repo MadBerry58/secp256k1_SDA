@@ -3,8 +3,6 @@ set(manager_files
 
 Ports.cpp
 Ports.h
-managers.h
-managers.cpp
 
     FileManager/FileManager.h
     FileManager/FileManager.cpp
@@ -66,5 +64,8 @@ managers.cpp
             UIManager/TestUI/FileTest.cpp
             UIManager/TestUI/NetworkTest.cpp
             UIManager/TestUI/MemoryTest.cpp
+    
+    managers.h
+    managers.cpp
 )
 add_library(managerLib ${manager_files})

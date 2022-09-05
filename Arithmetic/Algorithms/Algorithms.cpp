@@ -29,7 +29,7 @@
  * @param algorithmType Specifies the algorithm type required by the user 
  * @return int 
  */
-unsigned int checkAlgorithmParams(IteratorSMStruct iteratorData)
+unsigned int checkAlgorithmParams(IteratorSM_struct iteratorData)
 {
     switch (iteratorData.algorithm)
     {
