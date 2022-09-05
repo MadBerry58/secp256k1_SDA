@@ -27,5 +27,6 @@ target_link_libraries(${PROJECT_NAME} #library linking order goes from high leve
 managerLib
 srcLib
 ${Boost_LIBRARIES}
+pthread
 gmp
 )

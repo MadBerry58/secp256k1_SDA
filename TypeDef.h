@@ -23,9 +23,10 @@
 #include <getopt.h>
 #include <math.h>
 #include <atomic>
-// #include <pthread.h>
+#include <atomic>
+#include <pthread.h>
 // #include "threads.h"
-
+#include <unistd.h>
 typedef std::ofstream OutputFile;
 
 class Point
