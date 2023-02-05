@@ -1,5 +1,8 @@
 #include "Mod.h"
 
+#include "../../Utility/GlobalData/ErrorCodes.h"
+#include "../../Utility/GlobalData/Definitions.h"
+
 mpz_t moduloHalb;
 mpz_t order;
 mpz_t orderHalf;
@@ -24,8 +27,6 @@ mpz_t randomSeed;
 
 unsigned int init_Mod() 
 {
-    DEBUG_MSG("Initializing Modular library \n");
-
     mpz_init_set_str(moduloHalb, moduloHalb_String, PREFFERED_BASE);
     mpz_init_set_str(order, order_String, PREFFERED_BASE);
     mpz_init_set_str(prime, prime_String, PREFFERED_BASE);
@@ -47,54 +48,34 @@ unsigned int init_Mod()
 
     if (mpz_cmp_ui(seven, 7) != 0)
     {
-        DEBUG_MSG("MPZ initialization failed \n");
         return MOD_E_MPZ_ASSIGNMENT_INVALID;
     }
     mpz_add(t1, primeMinusOne, one);
     if (mpz_cmp(t1, prime) != 0)
     {
-        DEBUG_MSG("MPZ addition failed \n");
-        
         return MOD_E_MPZ_ADDITION_INVALID;
     }
 
-    DEBUG_MSG("MPZ functionality works\n");
-
-    DEBUG_MSG("Initializing random number variables\n");
-    
     gmp_randinit_mt(randomState);
     mpz_init_set_str(randomSeed, RANDOMNESS_SEED, PREFFERED_BASE);
     gmp_randseed(randomState, randomSeed);
-    
-    DEBUG_MSG("Random number variables initalized successfully\n");
-
-    DEBUG_MSG("Testing Mod addition \n");
 
     add(t1, primeMinusOne, six);
     if (mpz_cmp(t1, five) != 0)
     {
-        DEBUG_MSG("Mod addition failed \n");
         return MOD_E_MOD_ADDITION_INVALID;
     }
-
-    DEBUG_MSG("Testing Mod subtraction \n");
     
     sub(t1, six, two);
     if (mpz_cmp(t1, four) != 0)
     {
-        DEBUG_MSG("Mod subtraction failed \n");
         return MOD_E_MOD_SUBTRACTION_INVALID;
     }
 
-    DEBUG_MSG("Testing Mod Square Root \n");
-
     modSqrt(t1, six);
-
-    DEBUG_MSG("Square root of 6: %Zd \n", t1);
 
     if (mpz_cmp_ui(t1, 0u) != 0)
     {
-        DEBUG_MSG("Mod squareRoot 0 failed \n");
         return MOD_E_MOD_SUBTRACTION_INVALID;
     }
 
@@ -104,14 +85,8 @@ unsigned int init_Mod()
     modSqrt(t1, t2);
     if (mpz_cmp_ui(t1, 0u) == 0)
     {
-        DEBUG_MSG("Mod squareRoot %Zu failed \n", t2);
         return MOD_E_MOD_SQUAREROOT_INVALID;
     }
-
-    DEBUG_MSG("              X: %Zu \n", t2);
-    DEBUG_MSG("sqare root pf X: %Zu \n", t1);
-
-    DEBUG_MSG("Mod functionality correctly initialized \n");
 
     printf("Mod OK \n");
 
@@ -287,8 +262,7 @@ void neg(mpz_t &result, mpz_t &number){
 }
 
 void negKey(mpz_t &result, mpz_t &number){
-    mpz_sub(t1, order, number);
-    mpz_mod(result, t1, order);
+    mpz_sub(result, order, number);
 }
 
 void add(mpz_t &result, mpz_t &A, mpz_t &B)
@@ -324,19 +298,20 @@ void sub(mpz_t &result, mpz_t &A, mpz_t &B)
 
 void subKeys(mpz_t &result, mpz_t &A, mpz_t &B)
 {
+    negKey(t1, B);
     if(mpz_cmp_ui(A, 0) == 0)
     {
-        mpz_set(result, B);
+        mpz_set(result, t1);
         return;
     }
-    else if(mpz_cmp_ui(B, 0) == 0)
+    else 
+    if(mpz_cmp_ui(B, 0) == 0)
     {
         mpz_set(result, A);
         return;
     }
     else
     {
-        negKey(t1, B);
         addKeys(result, A, t1);
     }
 }
@@ -369,12 +344,12 @@ void mul(mpz_t &result, mpz_t &number, mpz_t &multiple)
 
 void divKey(mpz_t &result, mpz_t &number, mpz_t &divisor)
 {
-    if(mpz_cmp_ui(divisor, 0) == 0)
+    if(mpz_cmp_ui(divisor, 0u) == 0u)
     {
         gmp_printf("Division by zero!\n");
         return;
     }
-    else if(mpz_cmp_ui(divisor, 1) == 0)
+    else if(mpz_cmp_ui(divisor, 1u) == 0u)
     {
         mpz_set(result, number);
         return;
@@ -382,8 +357,7 @@ void divKey(mpz_t &result, mpz_t &number, mpz_t &divisor)
     else
     {
         mpz_invert(t1, divisor, order);
-        mpz_mul(t2, number, t1);
-        mpz_mod(result, t2, order);
+        mulKey(result, number, t1);
     }
 }
 

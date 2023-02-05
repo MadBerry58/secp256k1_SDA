@@ -1,257 +1,44 @@
 #include "Arithmetic/Arithmetic.h"
-#include "managers/managers.h"
-
-#define FLAG_OPERATION_NONE             0u
-#define FLAG_OPERATION_CLIENT           1u
-#define FLAG_OPERATION_SERVER           2u
-#define FLAG_OPERATION_SATELLITE        3u
-#define FLAG_OPERATION_TUNELOAD         4u
-
-static int verbose_flag = false;
-static int userInterface_flag = false;
-static int operationType_flag = FLAG_OPERATION_NONE;
-unsigned long errorNo;
-
-std::ifstream checkpointFile;
-std::ifstream knownPointsFile;
-
-InitDataStruct initData;
-
-std::ifstream inputFile;
+#include "Utility/Utility.h"
+#include "InstanceManager/InstanceManager.h"
 
 int main(int argc, char **argv)
 {
-    char optiune;
-        if (argc < 1)
-    { /* First argument is the file name */
-        printf("Internal error, file name argument missing\n");
-        exit(1);
-    }
+  unsigned int retVal = 0;
+  unsigned int inputData;
+  printf("Hello World!\n");
+  Arithmetic_Init();
 
-    static struct option long_options[] =
-        {
-            /* These options set a flag. */
-            {"verbose",                 no_argument,        &verbose_flag,          1u       },
-            {"brief",                   no_argument,        &verbose_flag,          0u       },
-            {"UserInterface",           no_argument,        &userInterface_flag,    1u       },
-            {"ClientMode",              no_argument,        &operationType_flag,    FLAG_OPERATION_CLIENT },
-            {"ServerMode",              no_argument,        &operationType_flag,    FLAG_OPERATION_SERVER },
-            {"SatelliteMode",           no_argument,        &operationType_flag,    FLAG_OPERATION_SATELLITE },
-            {"tuneSystemLoad",          no_argument,        &operationType_flag,    FLAG_OPERATION_TUNELOAD },
-            
-            {"serverAdress",            required_argument,  0,                      's'},
-            {"serverPort",              required_argument,  0,                      'p'},
-            {"checkpointFile",          required_argument,  0,                      'c'},
+  InitDataStruct initialProgramData;
+  std::string textResponseString;
 
-            {"knownPointsFile",         required_argument,  0,                      'k'},
+  parseArguments(argc, argv, textResponseString, initialProgramData);
 
-            {"help",                    optional_argument,  0,                      'h'},
-            {0, 0, 0, 0}
-        };
+  switch(initialProgramData.instanceType)
+  {
+    case FLAG_OPERATION_NOOP:
+    break;
 
-    int option_index = 0;
+    case FLAG_OPERATION_CLIENT:
+    createClientInstance(initialProgramData.workersPerCoordinator, initialProgramData.memorySize);
+    break;
 
-    while ((optiune = getopt_long(argc, argv, "c:s:h", long_options, &option_index)) != -1) // se analizeaza optiunile date de utilizator
-    {
+    case FLAG_OPERATION_SERVER:
+    createServerInstance(inputData);
+    break;
 
-        switch (optiune)
-        {
-            case 0: //flag declaration
-                if (long_options[option_index].flag != 0)
-                {
-                    gmp_printf("%s flag set \n", long_options[option_index].name);
-                }
-                if (optarg)
-                {
-                    gmp_printf(" with arg %s \n", optarg);
-                }
-                break;
-            
-            /* afiseaza descrierea programului */
-            case 'h': 
-                std::cout << "\n"
-                          << "Secp256k1-SDA - SECP256k1 elliptic curve smooth distribution attacker\n"
-                          << "This program is a proof of concept for a distributed heuristic bruteforce crowd sourced attack, targeting elliptic curve based key pairs\n"
-                          << "Implementation details can be found in the project documentation\n"
-                          << "The program can run in 3 different modes:\n"
-                          << "Server Mode - host a central database of known keys to compare client generated data against\n"
-                          << "Client Mode - calculate public keys derived from the target public key, and send the results to the central server\n"
-                          << "TBD: Satellite Mode - host an additional database of known keys to suppliment the central server known search space\n"
-                          << "\n";
-                return 0u;
+    case FLAG_OPERATION_SATELLITE:
+    createSatelliteInstance(inputData);
+    break;
 
-            /* Server Mode operation arguments */
-            case 'k':
-            if(optarg)
-                {
-                    initData.knownPointsFileName = optarg;
-                }
-                break;
-            
+    case FLAG_OPERATION_TUNELOAD:
+    ///TODO: create load tuning routine
+    break;
 
-            /* Client Mode operation arguments */
-            case 'c':
-                if(optarg)
-                {
-                    initData.checkpointFileName = optarg;
-                }
-                break;
+    default:
+    break;
 
-            case 's':
-                if(optarg)
-                {
-                    initData.serverAdress = optarg;
-                }
-                break;
-            
-            case 'p':
-                if(optarg)
-                {
-                    initData.serverPort = optarg;
-                }
+  }
 
-            case '?': /* getopt returneaza '?' cand optiunea nu este cunoscuta */
-                printf("Argumentul %s este eronat\n", (char *)(&optiune));
-                exit(EXIT_FAILURE);
-            }
-    }
-
-    /* Initialize arithmetic functionality */
-    if ((errorNo = init_Mod()) != MOD_E_OK)
-    {
-        printf("Modular Arithmetic init failed with code %lu\n", errorNo);
-    }
-    else if ((errorNo = init_Point()) != POINT_E_OK)
-    {
-        printf("Point Arithmetic init failed with code %lu\n", errorNo);
-    }
-
-    switch(operationType_flag)
-    {
-        case FLAG_OPERATION_NONE:
-            //gmp_printf("Please choose the desired operating mode: \n./secp256k1_SDA --userInterface | resumeIteration | generateKnownPoints | tuneSystemLoad\n");
-            gmp_printf("Initial Testing Checkpoint 1: main.c\n");
-            
-            init_Managers(initData);
-            break;
-
-        case FLAG_OPERATION_CLIENT:
-            /* Check for local checkpoint file */
-            if(initData.checkpointFileName.empty())
-            {
-                //notify the user if a new checkpoint file is desired, or if the program should look for a checkpoint file locally
-                std::cout << "A checkpoint file is required for ClientMode operation.\n"
-                          << "Should I create a new checkpoint file (c) or search locally for one? (s)\n";
-                std::cin  >>  initData.user_input;
-                if('c' == initData.user_input)
-                {
-                    //Mark the file name for later creation by the fileManager
-                }
-                else if('s' == initData.user_input)
-                {
-                    //Search local folder for *.checkpoint file and assign it to checkpointFileName
-                }
-                else
-                {
-                    std::cout << "Unknown option selected. Exiting program\n";
-                    exit(1);
-                }
-            }
-            else
-            {
-                //check if the provided file exists
-                    //if not, ask the user if the creation of a new checkpoint file with the provided name is desired
-                    //if yes, check the file integrity
-                        //if yes, confirm checkpoint file loading
-                        //if not, try recovering the file data or notify user of file corruption
-            }
-
-            /* Check for server connection */
-            if(initData.serverAdress.empty())
-            {
-                //output fatal error: a hostname must be provided
-            }
-            else
-            {
-                //check if the provided hostname is valid
-                    //if not, output fatal error: host name invalid
-                    //if yes:
-                if(initData.serverPort.empty())
-                {
-                    //output fatal error: a port must be provided
-                }
-                else
-                {
-                    //check if the provided port is valid
-                    //if not, output fatal error: port invalid
-                    //if yes:
-                        //attempt connectinon to host (ping and/or UDP message to the Frontend)
-                            //if successful: start clientSM and request a clientHandlerSM
-                            //else: output fatal error: host not responding
-                }
-            }
-            break;
-        case FLAG_OPERATION_SERVER:
-            /* Check for known points file */
-            if(initData.knownPointsFileName.empty())
-            {
-                //notify the user if a known points file is desired, or if the program should look for a file locally
-            }
-            else
-            {
-                //check if the provided file exists
-                    //if not, ask the user if the creation of a new known points file with the provided name is desired
-                    //if yes, check the file integrity
-                        //if yes, confirm known points file loading
-                        //if not, try recovering the file data or notify user of file corruption
-            }
-            break;
-
-        case FLAG_OPERATION_SATELLITE:
-            /* Check for known points file */
-            if(initData.knownPointsFileName.empty())
-            {
-                //notify the user if a known points file is desired, or if the program should look for a file locally
-            }
-            else
-            {
-                //check if the provided file exists
-                    //if not, ask the user if the creation of a new known points file with the provided name is desired
-                    //if yes, check the file integrity
-                        //if yes, confirm known points file loading
-                        //if not, try recovering the file data or notify user of file corruption
-            }
-
-            /* Check for server connection */
-            if(initData.serverAdress.empty())
-            {
-                //output fatal error: a hostname must be provided
-            }
-            else
-            {
-                //check if the provided hostname is valid
-                    //if not, output fatal error: host name invalid
-                    //if yes:
-                if(initData.serverPort.empty())
-                {
-                    //output fatal error: a port must be provided
-                }
-                else
-                {
-                    //check if the provided port is valid
-                    //if not, output fatal error: port invalid
-                    //if yes:
-                        //attempt connectinon to host (ping and/or UDP message to the Frontend)
-                            //if successful: start clientSM and request a clientHandlerSM
-                            //else: output fatal error: host not responding
-                }
-            }
-            break;
-
-        case FLAG_OPERATION_TUNELOAD:
-            break;
-        default:
-            break;
-    }
-    return 0;
+    return retVal;
 }

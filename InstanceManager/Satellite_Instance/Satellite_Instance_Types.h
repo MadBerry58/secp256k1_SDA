@@ -1,0 +1,6 @@
+#ifndef SATELLITE_INSTANCE_TYPES
+#define SATELLITE_INSTANCE_TYPES
+
+
+
+#endif

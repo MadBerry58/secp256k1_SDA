@@ -1,5 +1,9 @@
 #include "Algorithms.h"
 
+#include <fstream>
+#include "../../Utility/GlobalData/ErrorCodes.h"
+#include "../../Utility/GlobalData/Definitions.h"
+
 #define BTREE_BITMASKED // allows for tweaking and testing the functionality of the BTree iterator
 #ifdef  BTREE_BITMASKED
 //  #define BTREE_BITMASKED_STANDARD
@@ -21,51 +25,9 @@
 #define RIGHT 1
 #define EVEN  0
 #define ODD   1
-/**
- * @brief Checks the validity of the provided iteration parameters
- * 
- * @details The function performs 
- * 
- * @param algorithmType Specifies the algorithm type required by the user 
- * @return int 
- */
-unsigned int checkAlgorithmParams(IteratorSM_struct iteratorData)
-{
-    switch (iteratorData.algorithm)
-    {
-        case ITERATION_ALGORITHM_INVALID:
-            DEBUG_MSG("Algorithm undefined\n");
-            break;
-
-        case ITERATION_ALGORITHM_SLICED_STEPS:
-            DEBUG_MSG("slicedSteps algorithm selected\n");
-            break;
-
-        case ITERATION_ALGORITHM_CONTINUOUS_STEPS:
-            DEBUG_MSG("continuousSteps algorithm selected\n");
-            break;
-
-        case ITERATION_ALGORITHM_CONTINUOUS_MULTIPLY:
-            DEBUG_MSG("continuousMultiply algorithm selected\n");
-            break;
-
-        case ITERATION_ALGORITHM_CONTINUOUS_DOUBLING:
-            DEBUG_MSG("continuousDoubling algorithm selected\n");
-            break;
-
-        case ITERATION_ALGORITHM_BTREE_SUBDIVISION:
-            DEBUG_MSG("bTreeSubdivision algorithm selected\n");
-            break;
-
-        default:
-            break;
-    }
-    return 0;
-}
 
 unsigned int init_continuousSteps()
 {
-    DEBUG_MSG("Accessed the continuousSteps initializer\n");
     return 0;
 }
 
@@ -78,7 +40,6 @@ unsigned int init_continuousSteps()
  */
 unsigned int continuousSteps()
 {
-    DEBUG_MSG("Accessed the continuousSteps algorithm\n");
     return 0;
 }
 
@@ -97,13 +58,11 @@ unsigned int init_slicedSteps()
  */
 unsigned int slicedSteps()
 {
-    DEBUG_MSG("Accessed the slicedSteps algorithm\n");
     return 0;
 }
 
 unsigned int init_continuousMultiply()
 {
-    DEBUG_MSG("Accessed the continuousMultiply initializer\n");
     return 0;
 }
 /**
@@ -113,13 +72,11 @@ unsigned int init_continuousMultiply()
  */
 unsigned int continuousMultiply()
 {
-    DEBUG_MSG("Accessed the continuousMultiply algorithm\n");
     return 0;
 }
 
 unsigned int init_continuousDoubling()
 {
-    DEBUG_MSG("Accessed the continuousDoubling initializer\n");
     return 0;
 }
 /**
@@ -129,13 +86,11 @@ unsigned int init_continuousDoubling()
  */
 unsigned int continuousDoubling()
 {
-    DEBUG_MSG("Accessed the continuousDoubling algorithm\n");
     return 0;
 }
 
 unsigned int init_bTreeSubdivision(void **args, unsigned int arg_no)
 {
-    DEBUG_MSG("Accessed the algorithm\n");
     static bool constDataInitialized;
     
     unsigned int databaseSize = *(unsigned int*)(args[0]);
@@ -281,7 +236,7 @@ unsigned int bTreeSubdivision(void **args, unsigned int arg_no)
     #ifdef BTREE_BITMASKED_EXPERIMENTAL
     if(depthMax < depth)
     {
-        DEBUG_MSG("depth is not in a valid range");
+        // DEBUG_MSG("depth is not in a valid range"); ///TODO: create proper handler
     }
 
     while(depth > -1) /* as long as the end of the iteration has not been reached */
@@ -341,7 +296,6 @@ unsigned int bTreeSubdivision(void **args, unsigned int arg_no)
  */
 unsigned int hashGeneratorIterator(std::ofstream &outputFile, Point &startingPoint, Point &incrementPoint, Point &remainderPoint, unsigned int numberOfSlices, unsigned int pointsPerSlice)
 {
-    DEBUG_MSG("Accessed the hashGeneratorIterator algorithm\n");
 
     for (unsigned long i = 0; i < numberOfSlices; ++i)
     {

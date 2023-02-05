@@ -1,0 +1,29 @@
+#ifndef CLIENTHANDLER_SM_H
+#define CLIENTHANDLER_SM_H
+
+#include "../ClientHandler.h"
+
+enum  ClientHandlerState //ClientHandlerSM states
+{
+    CLIENT_HANDLER_SM_UNINITIALIZED,
+    CLIENT_HANDLER_SM_INITIALIZED,
+    CLIENT_HANDLER_SM_WAITING_REQUEST,
+    CLIENT_HANDLER_SM_RECIVED_CONNECTIONREQUEST,
+    CLIENT_HANDLER_SM_AWAITINGHANDSHAKE,
+    CLIENT_HANDLER_SM_CONNECTED,
+    CLIENT_HANDLER_SM_RECIVED_REGISTERPROGRESS_REQUEST,
+    CLIENT_HANDLER_SM_REGISTERING_PROGRESS,
+    CLIENT_HANDLER_SM_FAULT
+};
+
+enum ClientRequests
+{
+    REQUEST_,
+    REQUEST_REGISTER_PROGRESS,
+    REQUEST_FAULT
+};
+
+unsigned int init_ClientHandlerSM(ClientHandlerSM_struct *messageStruct);
+unsigned int ClientHandlerSM(ClientHandlerSM_struct *messageStruct);
+
+#endif

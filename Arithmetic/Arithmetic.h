@@ -5,4 +5,6 @@
 #include "PointArithmetic/Point.h"
 #include "Algorithms/Algorithms.h"
 
+unsigned int Arithmetic_Init();
+
 #endif

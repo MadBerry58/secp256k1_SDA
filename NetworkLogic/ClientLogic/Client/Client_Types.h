@@ -1,0 +1,22 @@
+//ClientSM states
+enum ClientSM_state
+{
+    CLIENT_SM_UNINITIALIZED,
+    CLIENT_SM_INITIALIZED,
+    CLIENT_SM_CONNECTING_TO_FRONTEND,
+    CLIENT_SM_REQUESTING_HANDLER_ID,
+    CLIENT_SM_CONNECTING_TO_HANDLER,
+    CLIENT_SM_CONNECTED,
+    CLIENT_SM_REQUESTING_PROGRESS_REGISTRATION,
+    CLIENT_SM_SENDING_PROGRESS,
+    CLIENT_SM_DISCONNECTED,
+    CLIENT_SM_SHUTDOWN,
+    CLIENT_SM_FAULT
+};
+
+struct ClientSM_struct
+{   
+    // std::string dummyData;
+    // Point pointBuffer[256];
+    // std::thread *stateMachineHandle;
+};
